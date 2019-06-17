@@ -34,7 +34,15 @@ public class DataStruction {
     //前驱后继
 
     //线性表的顺序存储结构
-    //存储算法，时间复杂度O(1)，通过位置存在值
+    /**
+     *  #define MAXSIZE 20
+     *  typedef int ElemType;
+     *  typedef struct{
+     *      int length;
+     *      ElemType data[MAXSIZE];
+     *  }sqList;
+     **/
+    //存储算法，时间复杂度O(1)，通过位置存储值
     //查找算法，时间复杂度O(1)，通过位置返回值
     //插入算法，当插入位置n时，需要移动len-n次，时间复杂度0(n)
     //删除算法，时间复杂度0(n)
@@ -44,8 +52,22 @@ public class DataStruction {
     //头节点：链表的第一个节点；
 
     //单链表
+    /**
+     *  typedef struct Node{
+     *      ElemType data;
+     *      struct Node* next;
+     *  }Node;
+     *
+     *  typedef struct Node *LinkList;  //LinkList是指向链表的头节点，LinkList->next指向链表的第一个节点
+     * */
     //  头指针--> |head--> a1|addr1--> a2|addr2-->......-->an|NULL
     //  头指针--> |NULL        空链表
-    //
+    //存储和查找算法,当查找位置n时，指针需要移动n次，时间复杂度0(n)
+    //插入和删除算法，在节点p和q之间插入s，查找到p和q节点，s->next=q,p->next=s就可以了，插入和删除时间复杂度0(1)
+    //整表创建，头部插入、尾部插入
+    //整表删除，将下一节点赋值给q，释放p，q赋值给p
 
+    //静态链表：用数组描述的链表
+    //数组的每个数据元素由数据域data和游标cur组成
+    //
 }
