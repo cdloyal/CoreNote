@@ -1,7 +1,7 @@
-package cd.note;
+package cd.note.others;
 
 /**
-  * @Description:    数据结构的概念
+  * @Description:    jni实现的数据结构
   * @Author:         陈达
   * @CreateDate:     2019/6/16 15:00
   * @UpdateUser:     陈达

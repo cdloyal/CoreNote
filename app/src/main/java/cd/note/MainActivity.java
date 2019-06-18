@@ -3,6 +3,9 @@ package cd.note;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
+import cd.note.others.Clone;
+import cd.note.others.DataStructure;
+
 public class MainActivity extends AppCompatActivity {
 
     @Override

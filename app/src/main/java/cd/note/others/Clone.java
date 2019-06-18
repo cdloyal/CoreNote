@@ -1,11 +1,13 @@
-package cd.note;
+package cd.note.others;
 
 import android.util.Log;
 
 import java.io.Serializable;
 
+import cd.libcorenote.CloneUtils;
+
 /**
-  * @Description:    构造函数，实例复制的问题
+  * @Description:    深浅复制的问题
   * @Author:         陈达
   * @CreateDate:     2019/6/16 12:37
   * @UpdateUser:     陈达

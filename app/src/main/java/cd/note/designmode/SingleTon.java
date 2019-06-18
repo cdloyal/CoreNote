@@ -1,4 +1,4 @@
-package cd.note;
+package cd.note.designmode;
 
 /**
  * @Description: 单例模式

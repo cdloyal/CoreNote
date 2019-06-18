@@ -121,7 +121,7 @@ Status deleteElem(SqList* list,int i,ElemType* e){
 
 extern "C"
 JNIEXPORT jint JNICALL
-Java_cd_note_DataStructure_test(JNIEnv *env, jclass type) {
+Java_cd_note_others_DataStructure_test(JNIEnv *env, jclass type) {
 
     LOGD("线性表顺序存储结构");
     ElemType e;
@@ -144,4 +144,3 @@ Java_cd_note_DataStructure_test(JNIEnv *env, jclass type) {
     return 0;
 
 }
-

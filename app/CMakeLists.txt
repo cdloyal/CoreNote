@@ -17,29 +17,29 @@ find_library(log-lib
 
 
 # 生成库文件
-add_library( datastructure
+add_library( corenote
              SHARED
              ${ALL_SRC})
 
 
 # 库文件的链接
-target_link_libraries( datastructure
+target_link_libraries( corenote
 
                        ${log-lib})
 
 
 # 生成静态库文件
-#add_library(datastructure_s
+#add_library(corenote_s
 #             STATIC
 #             ${ALL_SRC} )
 
-#target_link_libraries(  datastructure_s
+#target_link_libraries(  corenote_s
 #                        tools
 #                        ${log-lib} )
 
 # 生成可执行文件
- #add_executable(datastructure_bin
+ #add_executable(corenote_bin
  #               ${ALL_SRC})
- #target_link_libraries(datastructure_bin
+ #target_link_libraries(corenote_bin
  #                       tools
  #                      ${log-lib} )

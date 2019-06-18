@@ -1,4 +1,4 @@
-package cd.note;
+package cd.libcorenote;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
