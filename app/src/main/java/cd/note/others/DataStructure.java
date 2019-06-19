@@ -12,7 +12,7 @@ package cd.note.others;
 public class DataStructure {
 
     static {
-        System.loadLibrary("datastructure");
+        System.loadLibrary("corenote");
     }
 
     public static native int test();

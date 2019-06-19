@@ -1,4 +1,5 @@
 #include <jni.h>
+#include <cstring>
 #include "log.h"
 #include "datastructure.h"
  /**
@@ -47,6 +48,7 @@
 //删除算法，时间复杂度0(n)
 Status initSqList(SqList* list){
     list->length=0;
+    memset(list->data,0x00, sizeof((list->data))/ sizeof(ElemType));
     return OK;
 }
 Status GetElem(SqList* list,int i,ElemType* e){
@@ -127,7 +129,6 @@ Java_cd_note_others_DataStructure_test(JNIEnv *env, jclass type) {
     ElemType e;
     SqList sqList;
     initSqList(&sqList);
-    LOGD("sqList.length=%d,sqList.data[0]=%d",sqList.length,sqList.data[0]);
     int ret = insertElem(&sqList,1,1);
     ret = GetElem(&sqList,1,&e);
     LOGD("sqList.length=%d,GetElem(&sqList,1,&e)=%d",sqList.length,e);
