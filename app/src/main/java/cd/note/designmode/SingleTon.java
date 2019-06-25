@@ -1,5 +1,7 @@
 package cd.note.designmode;
 
+import android.content.Context;
+
 /**
  * @Description: 单例模式
  * @Author: 陈达
@@ -10,6 +12,8 @@ package cd.note.designmode;
  * @Version: 1.0
  */
 public class SingleTon {
+    private Context context;
+
     private SingleTon() {
     }
 
@@ -54,7 +58,7 @@ public class SingleTon {
     private static class SingleTonInner{
         private static SingleTon singleTon = new SingleTon();
     }
-    public static SingleTon getInstance(){
+    public static SingleTon getInstance(Context context){
         return SingleTonInner.singleTon;
     }
 
