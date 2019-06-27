@@ -4,7 +4,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
 import cd.note.others.Clone;
-import cd.note.others.DataStructure;
+import cd.note.others.JniTest;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -19,7 +19,10 @@ public class MainActivity extends AppCompatActivity {
         //深拷贝
         Clone.deepCloneTest();
 
+        //线性表的顺序存储结构
+        JniTest.sqListTest();
 
-        DataStructure.test();
+        //插入排序算法
+        JniTest.insertSortTest();
     }
 }

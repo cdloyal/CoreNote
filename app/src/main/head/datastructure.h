@@ -17,7 +17,7 @@ typedef struct{
     ElemType data[SqList_MAXSIZE];
 }SqList;
 
-//线性表的操作
+//线性表的查找
 #define OK 1
 #define ERROR 0
 typedef int Status;

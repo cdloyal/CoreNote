@@ -9,13 +9,15 @@ package cd.note.others;
   * @UpdateRemark:   更新说明：
   * @Version:        1.0
   */
-public class DataStructure {
+public class JniTest {
 
     static {
         System.loadLibrary("corenote");
     }
 
-    public static native int test();
+    //线性表的顺序存储结构
+    public static native int sqListTest();
 
-
+    //插入排序
+    public static native void insertSortTest();
 }

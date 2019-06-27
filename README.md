@@ -7,7 +7,7 @@ cd.note.designmode.*
 cd.note.others.Clone
 该类是关于对象和对象的引用，浅拷贝和深拷贝的思考
 
-cd.note.others.DataStructure
+cd.note.others.JniTest
 该类通过jni使用C语言实现的数据结构，目前实现了线性表的顺序结构、
 
 

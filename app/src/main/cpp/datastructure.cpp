@@ -1,6 +1,3 @@
-#include <jni.h>
-#include <cstring>
-#include "log.h"
 #include "datastructure.h"
  /**
  * 作者：chenda
@@ -48,7 +45,6 @@
 //删除算法，时间复杂度0(n)
 Status initSqList(SqList* list){
     list->length=0;
-    memset(list->data,0x00, sizeof((list->data))/ sizeof(ElemType));
     return OK;
 }
 Status GetElem(SqList* list,int i,ElemType* e){
@@ -120,28 +116,3 @@ Status deleteElem(SqList* list,int i,ElemType* e){
  *     int cur;
  * }Component,StaticLinkList[MAXSIZE];
  * */
-
-extern "C"
-JNIEXPORT jint JNICALL
-Java_cd_note_others_DataStructure_test(JNIEnv *env, jclass type) {
-
-    LOGD("线性表顺序存储结构");
-    ElemType e;
-    SqList sqList;
-    initSqList(&sqList);
-    int ret = insertElem(&sqList,1,1);
-    ret = GetElem(&sqList,1,&e);
-    LOGD("sqList.length=%d,GetElem(&sqList,1,&e)=%d",sqList.length,e);
-    ret = insertElem(&sqList,1,2);
-    ret = GetElem(&sqList,1,&e);
-    LOGD("sqList.length=%d,GetElem(&sqList,1,&e)=%d",sqList.length,e);
-    ret = deleteElem(&sqList,1,&e);
-    LOGD("sqList.length=%d,deleteElem(&sqList,1,&e)=%d",sqList.length,e);
-    ret = GetElem(&sqList,1,&e);
-    LOGD("sqList.length=%d,GetElem(&sqList,1,&e)=%d",sqList.length,e);
-    ret = deleteElem(&sqList,1,&e);
-    LOGD("sqList.length=%d,deleteElem(&sqList,1,&e)=%d",sqList.length,e);
-
-    return 0;
-
-}
