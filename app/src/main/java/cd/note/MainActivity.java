@@ -29,5 +29,7 @@ public class MainActivity extends AppCompatActivity {
         //线程测试
         //新建--->可运行--->被终止
         ThreadTest.threadNNT();
+        //新建--->可运行--->被阻塞--->可运行--->被终止
+        ThreadTest.threadNNBNT();
     }
 }

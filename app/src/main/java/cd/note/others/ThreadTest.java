@@ -50,8 +50,37 @@ public class ThreadTest {
     }
 
     //新建--->可运行--->被阻塞--->可运行--->被终止
-    public static void threadNNT(){
+    public static void threadNNBNT(){
+        Thread syncThread = new Thread(new SyncTask());
+        syncThread.start();
+        //确保syncThread先运行
+        try {
+            Thread.sleep(10);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
+        Thread thread = new Thread(new Task());
+        Log.d(TAG,thread.getName()+":"+thread.getState());
+        thread.start();
+        Log.d(TAG,thread.getName()+":"+thread.getState());
+
+//        while (true){
+//            if(thread.getState()==Thread.State.BLOCKED){
+//                Log.d(TAG,"thread.getState()==Thread.State.BLOCKED?"+(thread.getState()==Thread.State.BLOCKED));
+//                break;
+//            }
+//        }
+        while (thread.getState()!=Thread.State.BLOCKED){}
+
+        Log.d(TAG,thread.getName()+":"+thread.getState());
+
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        Log.d(TAG,thread.getName()+":"+thread.getState());
     }
 
     private static final Object lock = new Object();
@@ -59,6 +88,7 @@ public class ThreadTest {
         @Override
         public void run() {
             synchronized (lock){
+                Log.d(TAG, Thread.currentThread().getName() + ":" + Thread.currentThread().getState());
                 try {
                     Thread.sleep(5000);     //锁定一定时间
                 } catch (InterruptedException e) {
