@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import cd.note.others.Clone;
 import cd.note.others.JniTest;
+import cd.note.others.ThreadTest;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -24,5 +25,9 @@ public class MainActivity extends AppCompatActivity {
 
         //插入排序算法
         JniTest.insertSortTest();
+
+        //线程测试
+        //新建--->可运行--->被终止
+        ThreadTest.threadNNT();
     }
 }
