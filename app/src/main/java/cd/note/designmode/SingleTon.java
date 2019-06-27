@@ -17,17 +17,17 @@ public class SingleTon {
     private SingleTon() {
     }
 
-//    private SingleTon instance;
+//    private static SingleTon instance;
 
     //多线程下可能创建两个instance，
-//    public SingleTon getInstance() {
+//    public static SingleTon getInstance() {
 //        if (instance == null)
 //            instance = new SingleTon();
 //        return instance;
 //    }
 
     //效率不高
-//    public SingleTon getInstance(){
+//    public static SingleTon getInstance(){
 //        synchronized (SingleTon.class){
 //            if(instance==null)
 //                instance = new SingleTon();
@@ -36,7 +36,7 @@ public class SingleTon {
 //    }
 
     //实现复杂
-//    public SingleTon getInstance() {
+//    public static SingleTon getInstance() {
 //        if (instance == null)
 //            synchronized (SingleTon.class) {
 //                if (instance == null)

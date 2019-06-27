@@ -41,13 +41,13 @@ public class ThreadSyncTest {
         Thread thread2 = new Thread(new Runnable() {
             @Override
             public void run() {
-                tst2.notSyncfun();
+                tst1.notSyncfun();
             }
         });
         Thread thread3 = new Thread(new Runnable() {
             @Override
             public void run() {
-                tst3.syncFun1();
+                tst1.syncFun2();
             }
         });
 
@@ -63,13 +63,16 @@ public class ThreadSyncTest {
 
     private static class Tst{
         public synchronized void syncFun1(){
-            Log.d(TAG,"enter syncFun1");
-            try {
-                Thread.sleep(5000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            synchronized(Tst.class){
+                Log.d(TAG,"enter syncFun1");
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                Log.d(TAG,"exit syncFun1");
             }
-            Log.d(TAG,"exit syncFun1");
+
         }
         public synchronized void syncFun2(){
             Log.d(TAG,"enter syncFun2");
