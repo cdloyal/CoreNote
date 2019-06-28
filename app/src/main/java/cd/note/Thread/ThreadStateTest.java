@@ -33,6 +33,12 @@ public class ThreadStateTest {
      *
      * 实际上，yield()方法对应了如下操作： 先检测当前是否有相同优先级的线程处于同可运行状态，如有，则把 CPU 的占有权交给此线程，
      * 否则继续运行原来的线程。所以yield()方法称为“退让”，它把运行机会让给了同等优先级的其他线程。
+     *
+     * 线程结束方法：1、使用标志位；2、使用interrupt()中断线程；3、使用stop方法（弃用）
+     * if(Thread.currentThread().isInterrupted()){
+     *      break;  //退出循环
+     * }
+     *
      * */
 
     private final static String TAG = "ThreadStateTest";
