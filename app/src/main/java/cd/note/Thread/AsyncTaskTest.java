@@ -52,5 +52,4 @@ public class AsyncTaskTest extends AsyncTask<Integer,String, Boolean> {
     protected void onCancelled() {
         super.onCancelled();
     }
-
 }

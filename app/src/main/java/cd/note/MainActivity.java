@@ -8,6 +8,7 @@ import cd.note.Thread.HandlerTest;
 import cd.note.Thread.ThreadStateTest;
 import cd.note.Thread.ThreadSync;
 import cd.note.Thread.ThreadSyncTest;
+import cd.note.memory.MemoryTest;
 import cd.note.others.Clone;
 import cd.note.others.JniTest;
 
@@ -52,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
 
         ThreadSync.test1();
 
-
+        MemoryTest memoryTest = new MemoryTest();
+        memoryTest.test();
     }
 }

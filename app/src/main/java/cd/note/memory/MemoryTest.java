@@ -1,5 +1,7 @@
 package cd.note.memory;
 
+import android.util.Log;
+
 /**
  * 作者：chenda
  * 时间：2019/6/28:9:34
@@ -25,7 +27,43 @@ public class MemoryTest {
      *      由于这些资源任持有Activity的引用，而不能销毁Activity，导致内存溢出
      *      图片资源Bitmap、BraodcastReceive、文件流IO、数据库游标cursor、动画、线程等。
      *
+     * 强引用、弱引用、软引用、虚引用的概念、及内存泄漏
+     * https://www.jianshu.com/p/8614aa3fbf09
      *
+     * 强引用导致的内存泄漏
+     *      A a = new A();
+     *      B b = new B();
+     *      b.a = a;
+     *      a = null;
+     *
+     * 匿名类导致的泄漏：匿名AsyncTsk、匿名Handler、匿名Thread、匿名TimerTask、匿名Runnable
+     *
+     * 单例
+     *
+     * 非静态内部类作为静态变量
+     *
+     * 解决方案1：弱引用+静态内部类
+     *
+     * 解决方案2：在onDestory的时候，手动清除Message
      *
      * */
+
+    private final static String TAG = "MemoryTest";
+    public void test(){
+        A a = new A();
+        B b = new B();
+        a.num = 5;
+        b.a = a;
+        a = null;
+        Log.d(TAG,"b.a.num="+b.a.num);
+    }
+
+    private class A{
+        public int num;
+    }
+
+    private class B{
+        public A a;
+        private String s;
+    }
 }
