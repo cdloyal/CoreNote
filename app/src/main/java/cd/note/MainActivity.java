@@ -5,11 +5,10 @@ import android.support.v7.app.AppCompatActivity;
 
 import cd.note.Thread.AsyncTaskTest;
 import cd.note.Thread.HandlerTest;
-import cd.note.Thread.ThreadStateTest;
 import cd.note.Thread.ThreadSync;
 import cd.note.Thread.ThreadSyncTest;
 import cd.note.memory.MemoryTest;
-import cd.note.others.Clone;
+import cd.note.designmode.Clone;
 import cd.note.others.JniTest;
 import cd.note.sqlite.SqliteTest;
 

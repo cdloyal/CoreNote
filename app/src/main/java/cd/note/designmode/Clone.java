@@ -1,4 +1,4 @@
-package cd.note.others;
+package cd.note.designmode;
 
 import android.util.Log;
 
@@ -7,7 +7,7 @@ import java.io.Serializable;
 import cd.libcorenote.CloneUtils;
 
 /**
-  * @Description:    深浅复制的问题
+  * @Description:    深浅复制的问题、原型模式
   * @Author:         陈达
   * @CreateDate:     2019/6/16 12:37
   * @UpdateUser:     陈达

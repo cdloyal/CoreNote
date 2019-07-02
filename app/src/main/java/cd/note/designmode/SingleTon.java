@@ -62,4 +62,6 @@ public class SingleTon {
         return SingleTonInner.singleTon;
     }
 
+    //单例模式的拓展
+    //建立多个单例：List<SingleTon>
 }
