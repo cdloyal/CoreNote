@@ -46,6 +46,11 @@ public class MemoryTest {
      *
      * 解决方案2：在onDestory的时候，手动清除Message
      *
+     *
+     * https://www.jianshu.com/p/9745a9375191
+     * bitmap优化
+     * 内存抖动
+     *
      * */
 
     private final static String TAG = "MemoryTest";

@@ -11,6 +11,7 @@ import cd.note.Thread.ThreadSyncTest;
 import cd.note.memory.MemoryTest;
 import cd.note.others.Clone;
 import cd.note.others.JniTest;
+import cd.note.sqlite.SqliteTest;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -55,5 +56,7 @@ public class MainActivity extends AppCompatActivity {
 
         MemoryTest memoryTest = new MemoryTest();
         memoryTest.test();
+
+        SqliteTest.test(this);
     }
 }
