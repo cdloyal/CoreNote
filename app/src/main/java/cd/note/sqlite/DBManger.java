@@ -112,6 +112,6 @@ public class DBManger {
     public void setBlob(byte[] blob){
         SQLiteDatabase db = myDbHelper.getWritableDatabase();
         db.execSQL("INSERT INTO person(img) values (?)", new byte[][]{blob});
-        db
+
     }
 }

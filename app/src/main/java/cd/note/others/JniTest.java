@@ -20,4 +20,7 @@ public class JniTest {
 
     //插入排序
     public static native void insertSortTest();
+
+    //归并排序
+    public static native void mergeSortTest();
 }

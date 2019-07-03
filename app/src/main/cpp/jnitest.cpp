@@ -1,5 +1,5 @@
 #include <jni.h>
-#include <tool.h>
+#include "IntArrayPrinter.h"
 #include "log.h"
 #include "datastructure.h"
 #include "algorithm.h"
@@ -37,9 +37,29 @@ JNIEXPORT void JNICALL
 Java_cd_note_others_JniTest_insertSortTest(JNIEnv *env, jclass type) {
 
     int array[] = {3,1,6,7,3,1,0,9};
+
+    LOGD("--------insertSortTest--------");
     LOGD("array old:");
     printIntArr(array,sizeof(array)/ sizeof(int));
+
     insertSort(array, sizeof(array)/ sizeof(int));
+
+    LOGD("array new:");
+    printIntArr(array,sizeof(array)/ sizeof(int));
+
+}extern "C"
+JNIEXPORT void JNICALL
+Java_cd_note_others_JniTest_mergeSortTest(JNIEnv *env, jclass type) {
+
+    int array[] = {1,6,7,3,1,0,9,2};
+//    int array[] = {3,1,6,7,39,1,20,9,21};
+
+    LOGD("--------mergeSortTest--------");
+    LOGD("array old:");
+    printIntArr(array,sizeof(array)/ sizeof(int));
+
+    insertSort(array, sizeof(array)/ sizeof(int));
+
     LOGD("array new:");
     printIntArr(array,sizeof(array)/ sizeof(int));
 
