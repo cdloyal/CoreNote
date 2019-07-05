@@ -29,6 +29,9 @@ public class MainActivity extends AppCompatActivity {
 
         //线性表的顺序存储结构
         JniTest.sqListTest();
+        //线性表的链式存储结构
+        JniTest.linkListTest();
+
 
         //插入排序算法
         JniTest.insertSortTest();

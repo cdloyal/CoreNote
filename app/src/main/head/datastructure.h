@@ -21,10 +21,26 @@ typedef struct{
 #define OK 1
 #define ERROR 0
 typedef int Status;
-Status initSqList(SqList* list);
-Status GetElem(SqList* list,int i,ElemType* e);
-Status insertElem(SqList* list,int i,ElemType e);
-Status deleteElem(SqList* list,int i,ElemType* e);
+Status sqlistInit(SqList *list);
+Status sqlistGet(SqList *list, int i, ElemType *e);
+Status sqlistInsert(SqList *list, int i, ElemType e);
+Status sqlistDelete(SqList *list, int i, ElemType *e);
+
+
+//线性表的链式存储结构,带头节点
+typedef int NodeElemType;
+typedef struct Node{
+    NodeElemType data;
+    struct Node* next;
+}LinkList;
+Status linklistCreateHead(LinkList *list,int n);
+//Status linklistCreateTrail(LinkList *list,int n);
+Status linklistCreateTrail(LinkList *list,int n);  //为什么用二级指针？因为函数内部molloc，使得形参的地址改变，
+Status linklistClear(LinkList *list);
+Status linklistGet(LinkList *list, int i, NodeElemType *e);
+Status linklistInsert(LinkList *list, int i, NodeElemType e);
+Status linklistDelete(LinkList *list, int i, NodeElemType *e);
+
 
 
 #endif //CORENOTE_DATASTRUCTURE_H

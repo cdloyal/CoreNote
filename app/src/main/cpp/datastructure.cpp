@@ -1,3 +1,5 @@
+#include <cstdlib>
+#include <time.h>
 #include "datastructure.h"
  /**
  * 作者：chenda
@@ -43,11 +45,11 @@
 //查找算法，时间复杂度O(1)，通过位置返回值
 //插入算法，当插入位置n时，需要移动len-n次，时间复杂度0(n)
 //删除算法，时间复杂度0(n)
-Status initSqList(SqList* list){
+Status sqlistInit(SqList *list){
     list->length=0;
     return OK;
 }
-Status GetElem(SqList* list,int i,ElemType* e){
+Status sqlistGet(SqList *list, int i, ElemType *e){
     if(list== nullptr || list->length<0 )
         return ERROR;
     if( i<1 || i>list->length)
@@ -56,7 +58,7 @@ Status GetElem(SqList* list,int i,ElemType* e){
     *e=list->data[i-1];
     return OK;
 }
-Status insertElem(SqList* list,int i,ElemType e){
+Status sqlistInsert(SqList *list, int i, ElemType e){
     if(list== nullptr || list->length>=sizeof((list->data))/ sizeof(ElemType))
         return ERROR;
     if( i<1 || i>list->length+1 )
@@ -71,7 +73,7 @@ Status insertElem(SqList* list,int i,ElemType e){
     list->length++;
     return OK;
 }
-Status deleteElem(SqList* list,int i,ElemType* e){
+Status sqlistDelete(SqList *list, int i, ElemType *e){
     if(list== nullptr || list->length<1)
         return ERROR;
     if( i<1 || i>list->length )
@@ -104,6 +106,122 @@ Status deleteElem(SqList* list,int i,ElemType* e){
 //插入和删除算法，在节点p和q之间插入s，查找到p和q节点，s->next=q,p->next=s就可以了，插入和删除时间复杂度0(1)
 //整表创建，头部插入、尾部插入
 //整表删除，将下一节点赋值给q，释放p，q赋值给p
+
+Status linklistCreateHead(LinkList *list,int n){
+    LinkList *p;
+    int i;
+    list = (LinkList *)malloc(sizeof(LinkList));
+    list->next=NULL;
+    srand(time(0));     //初始化随机数种子
+    for(i=0;i<n;i++){
+        p = (LinkList* )malloc(sizeof(LinkList));
+        p->data=rand()%100+1;   //随机产生100以内的数字
+        p->next=list->next;
+        list->next = p;
+    }
+    return OK;
+}
+Status linklistCreateTrail(LinkList *list,int n){
+    LinkList *p, *trail;
+    int i;
+    trail = list;
+    srand(time(0));     //初始化随机数种子
+    for(i=0;i<n;i++){
+        p = (LinkList* )malloc(sizeof(LinkList));
+        p->data=rand()%100+1;   //随机产生100以内的数字
+        trail->next = p;
+        p->next=NULL;
+        trail = p;
+    }
+    return OK;
+}
+Status linklistClear(LinkList *list){
+    LinkList *p,*q;
+
+    if(list==NULL)
+        return OK;
+
+    p=list->next;
+    while (p!=NULL){
+        q=p;
+        p=p->next;
+        free(q);
+    }
+
+    list->next=NULL;
+    return OK;
+}
+Status linklistGet(LinkList *list, int i, NodeElemType *e){
+    LinkList *p;
+    if(list==NULL)
+        return ERROR;
+    if(i<1)
+        return ERROR;
+    p = list;         //带头节点
+    for(int j=0;j<i;j++){
+        if(p==NULL){
+            return ERROR;
+        }
+        p = p->next;
+    }
+    if(p==NULL){
+        return ERROR;
+    }
+    *e = p->data;
+    return OK;
+}
+
+Status linklistInsert(LinkList *list, int i, NodeElemType e){
+    LinkList *p,*q;
+    if(list==NULL)
+        return ERROR;
+    if(i<1)
+        return ERROR;
+    q = (LinkList* )malloc(sizeof(LinkList));
+    if(q==NULL)
+        return ERROR;
+
+    p = list;         //带头节点
+    for(int j=0;j<i-1;j++){
+        if(p==NULL){
+            return ERROR;
+        }
+        p = p->next;
+    }
+    if(p==NULL){
+        return ERROR;
+    }
+    q->data = e;
+    q->next = p->next;
+    p->next = q;
+    return OK;
+}
+Status linklistDelete(LinkList *list, int i, NodeElemType *e){
+    LinkList *p,*q;
+    if(list==NULL)
+        return ERROR;
+    if(i<1)
+        return ERROR;
+
+    p = list;         //带头节点
+    for(int j=1;j<=i-1;j++){
+        if(p==NULL){
+            return ERROR;
+        }
+        p = p->next;
+    }
+    if(p==NULL){
+        return ERROR;
+    }
+    q=p->next;
+    if(q==NULL){
+        return ERROR;
+    }
+    p->next=q->next;
+    *e = q->data;
+    free(q);
+    return OK;
+}
 
 //关于线性表的一些简单应用  http://www.cnblogs.com/zydark/p/7778131.html
 
