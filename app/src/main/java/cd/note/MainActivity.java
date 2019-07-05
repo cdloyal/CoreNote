@@ -10,6 +10,7 @@ import cd.note.Thread.ThreadSyncTest;
 import cd.note.designmode.Clone;
 import cd.note.memory.MemoryTest;
 import cd.note.others.CollectionTest;
+import cd.note.others.GenericTest;
 import cd.note.others.JniTest;
 import cd.note.sqlite.SqliteTest;
 
@@ -64,5 +65,8 @@ public class MainActivity extends AppCompatActivity {
 
         //java 集合测试
         new CollectionTest().test();
+
+        //java泛型
+        new GenericTest().test();
     }
 }

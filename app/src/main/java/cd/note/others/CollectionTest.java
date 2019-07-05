@@ -90,6 +90,12 @@ public class CollectionTest {
      * List list = Collections.SynchronizedList(new List<>());
      * Set set = Collections.SynchronizedSet(new Set<>());
      * Map map = Collections.SynchronizedMap(new Map<>());
+     *
+     *
+     *
+     * 栈（Stack）
+     *
+     * Properties 继承于 Hashtable.表示一个持久的属性集.属性列表中每个键及其对应值都是一个字符串。
      * */
 
     private final static String TAG = "CollectionTest";
