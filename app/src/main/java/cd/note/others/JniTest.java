@@ -26,4 +26,7 @@ public class JniTest {
 
     //归并排序
     public static native void mergeSortTest();
+
+    //分治法
+    public static native void divideConquer();
 }

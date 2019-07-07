@@ -37,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
         JniTest.insertSortTest();
         //归并排序算法
         JniTest.mergeSortTest();
+        //分治法
+        JniTest.divideConquer();
 
 //        //多线程状态测试
 //        //新建--->可运行--->被终止

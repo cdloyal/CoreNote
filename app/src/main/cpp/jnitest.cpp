@@ -2,10 +2,11 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <InsertSort.h>
 #include "IntArrayPrinter.h"
 #include "log.h"
 #include "datastructure.h"
-#include "algorithm.h"
+#include "DivideConquer.h"
 
 //
 // Created by chenda on 2019/6/23.
@@ -15,6 +16,8 @@ extern "C"
 JNIEXPORT jint JNICALL
 Java_cd_note_others_JniTest_sqListTest(JNIEnv *env, jclass type) {
 
+    printf("线性表顺序存储结构");
+    fflush(stdout);
     LOGD("线性表顺序存储结构");
     ElemType e;
     SqList sqList;
@@ -101,4 +104,23 @@ Java_cd_note_others_JniTest_linkListTest(JNIEnv *env, jclass type) {
     linklistClear(list);
     free(list);
     return 0;
+}extern "C"
+JNIEXPORT void JNICALL
+Java_cd_note_others_JniTest_divideConquer(JNIEnv *env, jclass type) {
+
+    int A[] = {13,  -3, -25,  20,  -3, -16, -23,  18,  20,  -7,   12,  -5, -22,  15,  -4,   7};
+    int B[] = {-13,  -3, -25,  -20,  -3, -16, -23};
+    int C[] = {13,  3, 25,  20,  3, 16, 23};
+
+    int max,left,right;
+    LOGD("--------divideConquer--------");
+
+    findMaxSubArray(A, 0, sizeof(A)/ sizeof(int)-1, &max, &left, &right);
+    LOGD("A[] max=%d,left=%d,right=%d,",max,left,right);
+
+    findMaxSubArray(B, 0, sizeof(B)/ sizeof(int)-1, &max, &left, &right);
+    LOGD("B[] max=%d,left=%d,right=%d,",max,left,right);
+
+    findMaxSubArray(C, 0, sizeof(C)/ sizeof(int)-1, &max, &left, &right);
+    LOGD("C[] max=%d,left=%d,right=%d,",max,left,right);
 }
