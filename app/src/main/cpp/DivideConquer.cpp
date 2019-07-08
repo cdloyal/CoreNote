@@ -161,6 +161,31 @@ void findMaxSubArray(int *A, int low, int high, int *max, int *left, int *right)
         *left = cross_left;
         *right = cross_right;
     }
+
+    /**
+     * 主方法求解递归式
+     *
+     *  T(n) = aT(n/b) + f(n)   //a>=1,b>1
+     *
+     *  T(n)的渐进界：
+     *      如果f(n)=theta(n^LOGb(a)),则T(n)=theta(n^LOGb(a) * lg(n))
+     *      如果存在一个常数c，f(n)=O(n^LOGb(a-c))，则T(n)=(n^LOGb(a))
+     *      如果存在一个常数c，f(n)=OHM(n^LOGb(a+c))，且对于某个常数d<1和所有足够的n有af(n/b)<=cf(n)，T(n)=f(n)
+     *
+     * */
+
+    /**
+     * 矩阵乘法的Strassen算法
+     *
+     * 矩阵相乘
+     *  设A为m*p的矩阵，设B为p*n的矩阵，记C=AB
+     *  Cij = (AB)ij = (k=1 -> p)(Aik * Bkj) = Ai1*B1j + Ai2*B2j +...+ Aip*Bpj
+     *
+     *  矩阵A的列数等于矩阵B的行数
+     *  矩阵C的第m行第n列元素等于矩阵A的第m行元素与矩阵B的第n列元素对应元素乘积
+     *  矩阵C的行数等于矩阵A的行数，矩阵C的列数等于矩阵B的列数，
+     *
+     * */
 }
 
 
