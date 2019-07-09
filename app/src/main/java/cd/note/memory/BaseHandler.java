@@ -1,4 +1,4 @@
-package cd.note.Thread;
+package cd.note.memory;
 
 import android.os.Handler;
 import android.os.Looper;

@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import cd.note.Thread.AsyncTaskTest;
 import cd.note.Thread.HandlerTest;
+import cd.note.Thread.ThreadPoolTest;
 import cd.note.Thread.ThreadSync;
 import cd.note.Thread.ThreadSyncTest;
 import cd.note.designmode.Clone;
@@ -53,6 +54,9 @@ public class MainActivity extends AppCompatActivity {
         //AsyncTask的使用
         AsyncTaskTest asyncTaskTest = new AsyncTaskTest();
         asyncTaskTest.execute();
+
+        //ThreadPool的使用
+        new ThreadPoolTest().test();
 
         //Handler测试
         HandlerTest.test();
