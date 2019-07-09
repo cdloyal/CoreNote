@@ -170,7 +170,21 @@ void findMaxSubArray(int *A, int low, int high, int *max, int *left, int *right)
      *  T(n)的渐进界：
      *      如果f(n)=theta(n^LOGb(a)),则T(n)=theta(n^LOGb(a) * lg(n))
      *      如果存在一个常数c，f(n)=O(n^LOGb(a-c))，则T(n)=(n^LOGb(a))
-     *      如果存在一个常数c，f(n)=OHM(n^LOGb(a+c))，且对于某个常数d<1和所有足够的n有af(n/b)<=cf(n)，T(n)=f(n)
+     *      如果存在一个常数c，f(n)=OHM(n^LOGb(a+c))，且对于某个常数d<1和所有足够的n有af(n/b)<=df(n)，T(n)=f(n)
+     *
+     *  T(n)=9T(n/3)+n
+     *      n^LOGb(a)=n^log3(9)=n^2;  n^(2-1)=n=f(n); T(n)=n^2
+     *
+     *  T(n)=T(2n/3)+1
+     *      n^LOGb(a)=nlog2/3(1)=n^0=1=f(n);    T(n)=n^0*lgn=lgn
+     *
+     *  T(n)=3T(n/4)+nlgn
+     *      n^LOGb(a)=n^0.793;  f(n)=OHM(n^0.793); 且对于某个常数d<1和所有足够的n有af(n/b)<=df(n),
+     *      af(n/b)=3(n/4)lg(n/4) <= df(n)=dnlgn; 当d=3/4,定理3成立；T(n)=f(n)=nlgn
+     *
+     * T(n)=2T(n/2)+nlgn
+     *      n^LOGb(a)=n;  f(n)=OHM(n);
+     *      af(n/b)=2(n/2)lg(n/2)=nlg(n/2) ? df(n)=dnlgn;
      *
      * */
 
@@ -183,7 +197,43 @@ void findMaxSubArray(int *A, int low, int high, int *max, int *left, int *right)
      *
      *  矩阵A的列数等于矩阵B的行数
      *  矩阵C的第m行第n列元素等于矩阵A的第m行元素与矩阵B的第n列元素对应元素乘积
-     *  矩阵C的行数等于矩阵A的行数，矩阵C的列数等于矩阵B的列数，
+     *  矩阵C的行数等于矩阵A的行数，矩阵C的列数等于矩阵B的列数
+     *
+     *
+     *  A(n,n)*B(n,n)矩阵相乘
+     *
+     *      输入：A(n,n)、B(n,n)
+     *      输出：C(n,n)
+     *      函数定义：Matrix matrixMulti(Matrix A,Matrix B)
+     *
+     *      暴力求解:Cij = (AB)ij = (k=1 -> n)(Aik * Bkj) = Ai1*B1j + Ai2*B2j +...+ Aip*Bpj
+     *               求解一次运行n次，共求n*n个元素，效率n^3
+     *
+     *      递归求解:
+     *
+     *          分解：求C(n,n),行数等于列数，子问题规模也要行数等于列数，分解成4个(n/2),(n/2)的数组
+     *                A、B也是分解成4个(n/2),(n/2)的数组,这里用来一些矩阵定理
+     *
+     *                a11 a12       b11 b12       c11 c12
+     *                a21 a22       b21 b22       c21 c22
+     *
+     *                c11 = a11*b11 + a12*b21
+     *                c12 = a11*b12 + a12*b22
+     *                c21 = a21*b11 + a22*b22
+     *                c22 = a21*b12 + a22*b22
+     *
+     *
+     *                简单来说，将输入输出分解
+     *                由上面的定理，
+     *                输出分解:C(n,n) -> C(0-n/2,0-n/2)、C(n/2-n,0-n/2)、C(0-n/2,n/2-n)、C(n/2-n,n/2-n)
+     *                                   c11             c12             c11             c12
+     *
+     *          求解：Matrix matrixMulti(Matrix A,Matrix B)   ==> 两个矩阵相乘等于一个新的矩阵
+     *                输入:A(n,n)、B(n,n)，当n=1时，此时输出C(1,1)=A(1,1)*B(1,1)
+     *
+     *          归并：c11 c12 c11 c12 -> C(n,n)
+     *                  c11 = a11*b11 + a12*b21   ==>  矩阵c11=矩阵a11和矩阵b11相乘，再加上矩阵a12和矩阵b21相乘,这里是矩阵相加，不是普通加法
+     *                                            ==>  c11=matrixMulti(a11,b11)+matrixMulti(a12,b21)
      *
      * */
 }
