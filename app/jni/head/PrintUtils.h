@@ -5,6 +5,6 @@
 #ifndef CORENOTE_TOOL_H
 #define CORENOTE_TOOL_H
 
-void printIntArr(int *array, int size);
+int intArray2String(int *intArray,int len,char *string);
 
 #endif //CORENOTE_TOOL_H

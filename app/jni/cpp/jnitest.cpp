@@ -3,7 +3,8 @@
 #include <cstdlib>
 #include <cstring>
 #include <InsertSort.h>
-#include "IntArrayPrinter.h"
+#include <ctime>
+#include "PrintUtils.h"
 #include "log.h"
 #include "datastructure.h"
 #include "DivideConquer.h"
@@ -42,16 +43,23 @@ Java_cd_note_others_JniTest_sqListTest(JNIEnv *env, jclass type) {
 JNIEXPORT void JNICALL
 Java_cd_note_others_JniTest_insertSortTest(JNIEnv *env, jclass type) {
 
+    clock_t start,finish;
     int array[] = {3,1,6,7,3,1,0,9};
+    char string[128];
 
     LOGD("--------insertSortTest--------");
     LOGD("array old:");
-    printIntArr(array,sizeof(array)/ sizeof(int));
+    intArray2String(array,sizeof(array)/ sizeof(int),string);
+    LOGD("%s",string);
 
+    start = clock();
     insertSort(array, sizeof(array)/ sizeof(int));
+    finish = clock();
 
     LOGD("array new:");
-    printIntArr(array,sizeof(array)/ sizeof(int));
+    intArray2String(array,sizeof(array)/ sizeof(int),string);
+    LOGD("%s",string);
+    LOGD("insertSort time= %lf s",(double)(finish-start)/CLOCKS_PER_SEC);
 
 }extern "C"
 JNIEXPORT void JNICALL
@@ -59,15 +67,18 @@ Java_cd_note_others_JniTest_mergeSortTest(JNIEnv *env, jclass type) {
 
     int array[] = {1,6,7,3,1,0,9,2};
 //    int array[] = {3,1,6,7,39,1,20,9,21};
+    char string[128];
 
     LOGD("--------mergeSortTest--------");
     LOGD("array old:");
-    printIntArr(array,sizeof(array)/ sizeof(int));
+    intArray2String(array,sizeof(array)/ sizeof(int),string);
+    LOGD("%s",string);
 
     insertSort(array, sizeof(array)/ sizeof(int));
 
     LOGD("array new:");
-    printIntArr(array,sizeof(array)/ sizeof(int));
+    intArray2String(array,sizeof(array)/ sizeof(int),string);
+    LOGD("%s",string);
 
 }extern "C"
 JNIEXPORT jint JNICALL
@@ -75,6 +86,8 @@ Java_cd_note_others_JniTest_linkListTest(JNIEnv *env, jclass type) {
 
     LinkList *list;
     ElemType e;
+    int offset=0;
+    char string[128];
 
     list = (LinkList *)malloc(sizeof(LinkList));
 
@@ -83,8 +96,10 @@ Java_cd_note_others_JniTest_linkListTest(JNIEnv *env, jclass type) {
     LOGD("old linkList:");
     for(int i=1; i<10;i++){
         linklistGet(list,i,&e);
-        LOGD("%d ",e);
+        offset += sprintf(string+offset,"%d ",e);
     }
+    string[offset]='\0';
+    LOGD("%s",string);
 
     linklistInsert(list,5,5);
     linklistInsert(list,6,6);
@@ -97,8 +112,10 @@ Java_cd_note_others_JniTest_linkListTest(JNIEnv *env, jclass type) {
     LOGD("new linkList:");
     for(int i=1; i<10;i++){
         linklistGet(list,i,&e);
-        LOGD("%d ",e);
+        offset += sprintf(string+offset,"%d ",e);
     }
+    string[offset]='\0';
+    LOGD("%s",string);
 
 
     linklistClear(list);
