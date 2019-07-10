@@ -18,8 +18,11 @@ public class JniTest {
     //线性表的顺序存储结构
     public static native int sqListTest();
 
-    //线性表的顺序链式结构
+    //线性表的单链表结构
     public static native int linkListTest();
+
+    //线性表的双向链表结构
+    public static native int dulLinkListTest();
 
     //插入排序
     public static native void insertSortTest();

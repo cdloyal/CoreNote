@@ -4,14 +4,20 @@
 #include <cstring>
 #include <InsertSort.h>
 #include <ctime>
+#include <Sqlist.h>
+#include <DulLinklist.h>
 #include "PrintUtils.h"
 #include "log.h"
-#include "datastructure.h"
+#include "Linklist.h"
 #include "DivideConquer.h"
 
 //
 // Created by chenda on 2019/6/23.
 //
+
+int large(const void* a,const void* b){
+    return (*(int*)a)>=(*(int*)b)?1:0;
+}
 
 extern "C"
 JNIEXPORT jint JNICALL
@@ -120,6 +126,33 @@ Java_cd_note_others_JniTest_linkListTest(JNIEnv *env, jclass type) {
 
     linklistClear(list);
     free(list);
+    return 0;
+}extern "C"
+JNIEXPORT jint JNICALL
+Java_cd_note_others_JniTest_dulLinkListTest(JNIEnv *env, jclass type) {
+
+    char string[128];
+    int offset = 0;
+    int max = -1;
+    int array[] = {1,9,4,2,64,5};
+    List list;
+    LOGD("--------dulLinkListTest--------");
+
+    initList(&list, sizeof(int));
+    for(int i:array)
+        insertLast(list,&i,NULL);
+
+    Iterator iterator = getIterator(list,0);
+    while (iterator!=list->head){
+        int* data = (int*)getData(iterator);
+        offset += sprintf(string+offset,"%d ",*data);
+        iterator = iterator->next;
+    }
+    LOGD("initList = %s",string);
+
+    getMax(list,0,list->length-1,large,&max);
+    LOGD("max = %d",max);
+
     return 0;
 }extern "C"
 JNIEXPORT void JNICALL
