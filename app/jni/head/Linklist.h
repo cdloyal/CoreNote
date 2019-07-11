@@ -32,4 +32,4 @@ Status linklistDelete(LinkList *list, int i, NodeElemType *e);
 
 
 
-#endif //CORENOTE_DATASTRUCTURE_H
+#endif

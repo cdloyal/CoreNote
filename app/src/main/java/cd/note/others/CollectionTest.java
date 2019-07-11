@@ -1,8 +1,14 @@
 package cd.note.others;
 
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 /**
  * 作者：chenda
@@ -100,7 +106,57 @@ public class CollectionTest {
 
     private final static String TAG = "CollectionTest";
 
-    public void test(){
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public void collectionStreamTest(){
+
+        //https://juejin.im/post/5b07f4536fb9a07ac90da4e5
+        List<Integer> list = Arrays.asList(1, 1, 2, 3, 4, 5, 5, 6, 7, 8, 9);
+        Log.d(TAG,"list="+list);
+
+        //过滤
+        List<Integer> filter = list.stream().filter(integer -> integer>3).collect(Collectors.toList());
+        Log.d(TAG,"list filter(>3)="+filter);
+
+        //自己写的filter
+        ArrayList arrayList = new ArrayList();
+        arrayList.addAll(list);
+        List<Integer> myFilter = myFilter(arrayList, (Integer a) -> a>5);
+        Log.d(TAG,"list myFilter(>5) ="+myFilter);
+
+
+        //去重
+        List<Integer> distinct = list.stream().distinct().collect(Collectors.toList());
+        Log.d(TAG,"list distinct="+distinct);
+
+        //限制
+        List<Integer> limit = list.stream().limit(3).collect(Collectors.toList());
+        Log.d(TAG,"list limit(3)="+limit);
+
+        //跳过
+        List<Integer> skip = list.stream().skip(3).collect(Collectors.toList());
+        Log.d(TAG,"list skip(3)="+skip);
+
+        //映射
+        List<String> map = list.stream().map(integer -> "-"+integer).collect(Collectors.toList());
+        Log.d(TAG,"list map(3)="+map);
+
+
+    }
+
+    private interface MyPredicate<T>{
+        public boolean test(T a);
+    }
+    private <T> List myFilter(ArrayList<T> list, MyPredicate<T> predicate){
+        List<T> newList = new ArrayList<T>();
+        for(T t : list){
+            if(predicate.test(t))
+                newList.add(t);
+        }
+        return newList;
+    }
+
+    public void TreeSetTest(){
         Student s1=new Student("zhangsan",20);
         Student s2=new Student("lis",22);
         Student s3=new Student("wangwu",24);
