@@ -41,4 +41,7 @@ dependencies {
     implementation project(':libcorenote')
     implementation 'io.reactivex.rxjava2:rxjava:2.2.10'
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
+    implementation 'com.squareup.okhttp3:okhttp:4.0.1'
+
+    implementation 'com.amitshekhar.android:rx2-android-networking:1.0.0'
 }
