@@ -5,8 +5,12 @@ import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
 
+import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
+
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
@@ -14,12 +18,18 @@ import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
+import io.reactivex.Scheduler;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * 作者：chenda
@@ -319,6 +329,153 @@ public class RxjavaTest {
 //                    }
 //                });
 
+//        noCondRepeat();
+        CondRepeat();
+    }
+
+
+    //无条件网络轮询
+    private void noCondRepeat(){
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://fy.iciba.com/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .build();
+        RetrofitInterface retrofitInterface = retrofit.create(RetrofitInterface.class);
+        Observable<Translation> observable = retrofitInterface.getAjax("fy","auto","auto","hello world");
+//        Observable<Translation> observable = retrofitInterface.getAjax();
+        Observer observer = new Observer<Translation>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+                Log.d(TAG,"get Translation onSubscribe");
+            }
+
+            @Override
+            public void onNext(Translation translation) {
+                translation.show();
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Log.d(TAG,"get Translation onError");
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onComplete() {
+                Log.d(TAG,"get Translation onComplete");
+            }
+        };
+
+        Observable.interval(2,1,TimeUnit.SECONDS)
+                //每次产生一个数字前doOnNext()一次
+                .doOnNext(new Consumer<Long>() {
+                    @Override
+                    public void accept(Long aLong) throws Exception {
+                        observable.subscribeOn(Schedulers.io()) .subscribe(observer);
+                    }
+                })
+                .subscribe(new Observer<Long>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(Long aLong) {
+                        Log.d(TAG,"interval()="+aLong);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
+
+    private void CondRepeat(){
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://fy.iciba.com/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .build();
+        RetrofitInterface retrofitInterface = retrofit.create(RetrofitInterface.class);
+        Observable<Translation> observable = retrofitInterface.getAjax("fy","auto","auto","hello world");
+//        Observable<Translation> observable = retrofitInterface.getAjax();
+        Observer observer = new Observer<Translation>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+                Log.d(TAG,"get Translation onSubscribe");
+            }
+
+            @Override
+            public void onNext(Translation translation) {
+                translation.show();
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Log.d(TAG,"get Translation onError");
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onComplete() {
+                Log.d(TAG,"get Translation onComplete");
+            }
+        };
+
+        observable.repeatWhen(new RrtryWithDelay(3,3000)).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Observer<Translation>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+
+            }
+
+            @Override
+            public void onNext(Translation translation) {
+                Log.d(TAG,"interval()="+aLong);
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        });
+
+    }
+
+    private class RrtryWithDelay implements Function<Observable<Object>, ObservableSource<?>> {
+
+        private final int maxRetries;
+        private final int retryDelayMillis;
+        private int retryCount;
+
+        public RrtryWithDelay(int maxRetries, int retryDelayMillis) {
+            this.maxRetries = maxRetries;
+            this.retryDelayMillis = retryDelayMillis;
+        }
+
+        @Override
+        public ObservableSource<?> apply(Observable<Object> objectObservable) throws Exception {
+            return objectObservable.flatMap(new Function<Object, ObservableSource<?>>() {
+                @Override
+                public ObservableSource<?> apply(Object o) throws Exception {
+                    if(++retryCount<= maxRetries)
+                        return Observable.timer(retryDelayMillis,TimeUnit.MICROSECONDS);
+                    return Observable.error(new Throwable("轮询失败"));
+                }
+            });
+        }
     }
 
     private Observable<String> getStringObservable() {
