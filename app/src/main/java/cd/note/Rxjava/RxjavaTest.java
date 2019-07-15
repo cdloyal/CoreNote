@@ -3,6 +3,7 @@ package cd.note.Rxjava;
 
 import android.os.Build;
 import android.support.annotation.RequiresApi;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
@@ -10,6 +11,7 @@ import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.BackpressureStrategy;
@@ -80,6 +82,107 @@ public class RxjavaTest {
          * compositeDisposable.clear();
          * */
 
+        operation();
+
+
+        //无条件轮询
+//        noCondRepeat();
+
+        //有条件轮询 RepeatWhen: onComplete()触发重试
+//        CondRepeat();
+
+        //retryWhen： onError()触发重试
+        retryWhen();
+
+        //flatMap:解决嵌套
+        //第二个请求依赖第一个请求，登录依赖注册的信息
+        flatMap();
+
+        //concat和firstElement结合：按顺序以不同方式做一件事，一个成功，后面不用再做
+        concat();
+
+    }
+
+    private void concat() {
+        //1.首先获取内存缓存中的数据，如果数据为空，获取硬盘缓存中的数据。
+        //2.获取硬盘缓存中的数据，如果硬盘缓存中数据为空，则从网络中获取数据。
+        //3.获取网络中的数据。
+
+        String memory = null; //内存缓存的数据
+        String disk = "磁盘中的数据";
+        String netWorkData = "网络中的数据";
+
+        Observable<String> observable1 = Observable.create(new ObservableOnSubscribe<String>() {
+            @Override
+            public void subscribe(ObservableEmitter<String> emitter) throws Exception {
+                if(TextUtils.isEmpty(memory)){
+                    emitter.onComplete();       //onComplete
+                    return;
+                }
+                emitter.onNext(memory);         //onNext
+            }
+        });
+
+        Observable<String> observable2 = Observable.create(new ObservableOnSubscribe<String>() {
+            @Override
+            public void subscribe(ObservableEmitter<String> emitter) throws Exception {
+                if(TextUtils.isEmpty(disk)){
+                    emitter.onComplete();       //onComplete
+                    return;
+                }
+                emitter.onNext(disk);         //onNext
+            }
+        });
+        Observable<String> observable3 = Observable.create(new ObservableOnSubscribe<String>() {
+            @Override
+            public void subscribe(ObservableEmitter<String> emitter) throws Exception {
+                if(TextUtils.isEmpty(netWorkData)){
+                    emitter.onComplete();       //onComplete
+                    return;
+                }
+                emitter.onNext(netWorkData);         //onNext
+            }
+        });
+
+        Observable.concat(observable1,observable2,observable3)
+                // 2. 通过firstElement()，从串联队列中取出并发送第1个有效事件（Next事件），即依次判断检查memory、disk、network
+                .firstElement()
+                .subscribe(new Consumer<String>() {
+                    @Override
+                    public void accept(String s) throws Exception {
+                        Log.d(TAG,s);
+                    }
+                });
+
+    }
+
+    private void flatMap(){
+        int id = 123;
+        Observable.just(id)
+                .doOnNext(new Consumer<Integer>() {
+                    @Override
+                    public void accept(Integer integer) throws Exception {
+                        Log.d(TAG,"register success,id="+id);
+                    }
+                })
+                .observeOn(Schedulers.io())     //登录还要在IO线程
+                .flatMap(new Function<Integer, ObservableSource<Integer>>() {
+                    @Override
+                    public ObservableSource<Integer> apply(Integer integer) throws Exception {
+                        return Observable.just(integer);
+                    }
+                })
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<Integer>() {
+                    @Override
+                    public void accept(Integer integer) throws Exception {
+                        Log.d(TAG,"login success,id="+id);
+                    }
+                });
+    }
+
+
+    private void operation(){
         //https://www.jianshu.com/p/b39afa92807e
         //Observable.interval(3, TimeUnit.SECONDS).subscribe(System.out::println);
         //Observable.range(5, 10).subscribe(i -> System.out.println("1: " + i));
@@ -197,6 +300,7 @@ public class RxjavaTest {
         //ConcatMap保证顺序
         Observable.just(new Integer[]{1,3,2,5},new Integer[]{1,4,5,5},new Integer[]{1,6,4})
                 .flatMap( integers-> Observable.fromArray(integers)).subscribe(i -> Log.d(TAG,"map() "+i) );
+
 
 
         //doOnNext：订阅者在接收到数据之前干点有意思的事情，比如保存数据库
@@ -328,11 +432,7 @@ public class RxjavaTest {
 //                    public void onComplete() {
 //                    }
 //                });
-
-//        noCondRepeat();
-        CondRepeat();
     }
-
 
     //无条件网络轮询
     private void noCondRepeat(){
@@ -430,37 +530,53 @@ public class RxjavaTest {
             }
         };
 
-        observable.repeatWhen(new RrtryWithDelay(3,3000)).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Observer<Translation>() {
+        observable.repeatWhen(new RepeatWithDelay(3,3000)).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(observer);
+
+    }
+
+    private void retryWhen(){
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://fy.iciba.com/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .build();
+        RetrofitInterface retrofitInterface = retrofit.create(RetrofitInterface.class);
+        Observable<Translation> observable = retrofitInterface.getAjax("fy","auto","auto","hello world");
+//        Observable<Translation> observable = retrofitInterface.getAjax();
+        Observer observer = new Observer<Translation>() {
             @Override
             public void onSubscribe(Disposable d) {
-
+                Log.d(TAG,"get Translation onSubscribe");
             }
 
             @Override
             public void onNext(Translation translation) {
-                Log.d(TAG,"interval()="+aLong);
+                translation.show();
             }
 
             @Override
             public void onError(Throwable e) {
-
+                Log.d(TAG,"get Translation onError");
+                e.printStackTrace();
             }
 
             @Override
             public void onComplete() {
-
+                Log.d(TAG,"get Translation onComplete");
             }
-        });
+        };
+
+        observable.retryWhen(new RetryWithDelay(3,3000)).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(observer);
 
     }
 
-    private class RrtryWithDelay implements Function<Observable<Object>, ObservableSource<?>> {
+    private class RepeatWithDelay implements Function<Observable<Object>, ObservableSource<?>> {
 
         private final int maxRetries;
         private final int retryDelayMillis;
         private int retryCount;
 
-        public RrtryWithDelay(int maxRetries, int retryDelayMillis) {
+        public RepeatWithDelay(int maxRetries, int retryDelayMillis) {
             this.maxRetries = maxRetries;
             this.retryDelayMillis = retryDelayMillis;
         }
@@ -469,10 +585,39 @@ public class RxjavaTest {
         public ObservableSource<?> apply(Observable<Object> objectObservable) throws Exception {
             return objectObservable.flatMap(new Function<Object, ObservableSource<?>>() {
                 @Override
-                public ObservableSource<?> apply(Object o) throws Exception {
+                public ObservableSource<?> apply(Object o) {
+                    Log.d(TAG,"retryWhen object = "+o.getClass());
+                    Log.d(TAG,"retryWhen object = "+o);
                     if(++retryCount<= maxRetries)
                         return Observable.timer(retryDelayMillis,TimeUnit.MICROSECONDS);
                     return Observable.error(new Throwable("轮询失败"));
+                }
+            });
+        }
+    }
+
+    private class RetryWithDelay implements Function<Observable<Throwable>, ObservableSource<?>> {
+
+        private final int maxRetries;
+        private final int retryDelayMillis;
+        private int retryCount;
+
+        public RetryWithDelay(int maxRetries, int retryDelayMillis) {
+            this.maxRetries = maxRetries;
+            this.retryDelayMillis = retryDelayMillis;
+        }
+
+        @Override
+        public ObservableSource<?> apply(Observable<Throwable> throwableObservable) throws Exception {
+            return throwableObservable.flatMap(new Function<Throwable, ObservableSource<?>>() {
+                @Override
+                public ObservableSource<?> apply(Throwable throwable) throws Exception {
+                    if(throwable instanceof IOException){
+                        if(++retryCount<= maxRetries)
+                            return Observable.timer(retryDelayMillis,TimeUnit.MICROSECONDS);
+                        return Observable.error(new Throwable("重试次数已超过设置次数"));
+                    }
+                    return Observable.error(new Throwable("发生了非网络异常（非I/O异常）"));
                 }
             });
         }
