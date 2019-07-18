@@ -51,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
         JniTest.divideConquer();
         //快速排序
         JniTest.quickSort();
+        //随机排序
+        JniTest.randomSort();
 
 //        //多线程状态测试
 //        //新建--->可运行--->被终止

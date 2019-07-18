@@ -35,4 +35,7 @@ public class JniTest {
 
     //快速排序
     public static native void quickSort();
+
+    //随机排序
+    public static native void randomSort();
 }

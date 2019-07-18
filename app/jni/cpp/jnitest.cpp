@@ -11,6 +11,7 @@
 #include "Linklist.h"
 #include "DivideConquer.h"
 #include <QuickSort.h>
+#include <Random.h>
 
 //
 // Created by chenda on 2019/6/23.
@@ -186,6 +187,20 @@ Java_cd_note_others_JniTest_quickSort(JNIEnv *env, jclass type) {
     quickSort(A,0, sizeof(A)/ sizeof(int)-1);
 
     LOGD("quickSort array new:");
+    intArray2String(A,sizeof(A)/ sizeof(int),string);
+    LOGD("%s",string);
+}extern "C"
+JNIEXPORT void JNICALL
+Java_cd_note_others_JniTest_randomSort(JNIEnv *env, jclass type) {
+    char string[128];
+    int A[] = {1,2,3,4,5,6,7,8,9,10};
+    LOGD("randomSort array src:");
+    intArray2String(A,sizeof(A)/ sizeof(int),string);
+    LOGD("%s",string);
+
+    randomize_in_place(A,0, sizeof(A)/ sizeof(int));
+
+    LOGD("randomSort array new:");
     intArray2String(A,sizeof(A)/ sizeof(int),string);
     LOGD("%s",string);
 }
