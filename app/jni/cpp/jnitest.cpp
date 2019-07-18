@@ -10,6 +10,7 @@
 #include "log.h"
 #include "Linklist.h"
 #include "DivideConquer.h"
+#include <QuickSort.h>
 
 //
 // Created by chenda on 2019/6/23.
@@ -173,4 +174,18 @@ Java_cd_note_others_JniTest_divideConquer(JNIEnv *env, jclass type) {
 
     findMaxSubArray(C, 0, sizeof(C)/ sizeof(int)-1, &max, &left, &right);
     LOGD("C[] max=%d,left=%d,right=%d,",max,left,right);
+}extern "C"
+JNIEXPORT void JNICALL
+Java_cd_note_others_JniTest_quickSort(JNIEnv *env, jclass type) {
+    char string[128];
+    int A[] = {13,  -3, -25,  20,  -3, -16, -23,  18,  20,  -7,   12,  -5, -22,  15,  -4,   7};
+    LOGD("quickSort array src:");
+    intArray2String(A,sizeof(A)/ sizeof(int),string);
+    LOGD("%s",string);
+
+    quickSort(A,0, sizeof(A)/ sizeof(int)-1);
+
+    LOGD("quickSort array new:");
+    intArray2String(A,sizeof(A)/ sizeof(int),string);
+    LOGD("%s",string);
 }

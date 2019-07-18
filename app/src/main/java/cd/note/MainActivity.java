@@ -43,14 +43,14 @@ public class MainActivity extends AppCompatActivity {
         //线性表的双向链表结构
         JniTest.dulLinkListTest();
 
-        new Java8().lambdaTest();
-
         //插入排序算法
         JniTest.insertSortTest();
         //归并排序算法
         JniTest.mergeSortTest();
         //分治法
         JniTest.divideConquer();
+        //快速排序
+        JniTest.quickSort();
 
 //        //多线程状态测试
 //        //新建--->可运行--->被终止
@@ -83,6 +83,8 @@ public class MainActivity extends AppCompatActivity {
         SqliteTest.test(this);
 
 
+
+        new Java8().lambdaTest();
         //java 集合测试
         new CollectionTest().TreeSetTest();
         new CollectionTest().collectionStreamTest();
@@ -90,4 +92,5 @@ public class MainActivity extends AppCompatActivity {
         //java泛型
         new GenericTest().test();
     }
+
 }

@@ -32,4 +32,7 @@ public class JniTest {
 
     //分治法
     public static native void divideConquer();
+
+    //快速排序
+    public static native void quickSort();
 }
