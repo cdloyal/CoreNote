@@ -10,7 +10,7 @@
 #include "log.h"
 #include "Linklist.h"
 #include "DivideConquer.h"
-#include <QuickSort.h>
+#include "QuickSort.h"
 #include <Random.h>
 
 //
