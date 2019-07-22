@@ -125,8 +125,8 @@ void merger(int* array,int start,int middle,int end){
     int rightLen = end-start;
     int left[leftLen];
     int right[rightLen];
-    memcpy(left, array, static_cast<size_t>(leftLen));
-    memcpy(right,array+start+1, static_cast<size_t>(rightLen));
+    memcpy(left, array, (leftLen));
+    memcpy(right,array+start+1, (rightLen));
 
     int leftIndex=0;
     int rightIndex=0;

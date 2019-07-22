@@ -12,6 +12,7 @@
 #include "DivideConquer.h"
 #include "QuickSort.h"
 #include <Random.h>
+#include "HeapSort_PriorityQueue.h"
 
 //
 // Created by chenda on 2019/6/23.
@@ -201,6 +202,24 @@ Java_cd_note_others_JniTest_randomSort(JNIEnv *env, jclass type) {
     randomize_in_place(A,0, sizeof(A)/ sizeof(int));
 
     LOGD("randomSort array new:");
+    intArray2String(A,sizeof(A)/ sizeof(int),string);
+    LOGD("%s",string);
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_cd_note_others_JniTest_buildMaxHeapbyMerge(JNIEnv *env, jclass type) {
+    char string[128];
+    int A[] = {13,  -3, -25,  20,  -3, -16, -23,  18,  20,  -7,   12,  -5, -22,  15,  -4,   40};
+    LOGD("buildMaxHeapbyMerge array src:");
+    intArray2String(A,sizeof(A)/ sizeof(int),string);
+    LOGD("%s",string);
+
+//    buildMaxHeapbyMerge(A, sizeof(A)/ sizeof(int),0);
+//    buildMaxHeap(A, sizeof(A)/ sizeof(int));
+    maxHeapSort(A, sizeof(A) / sizeof(int));
+
+    LOGD("buildMaxHeapbyMerge array new:");
     intArray2String(A,sizeof(A)/ sizeof(int),string);
     LOGD("%s",string);
 }

@@ -38,4 +38,7 @@ public class JniTest {
 
     //随机排序
     public static native void randomSort();
+
+    //堆排序
+    public static native void buildMaxHeapbyMerge();
 }

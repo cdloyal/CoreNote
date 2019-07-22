@@ -53,6 +53,8 @@ public class MainActivity extends AppCompatActivity {
         JniTest.quickSort();
         //随机排序
         JniTest.randomSort();
+        //堆排序
+        JniTest.buildMaxHeapbyMerge();
 
 //        //多线程状态测试
 //        //新建--->可运行--->被终止
