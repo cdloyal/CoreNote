@@ -1,14 +1,59 @@
 插入排序时间复杂度：
             T(n)=theta(n^2)
             常数个元素空间存储临时数据
+            稳定
 
 归并排序时间复杂度：
                     1
             T(n)=                       ==>     theta(nlgn)
                     2T(n/2)+OHM(n)
             随着n越大，临时数据越多
+            稳定
 
 堆排序时间复杂度：
             T(n)=theta(nlgn)
             常数个元素空间存储临时数据
+            不稳定
 
+快速排序：
+            最坏情况：当划分不平衡时，T(N)=O(n^2)
+            在输入元素互异的情况下，快速排序算法的期望运行时间O(nlgn)
+            不稳定
+
+
+上面集中都是比较排序，任何比较排序在最快情况下都要经过OHM(nlgn)次比较
+因此，归并排序和堆排序是渐进最优的
+
+线性时间复杂度的排序：计数排序、基数排序、桶排序
+
+计数排序：
+            假设n个输入元素中的每个元素都是在0~k区间的一个整数。当k=O(n)时，排序时间theta(n)
+
+COUNTING_SORT(A,B,k)
+    let C[0..k] be a new array
+    for i = 0 to k
+        C[i]=0
+    for i = 0 to A.length
+        C[A[i]]++;
+    for i = 0 to A.length
+        B[C[A[i]]] = A[i]
+        C[A[i]]--
+
+基数排序：
+            不适用与负数，要用链表，还要在链表中做插入操作
+RADIX-SORT(A)
+    //TODO 找到最大值，计算出最大位数d
+    //TODO 新建一个数组，数组的每个元素都是链表
+    for i = 0 to d
+        //TODO 插入
+        //TODO 排序
+
+
+对于数据结构，动态集合的操作，基本功能：增删改查
+    SEARCH(S,k)     k关键字或下标
+    INSERT(S,x)     插入到集合当中
+    DELETE(S,x)
+    MINIMUM(S)
+    MAXIMUM(S)
+    SUCCESSOR(S,x)  找到x，返回x的前一个指针
+    PREDECRSSOR(S,x)
