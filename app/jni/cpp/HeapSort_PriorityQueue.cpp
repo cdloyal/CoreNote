@@ -153,6 +153,17 @@ void maxHeapSort(int *A, int size){
 int maxHeapMaximum(int *A){
     return A[0];
 }
+int extractMaxHeap(int *A, int *size,int *maxValue){
+    if (*size < 1)
+        return -1;
+    *maxValue = A[0];
+
+    A[0] = A[*size-1] ;
+    (*size)--;
+
+    maxHeap(A,*size,0);
+    return 0;
+}
 int heapIncreaseKey(int *A,int i,int key){
     if(key<A[i])
         return -1;
@@ -168,6 +179,8 @@ int heapIncreaseKey(int *A,int i,int key){
 }
 
 void heapInsert(int *A,int size,int i){
-    A[size]=;
+    A[size]=i-1;
+    size++;
+    heapIncreaseKey(A,size-1,i);
 }
 
