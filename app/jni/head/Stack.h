@@ -8,9 +8,9 @@
 #ifndef CORENOTE_STACK_H
 #define CORENOTE_STACK_H
 
-typedef int DataType;
+typedef int ElemType;
 typedef struct node{
-    DataType data;
+    ElemType data;
     struct node* next;
 }Stack;
 
@@ -18,9 +18,9 @@ Stack* createStack();
 void stackEmpty(Stack* stack);
 void stackDestory(Stack* stack);
 int isEmpty(Stack* stack);
-int pushStack(Stack* stack,DataType data);
-int popEmpty(Stack* stack,DataType* data);
-DataType getTopElement(Stack* stack);
+int pushStack(Stack* stack,ElemType data);
+int popEmpty(Stack* stack,ElemType* data);
+ElemType getTopElement(Stack* stack);
 
 /**
  * 栈的应用：逆波兰计算机，后缀表达式

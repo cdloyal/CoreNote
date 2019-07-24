@@ -18,7 +18,7 @@ Stack* createStack(){
 void stackEmpty(Stack* stack){
     if(stack==NULL)
         return;
-    DataType data;
+    ElemType data;
     int ret = popEmpty(stack,&data);
     while (ret>=0){
         popEmpty(stack,&data);
@@ -33,7 +33,7 @@ int isEmpty(Stack *stack) {
     return stack->next == NULL;
 }
 
-int pushStack(Stack* stack,DataType data){
+int pushStack(Stack* stack,ElemType data){
     if(stack==NULL)
         return -1;
 
@@ -47,7 +47,7 @@ int pushStack(Stack* stack,DataType data){
     stack->next = node;
     return 0;
 }
-int popEmpty(Stack* stack,DataType* data){
+int popEmpty(Stack* stack,ElemType* data){
     if(stack==NULL || stack->next==NULL){
         data = NULL;
         return -1;
@@ -62,7 +62,7 @@ int popEmpty(Stack* stack,DataType* data){
     return 0;
 }
 
-DataType getTopElement(Stack* stack){
+ElemType getTopElement(Stack* stack){
     if(stack==NULL ){
         return NULL;
     }
