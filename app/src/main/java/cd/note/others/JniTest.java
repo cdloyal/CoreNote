@@ -41,4 +41,7 @@ public class JniTest {
 
     //堆排序
     public static native void buildMaxHeapbyMerge();
+
+    //二叉树
+    public static native void biTreeTest();
 }

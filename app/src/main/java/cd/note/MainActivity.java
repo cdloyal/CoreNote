@@ -95,6 +95,9 @@ public class MainActivity extends AppCompatActivity {
 
         //java泛型
         new GenericTest().test();
+
+        //二叉树
+        JniTest.biTreeTest();
     }
 
 }

@@ -13,7 +13,7 @@
 #include "QuickSort.h"
 #include <Random.h>
 #include "HeapSort_PriorityQueue.h"
-
+#include "BinaryTree.h"
 //
 // Created by chenda on 2019/6/23.
 //
@@ -222,4 +222,16 @@ Java_cd_note_others_JniTest_buildMaxHeapbyMerge(JNIEnv *env, jclass type) {
     LOGD("buildMaxHeapbyMerge array new:");
     intArray2String(A,sizeof(A)/ sizeof(int),string);
     LOGD("%s",string);
+}
+void visit(BTNElemType data,int level){
+    LOGD("biTree data=%c,level=%d",data,level);
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_cd_note_others_JniTest_biTreeTest(JNIEnv *env, jclass type) {
+
+    char c[] = "ABCDEFGHI   J";
+    BiTree biTree = creatBiTree(c, strlen(c),0);
+    preOrderTraverse(biTree,0,visit);
+    destroyBitTree(biTree);
 }

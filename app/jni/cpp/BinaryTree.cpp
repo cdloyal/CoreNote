@@ -1,3 +1,5 @@
+#include <cstdlib>
+#include "BinaryTree.h"
 /**
  * 二叉树的5种形态：
  *  空树
@@ -39,4 +41,57 @@
  *      struct BiTNode *lchild,rchild;
  *  }BiTNode, *BiTree;
  *
+ * ABCDEFGHI   J
+ *              A
+ *        B          C
+ *    D      E    F     G
+ *  H   I           J
+ * 前序遍历：若二叉树为空，则空操作返回，否则先访问根节点，然后前序遍历左子树，再前序遍历右子树.ABDHIECFJG
+ * 中序遍历：若二叉树为空，则空操作返回，否则先中序遍历左子树，然后访问根节点，再中序遍历右子树.HDIBEAFJCG
+ * 后序遍历：若二叉树为空，则空操作返回，否则从左到右先叶子后节点的方式遍历访问左右子树，最后访问根节点。HIDEBJFGCA
+ * 层序遍历：
+ *
  * */
+
+BiTree creatBiTree(char* array,int length,int index){
+
+    int l=2*index+1,r=2*index+2;
+    if(array==NULL||length<=0)
+        return NULL;
+
+    auto biTree = (struct BiTNode *)malloc(sizeof(struct BiTNode));
+    if(biTree==NULL)
+        return NULL;
+
+    biTree->data=array[index];
+    if(l>length-1||array[l]==' '){
+        biTree->lchild=NULL;
+    } else{
+        biTree->lchild=creatBiTree(array,length,l);
+    }
+
+    if(r>length-1||array[r]==' '){
+        biTree->rchild=NULL;
+    } else{
+        biTree->rchild=creatBiTree(array,length,r);
+    }
+    return biTree;
+}
+
+void preOrderTraverse(BiTree t,int level,void (*visit)(BTNElemType ,int )){
+    if(t==NULL)
+        return;
+
+    visit(t->data,level);
+    preOrderTraverse(t->lchild,level+1,visit);
+    preOrderTraverse(t->rchild,level+1,visit);
+}
+
+void destroyBitTree(BiTree t){
+    if(t==NULL)
+        return;
+
+    destroyBitTree(t->lchild);
+    destroyBitTree(t->rchild);
+    free(t);
+}
