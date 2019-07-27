@@ -44,4 +44,7 @@ public class JniTest {
 
     //二叉树
     public static native void biTreeTest();
+
+    //线索树
+    public static native void thrBiTreeTest();
 }

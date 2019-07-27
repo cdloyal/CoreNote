@@ -98,6 +98,9 @@ public class MainActivity extends AppCompatActivity {
 
         //二叉树
         JniTest.biTreeTest();
+
+        //二叉搜索树
+        JniTest.thrBiTreeTest();
     }
 
 }

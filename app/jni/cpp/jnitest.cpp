@@ -12,6 +12,7 @@
 #include "DivideConquer.h"
 #include "QuickSort.h"
 #include <Random.h>
+#include <ThrBitNode.h>
 #include "HeapSort_PriorityQueue.h"
 #include "BinaryTree.h"
 //
@@ -230,8 +231,33 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_cd_note_others_JniTest_biTreeTest(JNIEnv *env, jclass type) {
 
+    /**
+     * ABCDEFGHI   J
+     *              A
+     *        B          C
+     *    D      E    F     G
+     *  H   I           J
+     * */
     char c[] = "ABCDEFGHI   J";
     BiTree biTree = creatBiTree(c, strlen(c),0);
     preOrderTraverse(biTree,0,visit);
     destroyBitTree(biTree);
+}
+
+void visit_thr(TElemType data){
+    LOGD("thrBiTree data=%c",data);
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_cd_note_others_JniTest_thrBiTreeTest(JNIEnv *env, jclass type) {
+
+    char c[] = "ABCDEFGHI   J";
+
+    ThrBiTree t;
+    //建立头节点，中序线索二叉树
+    inOrderThread_Head(&t,c, strlen(c),0);
+
+    //中序遍历线索二叉树
+    inOrderTraverse_The(t,visit_thr);
+
 }
