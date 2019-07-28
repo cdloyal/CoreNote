@@ -23,6 +23,9 @@ BiTree creatBiTree(char* array,int length,int index);
 //前序遍历二叉树,level当前层数,visit每次遍历到节点要做的事情
 void preOrderTraverse(BiTree t,int level,void (*visit)(BTNElemType ,int ));
 
+//层序遍历二叉树,level当前层数,visit每次遍历到节点要做的事情
+void levelOrderTraverse(BiTree t,void (*visit)(BTNElemType ));
+
 void destroyBitTree(BiTree t);
 
 

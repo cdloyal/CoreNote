@@ -87,6 +87,12 @@ void preOrderTraverse(BiTree t,int level,void (*visit)(BTNElemType ,int )){
     preOrderTraverse(t->rchild,level+1,visit);
 }
 
+//层序遍历二叉树,level当前层数,visit每次遍历到节点要做的事情
+void levelOrderTraverse(BiTree t,void (*visit)(BTNElemType )){
+
+
+}
+
 void destroyBitTree(BiTree t){
     if(t==NULL)
         return;
@@ -95,3 +101,4 @@ void destroyBitTree(BiTree t){
     destroyBitTree(t->rchild);
     free(t);
 }
+
