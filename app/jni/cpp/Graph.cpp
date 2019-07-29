@@ -1,7 +1,8 @@
 //
 // Created by chenda on 2019/7/28.
 //
-
+#include <cstdlib>
+#include "Graph.hpp"
 
 /**
  * 图的定义：顶点和边的集合，顶点有穷非空,边可空。G(V,E)
@@ -64,24 +65,64 @@
  * 邻接表
  *  邻接矩阵，使用数组进行存储，存在浪费内存；要预先分配内存，由于内存分配不合理，需要重新分配内存
  *  数组与链表结合一起存在
+ *  顶点表节点结构：
+ *      data    first
+ *  边表结构
+ *      index   next
  *
+ *      typedef GRAPHDATATYPE int;
+ *      typedef struct GraphArrayNode{
+ *           GRAPHDATATYPE data;
+ *           struct GraphNode* fist;
+ *       };
+ *       typedef struct GraphNode{
+ *           int nextIndex;
+ *           struct GraphNode* next;
+ *       };
+ *       #define Len 10
+ *       typedef struct Graph{
+ *           struct GraphArrayNode array[Len];
+ *           int size;
+ *       };
+ *  缺陷：邻接表对于有向图，需要做基于出度的表和基于入度的表（逆邻接表）
  *
+ * 十字链表(有向表)
+ *  顶点表节点结构：
+ *      data    firstIn     firstOut
+ *  边表节点结构
+ *      tailVex headVex headLink tailLink
  *
+ * 邻接多重表(无向表)
+ *  顶点表节点结构：
+ *      data    first
+ *  边表结构
+ *      iVex    iLink   jVex    jLink
+ *
+ * 边集数组
+ *  顶点数组
+ *      data
+ *  边数组
+ *      begin end weight
+ *
+ * 图的普通遍历：有可能重复遍历，有可能漏了遍历
+ *
+ * 深度优先遍历DFS
+ *  右手原则：再没有遇到重复顶点的情况下，分叉路口始终是面对分叉口的右手边走，
+ *           每路过一个顶点就做一个记号，遇到重复顶点，面对分叉口的第二条右手边的路，
+ *           都重复了就返回
+ *  递归过程、像树的前序遍历
+ *
+ * 哈密尔顿路径：
+ *  图G中的哈密尔顿路径是指经过图G中每个顶点且只经过一次的一条路径。
+ * 哈密尔顿回路
  *
  *
  * */
 
-typedef struct GraphArrayNode{
-    int data;
-    struct GraphNode* fist;
-};
-typedef struct GraphNode{
-    int nextIndex;
-    struct GraphNode* next;
-};
-typedef GRAPHDATATYPE int;
-#define Len 10
-typedef struct Graph{
-    GraphArrayNode array[Len];
-    int size;
-};
+//创建图
+int CreateGraph(AMLGraph *&amlGraph,GraphKind kind){
+    amlGraph = (AMLGraph*)malloc(sizeof(AMLGraph));
+    amlGraph->kind=kind;
+    amlGraph->arcnum=0;
+    amlGraph->vexnum=0;
+}
