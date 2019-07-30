@@ -14,12 +14,13 @@
 #include <Random.h>
 #include <ThrBitNode.h>
 #include <Stack.h>
-#include <Graph.hpp>
+#include <AmlGraph.hpp>
 #include "HeapSort_PriorityQueue.h"
 #include "BinaryTree.h"
 //
 // Created by chenda on 2019/6/23.
 //
+#include "OLGraph.h"
 
 int large(const void* a,const void* b){
     return (*(int*)a)>=(*(int*)b)?1:0;
@@ -242,7 +243,8 @@ Java_cd_note_others_JniTest_biTreeTest(JNIEnv *env, jclass type) {
      * */
     char c[] = "ABCDEFGHI   J";
     BiTree biTree = creatBiTree(c, strlen(c),0);
-    preOrderTraverse(biTree,0,visit);
+//    preOrderTraverse(biTree,0,visit);
+    preOrderTraverse_stack(biTree,0,visit);
     destroyBitTree(biTree);
 }
 
@@ -266,29 +268,35 @@ Java_cd_note_others_JniTest_thrBiTreeTest(JNIEnv *env, jclass type) {
 JNIEXPORT void JNICALL
 Java_cd_note_others_JniTest_stackTest(JNIEnv *env, jclass type) {
 
-    Stack* stack = createStack();
+    Stack* stack = createStack(sizeof(int));
 
     LOGD("isStackEmpty(stack)=%d",isStackEmpty(stack));
-    pushStack(stack,5);
+    int value = 5,top;
+    pushStack(stack,&value);
     LOGD("isStackEmpty(stack)=%d",isStackEmpty(stack));
-    LOGD("getTopElement(stack)=%d",getTopElement(stack));
-    pushStack(stack,4);
+    getTopElement(stack,&top);
+    LOGD("getTopElement()=%d",top);
+    value = 4;
+    pushStack(stack,&value);
     LOGD("isStackEmpty(stack)=%d",isStackEmpty(stack));
-    LOGD("getTopElement(stack)=%d",getTopElement(stack));
-    pushStack(stack,2);
+    getTopElement(stack,&top);
+    LOGD("getTopElement()=%d",top);
+    value = 3;
+    pushStack(stack,&value);
     LOGD("isStackEmpty(stack)=%d",isStackEmpty(stack));
-    LOGD("getTopElement(stack)=%d",getTopElement(stack));
+    getTopElement(stack,&top);
+    LOGD("getTopElement()=%d",top);
     ElemType data;
-    popEmpty(stack,&data);
+    popStack(stack, &data);
     LOGD("popEmpty(stack)=%d",data);
-    popEmpty(stack,&data);
+    popStack(stack, &data);
     LOGD("popEmpty(stack)=%d",data);
-    popEmpty(stack,&data);
+    popStack(stack, &data);
     LOGD("popEmpty(stack)=%d",data);
     LOGD("isStackEmpty(stack)=%d",isStackEmpty(stack));
     stackDestory(stack);
 }
-void visitAMLGraph(VertexType data){
+void visitAMLGraph(AmlVexType data){
     LOGD("AmlGraph data=%d",data);
 }
 extern "C"
@@ -310,4 +318,24 @@ Java_cd_note_others_JniTest_AmlGraph(JNIEnv *env, jclass type) {
     insertArc(amlGraph,3,5,0);
 
     DFSTraverse(amlGraph,visitAMLGraph);
+}extern "C"
+JNIEXPORT void JNICALL
+Java_cd_note_others_JniTest_OLGraph(JNIEnv *env, jclass type) {
+
+    OLGGraph *olgGraph;
+    CreateOLGraph(olgGraph,DG);
+    insertOLVex(olgGraph,1);
+    insertOLVex(olgGraph,2);
+    insertOLVex(olgGraph,3);
+    insertOLVex(olgGraph,4);
+    insertOLVex(olgGraph,5);
+
+    insertOLArc(olgGraph,1,2,0);
+    insertOLArc(olgGraph,1,3,0);
+    insertOLArc(olgGraph,2,5,0);
+    insertOLArc(olgGraph,2,3,0);
+    insertOLArc(olgGraph,3,5,0);
+
+    DFSOLTraverse(olgGraph,visitAMLGraph);
+
 }

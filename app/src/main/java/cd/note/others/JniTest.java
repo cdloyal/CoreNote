@@ -53,4 +53,6 @@ public class JniTest {
 
     //邻接多重表
     public static native void AmlGraph();
+    //十字链表
+    public static native void OLGraph();
 }

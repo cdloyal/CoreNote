@@ -3,7 +3,7 @@
 //
 #include <cstdlib>
 #include <log.h>
-#include "Graph.hpp"
+#include "AmlGraph.hpp"
 
 /**
  *
@@ -125,7 +125,7 @@
 
 
 //创建图
-int CreateGraph(AMLGraph *&amlGraph,GraphKind kind){
+int CreateGraph(AMLGraph *&amlGraph,AmlKind kind){
     amlGraph = (AMLGraph*)malloc(sizeof(AMLGraph));
     if(amlGraph==NULL){
         LOGD("OVERFLOW create graph error");
@@ -138,7 +138,7 @@ int CreateGraph(AMLGraph *&amlGraph,GraphKind kind){
 }
 
 //定位一个顶点值为途中的位置，否则返回-1
-int locateVex(AMLGraph amlGraph,VertexType data){
+int locateVex(AMLGraph amlGraph,AmlVexType data){
     for (int i = 0; i < amlGraph.vexnum; ++i) {
         if(amlGraph.adjmulist[i].data == data){
             return i;
@@ -148,7 +148,7 @@ int locateVex(AMLGraph amlGraph,VertexType data){
 }
 
 //插入一个顶点
-int insertVex(AMLGraph *amlGraph,VertexType data){
+int insertVex(AMLGraph *amlGraph,AmlVexType data){
     for(int i=0;i<amlGraph->vexnum;++i){
         if(amlGraph->adjmulist[i].data==data){
             LOGD("insertVex errot,vertex %d is exist!",data);
@@ -165,7 +165,7 @@ int insertVex(AMLGraph *amlGraph,VertexType data){
 }
 
 //插入一条弧
-int insertArc(AMLGraph *amlGraph,VertexType vi,VertexType vj,int weight){
+int insertArc(AMLGraph *amlGraph,AmlVexType vi,AmlVexType vj,int weight){
     if(amlGraph==NULL){
         LOGD("error amlGraph==NULL!");
         return -1;
@@ -198,7 +198,7 @@ int insertArc(AMLGraph *amlGraph,VertexType vi,VertexType vj,int weight){
 
 //递归实现深度遍历邻接点
 //连通图/子图
-static void DFS(AMLGraph *G,int i,void (*visit)(VertexType)){
+void DFS(AMLGraph *G,int i,void (*visit)(AmlVexType)){
     G->visited[i] = isvisited;
     visit(G->adjmulist[i].data);
 
@@ -218,7 +218,7 @@ static void DFS(AMLGraph *G,int i,void (*visit)(VertexType)){
 //输入：图 G
 //输出：遍历图G的每个点
 //  图G可能有不同的子图
-int DFSTraverse(AMLGraph *G,void (*visit)(VertexType)){
+int DFSTraverse(AMLGraph *G,void (*visit)(AmlVexType)){
     if( G->vexnum<=0){
         LOGD("error vertex has none!");
         return -1;

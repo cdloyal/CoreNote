@@ -1,4 +1,5 @@
 #include <cstdlib>
+#include <Stack.h>
 #include "BinaryTree.h"
 /**
  * 二叉树的5种形态：
@@ -86,7 +87,22 @@ void preOrderTraverse(BiTree t,int level,void (*visit)(BTNElemType ,int )){
     preOrderTraverse(t->lchild,level+1,visit);
     preOrderTraverse(t->rchild,level+1,visit);
 }
+void preOrderTraverse_stack(BiTree t,int level,void (*visit)(BTNElemType ,int )){
+    if(t==NULL)
+        return;
 
+    BiTNode biTNode;
+    Stack* stack = createStack(sizeof(struct BiTNode));
+    pushStack(stack,t);
+    while (!isStackEmpty(stack)){
+        popStack(stack,&biTNode);
+        visit(biTNode.data,level++);
+        if(biTNode.rchild!=NULL)
+            pushStack(stack,biTNode.rchild);
+        if(biTNode.lchild!=NULL)
+            pushStack(stack,biTNode.lchild);
+    }
+}
 //层序遍历二叉树,level当前层数,visit每次遍历到节点要做的事情
 void levelOrderTraverse(BiTree t,void (*visit)(BTNElemType )){
 

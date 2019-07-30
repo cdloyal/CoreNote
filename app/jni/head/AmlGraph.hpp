@@ -9,16 +9,16 @@
 #define CORENOTE_GRAPH_H
 
 /**
- * 邻接多重表（无向表）
+ * 邻接多重表（无向图）
  * */
 
 #define MAX_VERTEX_NUM 20
 //顶点数据类型
-typedef int VertexType;
+typedef int AmlVexType;
 //访问标记
 typedef enum {unvisited,isvisited}VisitIf;
 //图的类型:无向图/网
-typedef enum {UDG,UDN}GraphKind;
+typedef enum {UDG,UDN}AmlKind;
 
 //边结构
 typedef struct EBox{
@@ -32,46 +32,48 @@ typedef struct EBox{
 
 //顶点结构
 typedef struct VexBox{
-    VertexType data;
+    AmlVexType data;
     struct EBox *firstarc;     //指向第一条依附于该顶点的边
 }VexBox;
 
 typedef struct {
     VexBox adjmulist[MAX_VERTEX_NUM];
     int vexnum,arcnum;  //顶点数量，边数量
-    GraphKind kind;
+    AmlKind kind;
     //访问标志数组
     int visited[MAX_VERTEX_NUM];
 }AMLGraph;
 
 //创建图
-int CreateGraph(AMLGraph *&amlGraph,GraphKind kind);
+int CreateGraph(AMLGraph *&amlGraph,AmlKind kind);
 //销毁图
 int destroyGraph(AMLGraph *amlGraph);
 
 //定位一个顶点值为途中的位置，否则返回-1
-int locateVex(AMLGraph amlGraph,VertexType data);
+int locateVex(AMLGraph amlGraph,AmlVexType data);
 
 //返回顶点的值
-VertexType getVex(AMLGraph *amlGraph,int v);
+AmlVexType getVex(AMLGraph *amlGraph,int v);
 
 //赋值
-int putVex(AMLGraph *amlGraph,VertexType oldData,VertexType newData);
+int putVex(AMLGraph *amlGraph,AmlVexType oldData,AmlVexType newData);
 
 //插入一个顶点
-int insertVex(AMLGraph *amlGraph,VertexType data);
+int insertVex(AMLGraph *amlGraph,AmlVexType data);
 
 //插入一条弧
-int insertArc(AMLGraph *amlGraph,VertexType vi,VertexType vj,int weight);
+int insertArc(AMLGraph *amlGraph,AmlVexType vi,AmlVexType vj,int weight);
 
 //返回顶点值为v的下一个邻接顶点的序号，否怎返回-1
-int FirstAdjVex(AMLGraph G,VertexType v);
+int FirstAdjVex(AMLGraph G,AmlVexType v);
 
 //返回顶点值为v相对于顶点值为w的下一个顶点的序号
-int NextAdjVex(AMLGraph G,VertexType v,VertexType w);
+int NextAdjVex(AMLGraph G,AmlVexType v,AmlVexType w);
 
-//深度优先遍历
-int DFSTraverse(AMLGraph *G, void (*visit)(VertexType));
+//深度优先遍历，起点i的连通图
+void DFS(AMLGraph *G,int i,void (*visit)(AmlVexType));
+//深度优先遍历，整图
+int DFSTraverse(AMLGraph *G, void (*visit)(AmlVexType));
 
 
 

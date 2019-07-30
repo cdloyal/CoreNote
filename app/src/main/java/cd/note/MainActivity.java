@@ -107,6 +107,9 @@ public class MainActivity extends AppCompatActivity {
 
         //邻接多重表
         JniTest.AmlGraph();
+
+        //十字链表
+        JniTest.OLGraph();
     }
 
 }

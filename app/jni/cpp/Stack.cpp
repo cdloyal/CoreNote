@@ -1,5 +1,7 @@
 #include <cstdlib>
+#include <cstring>
 #include "Stack.h"
+
 /**
  * 作者：chenda
  * 时间：2019/7/23:17:06
@@ -7,64 +9,74 @@
  * 说明：
  */
 
-Stack* createStack(){
-    Stack* stack = (Stack*)malloc(sizeof(struct StackNode));
-    if(stack==NULL)
+Stack *createStack(int data_size) {
+    Stack *stack = (Stack *) malloc(sizeof(struct Stack));
+    if (stack == NULL)
         return NULL;
 
-    stack->next=NULL;
+    stack->data_size = data_size;
+    stack->stack = NULL;
     return stack;
 }
-void stackEmpty(Stack* stack){
-    if(stack==NULL)
+
+void stackEmpty(Stack *stack) {
+    if (stack == NULL)
         return;
-    ElemType data;
-    while (popEmpty(stack,&data)>=0){
+    void* data;
+    while (popStack(stack, &data) >= 0) {
     }
 }
-void stackDestory(Stack*& stack){
+
+void stackDestory(Stack *&stack) {
     stackEmpty(stack);
     free(stack);
 }
 
 int isStackEmpty(Stack *stack) {
-    return stack->next == NULL;
+    return stack->stack == NULL;
 }
 
-int pushStack(Stack* stack,ElemType data){
-    if(stack==NULL)
+int pushStack(Stack *stack, void* data) {
+    if (stack == NULL)
         return -1;
 
-    Stack* node = (Stack*)malloc(sizeof(struct StackNode));
-    if(node==NULL)
+    StackNode *node = (StackNode *) malloc(sizeof(struct StackNode));
+    if (node == NULL)
         return -1;
 
-    node->next = stack->next;
-    node->data = data;
+    node->data = malloc(stack->data_size);
+    if(node->data==NULL){
+        free(node);
+        node=NULL;
+        return -1;
+    }
+    memcpy(node->data,data,stack->data_size);
 
-    stack->next = node;
+    node->next = stack->stack;
+    stack->stack = node;
     return 0;
 }
-int popEmpty(Stack *stack,ElemType* data){
-    if(stack==NULL || stack->next==NULL){
-        data = NULL;
+
+int popStack(Stack *stack, void *data) {
+    if (stack == NULL || stack->stack == NULL) {
         return -1;
     }
 
-    Stack* pop = stack->next;
-    * data = pop->data;
-
-    stack->next = pop->next;
+    StackNode *pop = stack->stack;
+    memcpy(data,pop->data,stack->data_size);
+    stack->stack = pop->next;
+    free(pop->data);
     free(pop);
-
+    pop=NULL;
     return 0;
 }
 
-ElemType getTopElement(Stack* stack){
-    if(stack==NULL ){
-        return NULL;
+int getTopElement(Stack* stack,void* data) {
+    if (stack == NULL || stack->stack == NULL) {
+        return -1;
     }
-    return stack->next->data;
+    memcpy(data,stack->stack->data,stack->data_size);
+    return 0;
 }
 
 
