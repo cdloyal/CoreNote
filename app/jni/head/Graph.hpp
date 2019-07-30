@@ -22,7 +22,7 @@ typedef enum {UDG,UDN}GraphKind;
 
 //边结构
 typedef struct EBox{
-    VisitIf make;       //访问标记
+    VisitIf mark;       //访问标记
     int ivex;           //边顶点1
     int jvex;           //边顶点2
     struct EBox *iLink; //指向依附于顶点1的下一条边，类似于起点相同的一条弧
@@ -33,17 +33,16 @@ typedef struct EBox{
 //顶点结构
 typedef struct VexBox{
     VertexType data;
-    EBox *firstarc;     //指向第一条依附于该顶点的边
-};
+    struct EBox *firstarc;     //指向第一条依附于该顶点的边
+}VexBox;
 
 typedef struct {
     VexBox adjmulist[MAX_VERTEX_NUM];
     int vexnum,arcnum;  //顶点数量，边数量
     GraphKind kind;
+    //访问标志数组
+    int visited[MAX_VERTEX_NUM];
 }AMLGraph;
-
-//访问标志数组
-int visited[MAX_VERTEX_NUM];
 
 //创建图
 int CreateGraph(AMLGraph *&amlGraph,GraphKind kind);
@@ -51,7 +50,7 @@ int CreateGraph(AMLGraph *&amlGraph,GraphKind kind);
 int destroyGraph(AMLGraph *amlGraph);
 
 //定位一个顶点值为途中的位置，否则返回-1
-int localVex(AMLGraph *amlGraph,VertexType data);
+int locateVex(AMLGraph amlGraph,VertexType data);
 
 //返回顶点的值
 VertexType getVex(AMLGraph *amlGraph,int v);
@@ -63,7 +62,7 @@ int putVex(AMLGraph *amlGraph,VertexType oldData,VertexType newData);
 int insertVex(AMLGraph *amlGraph,VertexType data);
 
 //插入一条弧
-int insertArc(AMLGraph *amlGraph,VertexType vi,VertexType vj);
+int insertArc(AMLGraph *amlGraph,VertexType vi,VertexType vj,int weight);
 
 //返回顶点值为v的下一个邻接顶点的序号，否怎返回-1
 int FirstAdjVex(AMLGraph G,VertexType v);
@@ -72,11 +71,8 @@ int FirstAdjVex(AMLGraph G,VertexType v);
 int NextAdjVex(AMLGraph G,VertexType v,VertexType w);
 
 //深度优先遍历
-int DFSTraverse(AMLGraph G);
+int DFSTraverse(AMLGraph G, void (*visit)(VertexType));
 
-
-//递归实现深度遍历邻接点
-void DFS(AMLGraph G,int i);
 
 
 #endif //CORENOTE_GRAPH_H

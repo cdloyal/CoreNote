@@ -2,9 +2,13 @@
 // Created by chenda on 2019/7/28.
 //
 #include <cstdlib>
+#include <log.h>
 #include "Graph.hpp"
 
 /**
+ *
+ * https://blog.csdn.net/doubleselect/article/details/40151877
+ *
  * 图的定义：顶点和边的集合，顶点有穷非空,边可空。G(V,E)
  *
  * 无向边Edge， 无序偶(Vi,Vj)表示
@@ -119,10 +123,117 @@
  *
  * */
 
+
 //创建图
 int CreateGraph(AMLGraph *&amlGraph,GraphKind kind){
     amlGraph = (AMLGraph*)malloc(sizeof(AMLGraph));
+    if(amlGraph==NULL){
+        LOGD("OVERFLOW create graph error");
+        return -1;
+    }
     amlGraph->kind=kind;
     amlGraph->arcnum=0;
     amlGraph->vexnum=0;
+    return 0;
 }
+
+//定位一个顶点值为途中的位置，否则返回-1
+int locateVex(AMLGraph amlGraph,VertexType data){
+    for (int i = 0; i < amlGraph.vexnum; ++i) {
+        if(amlGraph.adjmulist[i].data == data){
+            return i;
+        }
+    }
+    return -1;
+}
+
+//插入一个顶点
+int insertVex(AMLGraph *amlGraph,VertexType data){
+    for(int i=0;i<amlGraph->vexnum;++i){
+        if(amlGraph->adjmulist[i].data==data){
+            LOGD("insertVex errot,vertex %d is exist!",data);
+            return -1;
+        }
+    }
+
+    amlGraph->adjmulist[amlGraph->vexnum].data=data;
+    amlGraph->adjmulist[amlGraph->vexnum].firstarc=NULL;
+    amlGraph->visited[amlGraph->vexnum]=unvisited;
+    amlGraph->vexnum++;
+
+    return 0;
+}
+
+//插入一条弧
+int insertArc(AMLGraph *amlGraph,VertexType vi,VertexType vj,int weight){
+    if(amlGraph==NULL){
+        LOGD("error amlGraph==NULL!");
+        return -1;
+    }
+
+    int indexVi = locateVex(*amlGraph,vi);
+    if(vi==-1){
+        LOGD("error vertex vi not exist!");
+        return -1;
+    }
+    int indexVj = locateVex(*amlGraph,vj);
+    if(vj==-1){
+        LOGD("error vertex vj not exist!");
+        return -1;
+    }
+
+
+    EBox* eBox = (EBox*)malloc(sizeof(EBox));
+    eBox->ivex = indexVi;
+    eBox->jvex = indexVj;
+    eBox->iLink = amlGraph->adjmulist[indexVi].firstarc;
+    eBox->jLink = amlGraph->adjmulist[indexVj].firstarc;
+    amlGraph->adjmulist[indexVi].firstarc = eBox;
+    amlGraph->adjmulist[indexVj].firstarc = eBox;
+    if(amlGraph->kind==UDN)
+        eBox->weight = weight;
+
+    return 0;
+}
+
+//递归实现深度遍历邻接点
+//连通图/子图
+static void DFS(AMLGraph G,int i,void (*visit)(VertexType)){
+    G.visited[i] = isvisited;
+    visit(G.adjmulist[i].data);
+
+    EBox *eBox = G.adjmulist[i].firstarc;
+
+    while (eBox!=NULL){
+        int j = eBox->ivex==i?eBox->jvex:eBox->ivex;
+        if(G.visited[j]==isvisited){
+            eBox=eBox->ivex==i?eBox->iLink:eBox->jLink;
+            continue;
+        }
+        DFS(G,j,visit);
+    }
+}
+
+//深度优先遍历
+//输入：图 G
+//输出：遍历图G的每个点
+//  图G可能有不同的子图
+int DFSTraverse(AMLGraph G,void (*visit)(VertexType)){
+    if( G.vexnum<=0){
+        LOGD("error vertex has none!");
+        return -1;
+    }
+
+    for(int i=0;i<G.vexnum;++i){
+        G.visited[i] = unvisited;
+    }
+
+    for(int i=0;i<G.vexnum;++i){
+        if(G.visited[i]!=isvisited)
+            DFS(G,i,visit);
+    }
+
+    return 0;
+}
+
+

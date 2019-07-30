@@ -101,6 +101,12 @@ public class MainActivity extends AppCompatActivity {
 
         //二叉搜索树
         JniTest.thrBiTreeTest();
+
+        //栈
+        JniTest.stackTest();
+
+        //邻接多重表
+        JniTest.AmlGraph();
     }
 
 }

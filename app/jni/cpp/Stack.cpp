@@ -8,7 +8,7 @@
  */
 
 Stack* createStack(){
-    Stack* stack = (Stack*)malloc(sizeof(struct node));
+    Stack* stack = (Stack*)malloc(sizeof(struct StackNode));
     if(stack==NULL)
         return NULL;
 
@@ -19,17 +19,15 @@ void stackEmpty(Stack* stack){
     if(stack==NULL)
         return;
     ElemType data;
-    int ret = popEmpty(stack,&data);
-    while (ret>=0){
-        popEmpty(stack,&data);
+    while (popEmpty(stack,&data)>=0){
     }
 }
-void stackDestory(Stack* stack){
+void stackDestory(Stack*& stack){
     stackEmpty(stack);
     free(stack);
 }
 
-int isEmpty(Stack *stack) {
+int isStackEmpty(Stack *stack) {
     return stack->next == NULL;
 }
 
@@ -37,7 +35,7 @@ int pushStack(Stack* stack,ElemType data){
     if(stack==NULL)
         return -1;
 
-    Stack* node = (Stack*)malloc(sizeof(struct node));
+    Stack* node = (Stack*)malloc(sizeof(struct StackNode));
     if(node==NULL)
         return -1;
 
@@ -47,7 +45,7 @@ int pushStack(Stack* stack,ElemType data){
     stack->next = node;
     return 0;
 }
-int popEmpty(Stack* stack,ElemType* data){
+int popEmpty(Stack *stack,ElemType* data){
     if(stack==NULL || stack->next==NULL){
         data = NULL;
         return -1;
@@ -56,7 +54,7 @@ int popEmpty(Stack* stack,ElemType* data){
     Stack* pop = stack->next;
     * data = pop->data;
 
-    stack = pop->next;
+    stack->next = pop->next;
     free(pop);
 
     return 0;

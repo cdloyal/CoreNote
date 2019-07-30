@@ -47,4 +47,10 @@ public class JniTest {
 
     //线索树
     public static native void thrBiTreeTest();
+
+    //栈
+    public static native void stackTest();
+
+    //邻接多重表
+    public static native void AmlGraph();
 }

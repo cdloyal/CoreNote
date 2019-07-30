@@ -13,6 +13,8 @@
 #include "QuickSort.h"
 #include <Random.h>
 #include <ThrBitNode.h>
+#include <Stack.h>
+#include <Graph.hpp>
 #include "HeapSort_PriorityQueue.h"
 #include "BinaryTree.h"
 //
@@ -260,4 +262,52 @@ Java_cd_note_others_JniTest_thrBiTreeTest(JNIEnv *env, jclass type) {
     //中序遍历线索二叉树
     inOrderTraverse_The(t,visit_thr);
 
+}extern "C"
+JNIEXPORT void JNICALL
+Java_cd_note_others_JniTest_stackTest(JNIEnv *env, jclass type) {
+
+    Stack* stack = createStack();
+
+    LOGD("isStackEmpty(stack)=%d",isStackEmpty(stack));
+    pushStack(stack,5);
+    LOGD("isStackEmpty(stack)=%d",isStackEmpty(stack));
+    LOGD("getTopElement(stack)=%d",getTopElement(stack));
+    pushStack(stack,4);
+    LOGD("isStackEmpty(stack)=%d",isStackEmpty(stack));
+    LOGD("getTopElement(stack)=%d",getTopElement(stack));
+    pushStack(stack,2);
+    LOGD("isStackEmpty(stack)=%d",isStackEmpty(stack));
+    LOGD("getTopElement(stack)=%d",getTopElement(stack));
+    ElemType data;
+    popEmpty(stack,&data);
+    LOGD("popEmpty(stack)=%d",data);
+    popEmpty(stack,&data);
+    LOGD("popEmpty(stack)=%d",data);
+    popEmpty(stack,&data);
+    LOGD("popEmpty(stack)=%d",data);
+    LOGD("isStackEmpty(stack)=%d",isStackEmpty(stack));
+    stackDestory(stack);
+}
+void visitAMLGraph(VertexType data){
+    LOGD("AmlGraph data=%d",data);
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_cd_note_others_JniTest_AmlGraph(JNIEnv *env, jclass type) {
+
+    AMLGraph *amlGraph;
+    CreateGraph(amlGraph,UDG);
+    insertVex(amlGraph,1);
+    insertVex(amlGraph,2);
+    insertVex(amlGraph,3);
+    insertVex(amlGraph,4);
+    insertVex(amlGraph,5);
+
+    insertArc(amlGraph,1,2,0);
+    insertArc(amlGraph,1,3,0);
+    insertArc(amlGraph,2,5,0);
+    insertArc(amlGraph,2,3,0);
+    insertArc(amlGraph,3,5,0);
+
+    DFSTraverse(*amlGraph,visitAMLGraph);
 }

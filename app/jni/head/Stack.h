@@ -9,17 +9,17 @@
 #define CORENOTE_STACK_H
 
 typedef int ElemType;
-typedef struct node{
+typedef struct StackNode{
     ElemType data;
-    struct node* next;
+    struct StackNode* next;
 }Stack;
 
 Stack* createStack();
 void stackEmpty(Stack* stack);
-void stackDestory(Stack* stack);
-int isEmpty(Stack* stack);
+void stackDestory(Stack*& stack);
+int isStackEmpty(Stack *stack);
 int pushStack(Stack* stack,ElemType data);
-int popEmpty(Stack* stack,ElemType* data);
+int popEmpty(Stack *stack,ElemType* data);
 ElemType getTopElement(Stack* stack);
 
 /**
