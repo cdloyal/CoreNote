@@ -71,7 +71,7 @@ int FirstAdjVex(AMLGraph G,VertexType v);
 int NextAdjVex(AMLGraph G,VertexType v,VertexType w);
 
 //深度优先遍历
-int DFSTraverse(AMLGraph G, void (*visit)(VertexType));
+int DFSTraverse(AMLGraph *G, void (*visit)(VertexType));
 
 
 

@@ -309,5 +309,5 @@ Java_cd_note_others_JniTest_AmlGraph(JNIEnv *env, jclass type) {
     insertArc(amlGraph,2,3,0);
     insertArc(amlGraph,3,5,0);
 
-    DFSTraverse(*amlGraph,visitAMLGraph);
+    DFSTraverse(amlGraph,visitAMLGraph);
 }

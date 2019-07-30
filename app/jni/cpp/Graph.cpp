@@ -198,15 +198,15 @@ int insertArc(AMLGraph *amlGraph,VertexType vi,VertexType vj,int weight){
 
 //递归实现深度遍历邻接点
 //连通图/子图
-static void DFS(AMLGraph G,int i,void (*visit)(VertexType)){
-    G.visited[i] = isvisited;
-    visit(G.adjmulist[i].data);
+static void DFS(AMLGraph *G,int i,void (*visit)(VertexType)){
+    G->visited[i] = isvisited;
+    visit(G->adjmulist[i].data);
 
-    EBox *eBox = G.adjmulist[i].firstarc;
+    EBox *eBox = G->adjmulist[i].firstarc;
 
     while (eBox!=NULL){
         int j = eBox->ivex==i?eBox->jvex:eBox->ivex;
-        if(G.visited[j]==isvisited){
+        if(G->visited[j]==isvisited){
             eBox=eBox->ivex==i?eBox->iLink:eBox->jLink;
             continue;
         }
@@ -218,18 +218,18 @@ static void DFS(AMLGraph G,int i,void (*visit)(VertexType)){
 //输入：图 G
 //输出：遍历图G的每个点
 //  图G可能有不同的子图
-int DFSTraverse(AMLGraph G,void (*visit)(VertexType)){
-    if( G.vexnum<=0){
+int DFSTraverse(AMLGraph *G,void (*visit)(VertexType)){
+    if( G->vexnum<=0){
         LOGD("error vertex has none!");
         return -1;
     }
 
-    for(int i=0;i<G.vexnum;++i){
-        G.visited[i] = unvisited;
+    for(int i=0;i<G->vexnum;++i){
+        G->visited[i] = unvisited;
     }
 
-    for(int i=0;i<G.vexnum;++i){
-        if(G.visited[i]!=isvisited)
+    for(int i=0;i<G->vexnum;++i){
+        if(G->visited[i]!=isvisited)
             DFS(G,i,visit);
     }
 
