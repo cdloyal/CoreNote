@@ -3,6 +3,7 @@
 //
 #include <cstdlib>
 #include <log.h>
+#include <LQueue.h>
 #include "AmlGraph.hpp"
 
 /**
@@ -233,6 +234,56 @@ int DFSTraverse(AMLGraph *G,void (*visit)(AmlVexType)){
             DFS(G,i,visit);
     }
 
+    return 0;
+}
+
+//广度优先遍历，起点i的连通图
+void BFS(AMLGraph *G,int i,void (*visit)(AmlVexType)){
+    if(G==NULL)
+        return;
+    if(G->visited[i]==isvisited){
+        return;
+    }
+
+    LQueue *queue = creatLQueue(sizeof(int));
+
+    int vex;
+    EBox *eBox;
+
+    visit(G->adjmulist[i].data);
+    G->visited[i] = isvisited;
+    enLQueue(queue,&i);
+
+    while (!isLQueueEmpty(queue)){
+        deLQueue(queue,&vex);
+        eBox = G->adjmulist[vex].firstarc;
+        while (eBox!=NULL){
+            int j = eBox->ivex==vex?eBox->jvex:eBox->ivex;
+            if(G->visited[j]!=isvisited){
+                visit(G->adjmulist[j].data);
+                G->visited[j]=isvisited;
+                enLQueue(queue,&j);
+            }
+            eBox = eBox->ivex==vex?eBox->iLink:eBox->jLink;
+        }
+    }
+
+    destroyLQueue(queue);
+}
+
+//广度优先遍历，整图
+int BFSTraverse(AMLGraph *G, void (*visit)(AmlVexType)){
+    if(G==NULL)
+        return -1;
+
+    for(int i=0; i<G->vexnum; i++){
+        G->visited[i]=unvisited;
+    }
+
+    for(int i=0; i<G->vexnum; i++){
+        if(G->visited[i]!=isvisited)
+            BFS(G,i,visit);
+    }
     return 0;
 }
 

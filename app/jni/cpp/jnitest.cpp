@@ -319,8 +319,14 @@ Java_cd_note_others_JniTest_AmlGraph(JNIEnv *env, jclass type) {
     insertArc(amlGraph,2,3,0);
     insertArc(amlGraph,3,5,0);
 
-    DFSTraverse(amlGraph,visitAMLGraph);
-}extern "C"
+//    DFSTraverse(amlGraph,visitAMLGraph);
+
+    BFSTraverse(amlGraph,visitAMLGraph);
+}
+void visitOLGraph(AmlVexType data){
+    LOGD("OlGraph data=%d",data);
+}
+extern "C"
 JNIEXPORT void JNICALL
 Java_cd_note_others_JniTest_OLGraph(JNIEnv *env, jclass type) {
 
@@ -338,7 +344,7 @@ Java_cd_note_others_JniTest_OLGraph(JNIEnv *env, jclass type) {
     insertOLArc(olgGraph,2,3,0);
     insertOLArc(olgGraph,3,5,0);
 
-    DFSOLTraverse(olgGraph,visitAMLGraph);
+    DFSOLTraverse(olgGraph,visitOLGraph);
 
 }extern "C"
 JNIEXPORT void JNICALL

@@ -75,6 +75,9 @@ void DFS(AMLGraph *G,int i,void (*visit)(AmlVexType));
 //深度优先遍历，整图
 int DFSTraverse(AMLGraph *G, void (*visit)(AmlVexType));
 
-
+//广度优先遍历，起点i的连通图
+void BFS(AMLGraph *G,int i,void (*visit)(AmlVexType));
+//广度优先遍历，整图
+int BFSTraverse(AMLGraph *G, void (*visit)(AmlVexType));
 
 #endif //CORENOTE_GRAPH_H
