@@ -10,6 +10,9 @@
 
 #include <cstdio>
 
+//下面是二叉树的二叉链表存储结构
+//其实还可以用顺序存储方式的
+
 typedef char BTNElemType;
 
 typedef struct BiTNode{

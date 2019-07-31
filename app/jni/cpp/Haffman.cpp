@@ -23,15 +23,13 @@
  * decode
  *
  *
- *
- *
  * */
 
-#define MAXHAFFCODELEN 64
-typedef char HaffElemTypt;
+
 typedef struct HaffNode{
-    HaffElemTypt data;
+    void* data;
     int weight;
-    char haffCode[MAXHAFFCODELEN];
+    char *haffCode;
     struct HaffNode *left,*right;
 }HaffNode,*HaffTree;
+

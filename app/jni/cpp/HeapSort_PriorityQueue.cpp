@@ -6,6 +6,7 @@
 /**
  * 堆、堆排序、优先队列
  *
+ *
  * 堆：进似完全二叉树，除了最底层外，该树完全充满。顺序存储的特性就是数组元素连续
  *      A<=A.heap-size<=A.length
  *      A.heap-size ： 堆的有效元素
@@ -19,8 +20,12 @@
  *          4    5   6     7                             5    6    7     8
  *        8  9 10                                      9  10
  *
- * 最大堆：除根节点外的所有节点A[PARENT(i)]>=A[i]   例如:A[2]>=A[4]/A[5]
+ * 最大堆：除根节点外的所有节点A[PARENT(i)]>=A[i]   例如:A[2]>=A[4]&&A[2]>=A[5]，node.data>=node.lchild&&node.data.rchild
  * 最小堆：A[PARENT(i)]=<A[i]
+ *
+ * 堆排序原理：最大堆，node.data>=node.lchild&&node.data.rchild,树的最大值在根节点，
+ *             排序，根节点出来rootNode，最后一个节点替代根节点lastNode.lchild=rootNode.lchild...
+ *             重新递归建最大堆，建好堆重复取根结点
  *
  * 弄清除两个概念：
  * 树的下标与数组原来的下标
@@ -36,6 +41,7 @@
  * 树的叶节点：A[n/2+1 ... n]  (j-(start-1))/2+1+(start-1)
  *
  * 建堆：
+ *
  *  输入：无序数组A
  *  输出：数组A满足最大堆性质
  *
@@ -106,7 +112,12 @@
  * */
 
 
-static void maxHeap(int *A,int size,int i){
+typedef struct Operation{
+    bool (*greater)(void&, void&);
+};
+
+//维持最大堆性质
+static void maxHeap(void *A,int size,int i){
     int tmp,l=2*i+1,r=2*i+2,max=i;
     if(l<=size-1 && A[max]<A[l])
         max=l;
@@ -120,6 +131,7 @@ static void maxHeap(int *A,int size,int i){
     }
 }
 
+//递归法建堆
 void buildMaxHeapbyMerge(int *A,int size,int i){
     int l=2*i+1,r=2*i+2;
     if(l>size-1)        //不存在子节点，叶子
@@ -131,12 +143,14 @@ void buildMaxHeapbyMerge(int *A,int size,int i){
     maxHeap(A,size,i);
 }
 
+//非递归法建堆
 void buildMaxHeap(int *A,int size){
     for (int i=(size+1)/2;i>=0;i--){     //(size-(start-1))/2+1+(start-1) =  (size+1)/2
         maxHeap(A,size,i);
     }
 }
 
+//排序
 void maxHeapSort(int *A, int size){
 
     buildMaxHeap(A,size);
@@ -150,9 +164,11 @@ void maxHeapSort(int *A, int size){
     }
 }
 
+//返回最大值
 int maxHeapMaximum(int *A){
     return A[0];
 }
+//将最大值取出
 int extractMaxHeap(int *A, int *size,int *maxValue){
     if (*size < 1)
         return -1;
@@ -164,6 +180,7 @@ int extractMaxHeap(int *A, int *size,int *maxValue){
     maxHeap(A,*size,0);
     return 0;
 }
+//改变其中一个值
 int heapIncreaseKey(int *A,int i,int key){
     if(key<A[i])
         return -1;
@@ -177,7 +194,7 @@ int heapIncreaseKey(int *A,int i,int key){
 
     return 0;
 }
-
+//插入一个值
 void heapInsert(int *A,int size,int i){
     A[size]=i-1;
     size++;
