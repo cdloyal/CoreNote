@@ -55,6 +55,12 @@ int enLQueue(LQueue *queue, void *e){
         LOGD("error,EnLQueue failed overflow");
         return -1;
     }
+    node->data = malloc(queue->data_size);
+    if(node->data ==NULL){
+        LOGD("error,EnLQueue failed overflow");
+        return -1;
+    }
+
     memcpy(node->data,e,queue->data_size);
     node->next=queue->rear->next;
     queue->rear->next=node;
@@ -69,6 +75,9 @@ int deLQueue(LQueue* queue,void *e){
     LQNode *node = queue->front->next;
     memcpy(e,node->data,queue->data_size);
     queue->front->next = node->next;
+    if(node==queue->rear)
+        queue->rear=queue->front;
+    free(node->data);
     free(node);
     return 0;
 }

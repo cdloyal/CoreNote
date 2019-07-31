@@ -104,6 +104,8 @@ public class MainActivity extends AppCompatActivity {
 
         //栈
         JniTest.stackTest();
+        //堆
+        JniTest.queueTest();
 
         //邻接多重表
         JniTest.AmlGraph();

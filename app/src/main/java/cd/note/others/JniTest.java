@@ -42,14 +42,16 @@ public class JniTest {
     //堆排序
     public static native void buildMaxHeapbyMerge();
 
+    //栈
+    public static native void stackTest();
+    //堆
+    public static native void queueTest();
+
     //二叉树
     public static native void biTreeTest();
 
     //线索树
     public static native void thrBiTreeTest();
-
-    //栈
-    public static native void stackTest();
 
     //邻接多重表
     public static native void AmlGraph();

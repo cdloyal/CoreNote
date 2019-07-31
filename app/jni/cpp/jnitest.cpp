@@ -15,6 +15,8 @@
 #include <ThrBitNode.h>
 #include <Stack.h>
 #include <AmlGraph.hpp>
+#include <queue>
+#include <LQueue.h>
 #include "HeapSort_PriorityQueue.h"
 #include "BinaryTree.h"
 //
@@ -338,4 +340,28 @@ Java_cd_note_others_JniTest_OLGraph(JNIEnv *env, jclass type) {
 
     DFSOLTraverse(olgGraph,visitAMLGraph);
 
+}extern "C"
+JNIEXPORT void JNICALL
+Java_cd_note_others_JniTest_queueTest(JNIEnv *env, jclass type) {
+
+    LQueue *queue =  creatLQueue(sizeof(int));
+    LOGD("isLQueueEmpty(queue)=%d",isLQueueEmpty(queue));
+    int e = 1;
+    enLQueue(queue,&e);
+    LOGD("enQueue %d",e);
+    LOGD("isLQueueEmpty(queue)=%d",isLQueueEmpty(queue));
+    e = 3;
+    LOGD("enQueue %d",e);
+    enLQueue(queue,&e);
+    e = 2;
+    LOGD("enQueue %d",e);
+    enLQueue(queue,&e);
+
+    deLQueue(queue,&e);
+    LOGD("deLQueue %d",e);
+    deLQueue(queue,&e);
+    LOGD("deLQueue %d",e);
+
+    emptyLQueue(queue);
+    destroyLQueue(queue);
 }
