@@ -111,17 +111,17 @@
  *  INSERT(S,x)             把元素插入到集合S中
  * */
 
-
 typedef struct Operation{
-    bool (*greater)(void&, void&);
-};
+    void (*assign)(void *src, void *&dest);   //赋值操作,src原值，dest目标值
+    bool (*greater)(void *a, void *b);       //大于操作,a>b?
+}Operation;
 
 //维持最大堆性质
-static void maxHeap(void *A,int size,int i){
+static void maxHeap(int *A,int size,int i){
     int tmp,l=2*i+1,r=2*i+2,max=i;
-    if(l<=size-1 && A[max]<A[l])
+    if(l<=size-1 &&  A[max]<A[l])
         max=l;
-    if(r<=size-1 && A[max]<A[r])
+    if(r<=size-1 &&  A[max]<A[r])
         max=r;
     if(max!=i){
         tmp=A[i];
@@ -200,4 +200,11 @@ void heapInsert(int *A,int size,int i){
     size++;
     heapIncreaseKey(A,size-1,i);
 }
+
+
+
+
+
+
+
 

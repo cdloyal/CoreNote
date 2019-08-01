@@ -1,6 +1,6 @@
 #include <cstdlib>
 #include <time.h>
-#include "Linklist.h"
+#include "Linklist_C.h"
  /**
  * 作者：chenda
  * 时间：2019/6/18:13:39

@@ -36,6 +36,9 @@ public class MainActivity extends AppCompatActivity {
         //Rxjava
         new RxjavaTest().test();
 
+        //C\C++特性
+        JniTest.cTest();
+
         //线性表的顺序存储结构
         JniTest.sqListTest();
         //线性表的单链表结构

@@ -15,6 +15,9 @@ public class JniTest {
         System.loadLibrary("corenote");
     }
 
+    //C\C++特性
+    public static native void cTest();
+
     //线性表的顺序存储结构
     public static native int sqListTest();
 

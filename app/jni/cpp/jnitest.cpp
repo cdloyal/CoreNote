@@ -8,7 +8,7 @@
 #include <DulLinklist.h>
 #include "PrintUtils.h"
 #include "log.h"
-#include "Linklist.h"
+#include "Linklist_C.h"
 #include "DivideConquer.h"
 #include "QuickSort.h"
 #include <Random.h>
@@ -17,12 +17,22 @@
 #include <AmlGraph.hpp>
 #include <queue>
 #include <LQueue.h>
+#include <TemplateUse.h>
+#include <CTest.h>
 #include "HeapSort_PriorityQueue.h"
 #include "BinaryTree.h"
 //
 // Created by chenda on 2019/6/23.
 //
 #include "OLGraph.h"
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_cd_note_others_JniTest_cTest(JNIEnv *env, jclass type) {
+
+    ctest();
+
+}
 
 int large(const void* a,const void* b){
     return (*(int*)a)>=(*(int*)b)?1:0;
@@ -346,7 +356,8 @@ Java_cd_note_others_JniTest_OLGraph(JNIEnv *env, jclass type) {
 
     DFSOLTraverse(olgGraph,visitOLGraph);
 
-}extern "C"
+}
+extern "C"
 JNIEXPORT void JNICALL
 Java_cd_note_others_JniTest_queueTest(JNIEnv *env, jclass type) {
 
@@ -370,4 +381,6 @@ Java_cd_note_others_JniTest_queueTest(JNIEnv *env, jclass type) {
 
     emptyLQueue(queue);
     destroyLQueue(queue);
+
 }
+

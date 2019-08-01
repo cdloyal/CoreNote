@@ -26,10 +26,17 @@
  * */
 
 
-typedef struct HaffNode{
-    void* data;
+template <class T>
+struct HaffNode{
+    T data;
     int weight;
     char *haffCode;
     struct HaffNode *left,*right;
-}HaffNode,*HaffTree;
+};
 
+template <class T>
+class Haffman{
+public:
+    char* haffEncode();
+    char* haffDecode();
+};

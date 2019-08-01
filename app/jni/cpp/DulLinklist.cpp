@@ -50,6 +50,7 @@ int initList(List *list,int data_size){
     return 0;
 }
 
+
 //把data的数据内容插入到链表的list末尾
 //assign指定数据data间的赋值方法
 int insertLast(List list, void *data, void (*assign)(void *, const void *)){
