@@ -17,7 +17,6 @@
 #include <AmlGraph.hpp>
 #include <queue>
 #include <LQueue.h>
-#include <TemplateUse.h>
 #include <CTest.h>
 #include "HeapSort_PriorityQueue.h"
 #include "BinaryTree.h"
@@ -145,6 +144,15 @@ Java_cd_note_others_JniTest_linkListTest(JNIEnv *env, jclass type) {
 
     linklistClear(list);
     free(list);
+
+
+    //抽象链表
+//    LinkedList<int> *linkedList = new LinkedList<int>();
+//    linkedList->insert(135);
+//    LinkedList<int>::LLIterator it =linkedList->iterator();
+//
+//    LOGD("it.next() = %d",it.next());
+
     return 0;
 }extern "C"
 JNIEXPORT jint JNICALL
@@ -161,7 +169,7 @@ Java_cd_note_others_JniTest_dulLinkListTest(JNIEnv *env, jclass type) {
     for(int i:array)
         insertLast(list,&i,NULL);
 
-    Iterator iterator = getIterator(list,0);
+    DlIterator iterator = getIterator(list,0);
     while (iterator!=list->head){
         int* data = (int*)getData(iterator);
         offset += sprintf(string+offset,"%d ",*data);

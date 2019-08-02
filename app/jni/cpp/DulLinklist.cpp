@@ -77,14 +77,14 @@ int insertLast(List list, void *data, void (*assign)(void *, const void *)){
     return 0;
 }
 
-Iterator getIterator(List list, int index){
+DlIterator getIterator(List list, int index){
     //节点下标从0开始，头节点不计入下标值
     if(list==NULL)
         return NULL;
     if(index<0 || index>list->length-1)
         return NULL;
 
-    Iterator iterator = list->head;
+    DlIterator iterator = list->head;
 
     //如果index比长度的一半小，从前往后找
     if(index <= (list->length>>1)) {
@@ -105,7 +105,7 @@ int remove(List list, int index){
     if(index<0 || index>list->length-1)
         return -1;
 
-    Iterator iterator = getIterator(list,index);
+    DlIterator iterator = getIterator(list,index);
     Node *pre = iterator->pre;
     Node *next = iterator->next;
     pre->next = next;
@@ -133,8 +133,8 @@ int getMax(List list,int startIndex,int endIndex,int (*large)(const void*,const 
         return -1;
 
     int maxIndex = startIndex;
-    Iterator maxNode = getIterator(list,startIndex);
-    Iterator tmp = maxNode;
+    DlIterator maxNode = getIterator(list,startIndex);
+    DlIterator tmp = maxNode;
 
     for(int i=startIndex+1;i<=endIndex;i++){
         tmp = tmp->next;
@@ -147,6 +147,6 @@ int getMax(List list,int startIndex,int endIndex,int (*large)(const void*,const 
     return maxIndex;
 }
 
-void* getData(Iterator iterator){
+void* getData(DlIterator iterator){
     return iterator->data;
 }

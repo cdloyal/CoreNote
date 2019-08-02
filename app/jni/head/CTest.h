@@ -23,6 +23,12 @@ typedef struct strTest{
     }
 }strTest;
 
+template <class T>
+class pointerTemplate{
+public:
+    T t;
+};
+
 void ctest(void);
 
 #endif //CORENOTE_CTEST_H

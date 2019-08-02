@@ -141,7 +141,7 @@ public class CollectionTest {
         List<String> map = list.stream().map(integer -> "-"+integer).collect(Collectors.toList());
         Log.d(TAG,"list map(3)="+map);
 
-
+        list.iterator();
     }
 
     private interface MyPredicate<T>{

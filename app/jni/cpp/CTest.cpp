@@ -65,6 +65,7 @@ void ctest(void){
     int g=fun5();
     LOGD("ctest %d",g);
 
+    //符号重载
     CTest cTest1;
     cTest1.a = 100;
     CTest cTest2=cTest1;
@@ -79,5 +80,13 @@ void ctest(void){
     strTest2.a=4;
     LOGD("strTest1>strTest2 = %d",strTest1>strTest2);
 
+
+    //template 指针
+    int h = 111;
+    pointerTemplate<int*> pt;
+    pt.t = &h;
+    LOGD("pt.t=%d,&h=%d",(pt.t),&h);
 }
+
+
 

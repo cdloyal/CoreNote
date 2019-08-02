@@ -23,7 +23,7 @@ struct list{
 };
 
 //定义结点指针 node *为List类型的迭代器
-typedef struct node *Iterator;
+typedef struct node *DlIterator;
 
 //List类型的定义
 typedef struct list *List;
@@ -36,9 +36,9 @@ int initList(List *list,int data_size);
 int insertLast(List list, void *data, void (*assign)(void *, const void *));
 
 //返回index位置的迭代器
-Iterator getIterator(List list, int index);
+DlIterator getIterator(List list, int index);
 
-void* getData(Iterator iterator);
+void* getData(DlIterator iterator);
 
 //删除index位置的元素
 int remove(List list, int index);

@@ -5,8 +5,8 @@
  * 说明：
  */
 
-#ifndef CORENOTE_LINKLIST_H
-#define CORENOTE_LINKLIST_H
+#ifndef CORENOTE_LINKLIST_C_H
+#define CORENOTE_LINKLIST_C_H
 
 
 typedef int ElemType;
