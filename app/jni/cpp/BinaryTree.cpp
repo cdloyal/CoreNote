@@ -54,7 +54,7 @@
  *
  * */
 
-BiTree creatBiTree(char* array,int length,int index){
+BinTree creatBiTree(char* array,int length,int index){
 
     int l=2*index+1,r=2*index+2;
     if(array==NULL||length<=0)
@@ -79,7 +79,7 @@ BiTree creatBiTree(char* array,int length,int index){
     return biTree;
 }
 
-void preOrderTraverse(BiTree t,int level,void (*visit)(BTNElemType ,int )){
+void preOrderTraverse(BinTree t,int level,void (*visit)(BTNElemType ,int )){
     if(t==NULL)
         return;
 
@@ -87,7 +87,7 @@ void preOrderTraverse(BiTree t,int level,void (*visit)(BTNElemType ,int )){
     preOrderTraverse(t->lchild,level+1,visit);
     preOrderTraverse(t->rchild,level+1,visit);
 }
-void preOrderTraverse_stack(BiTree t,int level,void (*visit)(BTNElemType ,int )){
+void preOrderTraverse_stack(BinTree t,int level,void (*visit)(BTNElemType ,int )){
     if(t==NULL)
         return;
 
@@ -104,12 +104,12 @@ void preOrderTraverse_stack(BiTree t,int level,void (*visit)(BTNElemType ,int ))
     }
 }
 //层序遍历二叉树,level当前层数,visit每次遍历到节点要做的事情
-void levelOrderTraverse(BiTree t,void (*visit)(BTNElemType )){
+void levelOrderTraverse(BinTree t,void (*visit)(BTNElemType )){
 
 
 }
 
-void destroyBitTree(BiTree t){
+void destroyBitTree(BinTree t){
     if(t==NULL)
         return;
 

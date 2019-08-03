@@ -1,6 +1,8 @@
 //
 // Created by chenda on 2019/7/28.
 //
+#include <LinkedList.h>
+#include <BiTree.h>
 #include "Haffman.h"
 
 /**
@@ -26,17 +28,5 @@
  * */
 
 
-template <class T>
-struct HaffNode{
-    T data;
-    int weight;
-    char *haffCode;
-    struct HaffNode *left,*right;
-};
 
-template <class T>
-class Haffman{
-public:
-    char* haffEncode();
-    char* haffDecode();
-};
+

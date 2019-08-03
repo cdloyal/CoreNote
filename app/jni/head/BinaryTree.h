@@ -18,20 +18,20 @@ typedef char BTNElemType;
 typedef struct BiTNode{
     BTNElemType data;
     struct BiTNode *lchild,*rchild;
-}BiTNode, *BiTree;
+}BiTNode, *BinTree;
 
 //由一个数组创建二叉数
-BiTree creatBiTree(char* array,int length,int index);
+BinTree creatBiTree(char* array,int length,int index);
 
 //前序递归遍历二叉树,level当前层数,visit每次遍历到节点要做的事情
-void preOrderTraverse(BiTree t,int level,void (*visit)(BTNElemType ,int ));
+void preOrderTraverse(BinTree t,int level,void (*visit)(BTNElemType ,int ));
 //前序非递归遍历二叉树
-void preOrderTraverse_stack(BiTree t,int level,void (*visit)(BTNElemType ,int ));
+void preOrderTraverse_stack(BinTree t,int level,void (*visit)(BTNElemType ,int ));
 
 //层序遍历二叉树,level当前层数,visit每次遍历到节点要做的事情
-void levelOrderTraverse(BiTree t,void (*visit)(BTNElemType ));
+void levelOrderTraverse(BinTree t,void (*visit)(BTNElemType ));
 
-void destroyBitTree(BiTree t);
+void destroyBitTree(BinTree t);
 
 
 #endif //CORENOTE_BINARYTREE_H

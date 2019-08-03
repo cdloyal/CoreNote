@@ -18,6 +18,9 @@
 #include <queue>
 #include <LQueue.h>
 #include <CTest.h>
+#include <LinkedList.h>
+#include <BiTree.h>
+#include <Heap.h>
 #include "HeapSort_PriorityQueue.h"
 #include "BinaryTree.h"
 //
@@ -104,7 +107,19 @@ Java_cd_note_others_JniTest_mergeSortTest(JNIEnv *env, jclass type) {
     intArray2String(array,sizeof(array)/ sizeof(int),string);
     LOGD("%s",string);
 
-}extern "C"
+}
+void linkedListTest(){
+    //抽象链表
+    LinkedList<int> linkedList ;
+    linkedList.insert(135);
+    linkedList.insert(136);
+    linkedList.insert(137);
+    LinkedList<int>::LLIterator it =linkedList.iterator();
+    while (it.hasNext()){
+        LOGD("it.next() = %d",it.next());
+    }
+}
+extern "C"
 JNIEXPORT jint JNICALL
 Java_cd_note_others_JniTest_linkListTest(JNIEnv *env, jclass type) {
 
@@ -145,13 +160,9 @@ Java_cd_note_others_JniTest_linkListTest(JNIEnv *env, jclass type) {
     linklistClear(list);
     free(list);
 
+    linkedListTest();
 
-    //抽象链表
-//    LinkedList<int> *linkedList = new LinkedList<int>();
-//    linkedList->insert(135);
-//    LinkedList<int>::LLIterator it =linkedList->iterator();
-//
-//    LOGD("it.next() = %d",it.next());
+    LOGD("linkedListTest end");
 
     return 0;
 }extern "C"
@@ -246,9 +257,42 @@ Java_cd_note_others_JniTest_buildMaxHeapbyMerge(JNIEnv *env, jclass type) {
     LOGD("buildMaxHeapbyMerge array new:");
     intArray2String(A,sizeof(A)/ sizeof(int),string);
     LOGD("%s",string);
+
+    int B[] = {13,  -3, -25,  20,  -3, -16, -23,  18,  20,  -7,   12,  -5, -22,  15,  -4,   40};
+    Heap<int> *heap = new Heap<int>(2,B,sizeof(B)/ sizeof(int));
+    heap->buildHeap();
+    heap->heapSort();
+    LOGD("buildMaxHeapbyMerge B:");
+    intArray2String(B,sizeof(B)/ sizeof(int),string);
+    LOGD("%s",string);
+
 }
-void visit(BTNElemType data,int level){
+template <class DT>
+void visit(DT data,int level){
     LOGD("biTree data=%c,level=%d",data,level);
+}
+template <class DT>
+void visitBiTree(DT data){
+        LOGD("visitBiTree data=%c",data);
+}
+template <class DT>
+void visitBiTree1(DT data,int level){
+    LOGD("visitBiTree data=%c",data);
+}
+void bitreeTest(){
+    /**
+    * ABCDEFGHI   J
+    *              A
+    *        B          C
+    *    D      E    F     G
+    *  H   I           J
+    * */
+    char c[] = "ABCDEFGHI   J";
+
+    BiTree<char> biTree;
+    biTree.creatBiTree(c,strlen(c));
+    biTree.preOrder(visitBiTree1);
+    biTree.levelOrder(visitBiTree);
 }
 extern "C"
 JNIEXPORT void JNICALL
@@ -262,10 +306,12 @@ Java_cd_note_others_JniTest_biTreeTest(JNIEnv *env, jclass type) {
      *  H   I           J
      * */
     char c[] = "ABCDEFGHI   J";
-    BiTree biTree = creatBiTree(c, strlen(c),0);
+    BinTree biTree = creatBiTree(c, strlen(c),0);
 //    preOrderTraverse(biTree,0,visit);
     preOrderTraverse_stack(biTree,0,visit);
     destroyBitTree(biTree);
+
+    bitreeTest();
 }
 
 void visit_thr(TElemType data){

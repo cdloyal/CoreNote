@@ -185,7 +185,8 @@ int heapIncreaseKey(int *A,int i,int key){
     if(key<A[i])
         return -1;
 
-    if(i>0 && A[(i-1)/2]<A[i]){  //(j+(start-1))/2
+    A[i]=key;
+    while(i>0 && A[(i-1)/2]<A[i]){  //(j+(start-1))/2
         int tmp=A[i];
         A[i]=A[(i-1)/2];
         A[(i-1)/2]=tmp;

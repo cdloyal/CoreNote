@@ -26,8 +26,15 @@ typedef struct strTest{
 template <class T>
 class pointerTemplate{
 public:
+    pointerTemplate();
     T t;
 };
+//为什么C++编译器不能支持对模板的分离式编译
+//https://blog.csdn.net/pongba/article/details/19130
+template<class T>
+pointerTemplate<T>::pointerTemplate() {
+
+}
 
 void ctest(void);
 
