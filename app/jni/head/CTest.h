@@ -28,6 +28,7 @@ class pointerTemplate{
 public:
     pointerTemplate();
     T t;
+    int *i;
 };
 //为什么C++编译器不能支持对模板的分离式编译
 //https://blog.csdn.net/pongba/article/details/19130

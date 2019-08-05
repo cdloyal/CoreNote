@@ -115,6 +115,9 @@ public class MainActivity extends AppCompatActivity {
 
         //十字链表
         JniTest.OLGraph();
+
+        //哈夫曼编码
+        JniTest.haffman();
     }
 
 }

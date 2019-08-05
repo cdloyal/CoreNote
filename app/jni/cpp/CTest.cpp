@@ -1,6 +1,12 @@
 #include <log.h>
 #include <cstdlib>
 #include "CTest.h"
+
+
+#include <vector>
+using std::string;
+using std::vector;
+
 /**
  * 作者：chenda
  * 时间：2019/8/1:9:18
@@ -32,7 +38,25 @@ CTest* CTest::operator=(const CTest &copy){
 }
 
 void ctest(void){
-    //https://blog.csdn.net/xingjiarong/article/details/47282255
+
+    char ch1 = 'h';
+    char ch2 = 'b';
+    LOGD("(ch1==ch2)?%d",(ch1==ch2));
+
+    int ii = 6;
+    pointerTemplate<int> pt1;
+    pt1.t = 1;
+    pt1.i = &ii;
+    pointerTemplate<int> pt2 = pt1;
+    LOGD("ctest &pt1=%d",&pt1);
+    LOGD("ctest pt1.i=%d",pt1.i);
+    LOGD("ctest *pt1.i=%d",*pt1.i);
+    LOGD("ctest &pt2=%d",&pt2);
+    LOGD("ctest pt2.i=%d",pt2.i);
+    LOGD("ctest *pt1.i=%d",*pt2.i);
+
+    //https://blog.csdn.net/x
+    // ingjiarong/article/details/47282255
 //    char *str = "acbcdef";
 //    str[3]='x'; //运行时出错，str指向的是常量区，常量区的值不能被修改
 

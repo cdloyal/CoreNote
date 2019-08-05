@@ -9,6 +9,7 @@
 #define CORENOTE_BITREE_H
 
 #include "Stack.h"
+#include "LQueue.h"
 
 template <class DT>
 struct BiNode{
@@ -17,6 +18,38 @@ struct BiNode{
 };
 template <class DT>
 BiNode<DT>* creatBiTree_M(const DT *array, int size, int index);
+template <class DT>
+BiNode<DT>*  creatBiTree_M(LinkedList<DT> list){
+    LQueue* queue = creatLQueue(sizeof(BiNode<DT>*));
+    typedef typename LinkedList<DT>::LLIterator It;
+    It it = list.iterator();
+    if(!it.hasNext())
+        return NULL;
+    DT dt = it.next();
+    BiNode<DT> *tree;
+    BiNode<DT> *child;
+    BiNode<DT> *node = new BiNode<DT>();
+    node->data = dt;
+    node->rchild = NULL;
+    node->lchild = NULL;
+    tree = node;
+    enLQueue(queue,&node);
+    while (it.hasNext()){
+        deLQueue(queue,&node);
+        child = new BiNode<DT>();
+        child->data = it.next();
+        node->lchild = child;
+        enLQueue(queue,&child);
+        if(it.hasNext()){
+            child = new BiNode<DT>();
+            child->data = it.next();
+            node->rchild = child;
+            enLQueue(queue,&child);
+        }
+    }
+    destroyLQueue(queue);
+    return tree;
+}
 
 //前序递归遍历二叉树,level当前层数,visit每次遍历到节点要做的事情
 template <class DT>
@@ -30,15 +63,63 @@ void preOrder_stack_M(BiNode<DT>* t,int level,void (*visit)(DT ,int ));
 template <class DT>
 void levelOrder_M(BiNode<DT>* t,void (*visit)(DT ));
 
+/*
+  * Description:     维持堆属性建堆
+  * Return:          void
+  */
+template<class DT>
+static void heap_M(int flag,BiNode<DT>* tree) {
+    BiNode<DT>* max = tree;
+    BiNode<DT>* l = tree->lchild;
+    BiNode<DT>* r = tree->rchild;
+    DT tmp;
+    if(flag==1){
+        if(l!=NULL &&  max->data<l->data)
+            max=l;
+        if(r!=NULL &&  max->data<r->data)
+            max=r;
+    } else{
+        if(l!=NULL &&  max->data>l->data)
+            max=l;
+        if(r!=NULL &&  max->data>r->data)
+            max=r;
+    }
+    if(max!=tree){
+        tmp=tree->data;
+        tree->data=max->data;
+        max->data=tmp;
+        heap_M(flag,max);
+    }
+}
+
+/*
+    * Description:     二叉树转堆,二叉树要完全二叉树
+    * Input:           flag     1:建最大堆，2：建最小堆
+    *                  array    数据数组，建堆会改变传进来的数组
+    *                  size     数组长度
+    * Return:
+    */
+template<class DT>
+void buildHeapMerge(int flag,BiNode<DT>* tree) {
+    if(tree->lchild==NULL)        //不存在子节点，叶子
+        return;
+    if(tree->lchild!=NULL)       //存在左子数
+        buildHeapMerge(flag,tree->lchild);
+    if(tree->rchild==NULL)       //存在右子树
+        buildHeapMerge(flag,tree->rchild);
+    heap_M(flag,tree);
+}
+
+
 template <class DT>
 void destroyBiTree_M(BiNode<DT>* t);
 
 template <class DT>
 class BiTree{
 private:
-    BiNode<DT> *tree;
 
 public:
+    BiNode<DT> *tree;
     BiTree();
     ~BiTree();
 
@@ -49,10 +130,11 @@ public:
     * Return:          int     >=0成功，<失败
     */
     int creatBiTree(DT* array,int size);
+    int creatBiTree(LinkedList<DT> list);
     void preOrder(void (*visit)(DT ,int ));
     void preOrder_stack(void (*visit)(DT ,int ));
     void levelOrder(void (*visit)(DT ));
-
+    void heap(int flag);
 };
 
 
@@ -156,7 +238,11 @@ int BiTree<DT>::creatBiTree(DT *array, int size) {
     tree = creatBiTree_M(array, size, 0);
     return 0;
 }
-
+template<class DT>
+int BiTree<DT>::creatBiTree(LinkedList<DT> list) {
+    tree = creatBiTree_M(list);
+    return 0;
+}
 template<class DT>
 void BiTree<DT>::preOrder(void (*visit)(DT ,int )){
     preOrder_M(tree, 0, visit);
@@ -173,6 +259,13 @@ template<class DT>
 void BiTree<DT>::preOrder_stack(void (*visit)(DT ,int )){
     preOrder_stack_M(tree, 0, visit);
 }
+
+template<class DT>
+void BiTree<DT>::heap(int flag) {
+    heap_M(flag,tree);
+}
+
+
 
 
 #endif //CORENOTE_BITREE_H

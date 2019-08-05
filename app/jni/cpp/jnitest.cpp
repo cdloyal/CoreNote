@@ -21,6 +21,7 @@
 #include <LinkedList.h>
 #include <BiTree.h>
 #include <Heap.h>
+#include <Haffman.h>
 #include "HeapSort_PriorityQueue.h"
 #include "BinaryTree.h"
 //
@@ -438,3 +439,11 @@ Java_cd_note_others_JniTest_queueTest(JNIEnv *env, jclass type) {
 
 }
 
+extern "C"
+JNIEXPORT void JNICALL
+Java_cd_note_others_JniTest_haffman(JNIEnv *env, jclass type) {
+
+    char str[] = "Hello world! Java_cd_note_others_JniTest_haffman";
+    BiNode<HaffData<char>> *tree =  buildHaffTree<char>(str, strlen(str));
+
+}

@@ -10,7 +10,7 @@ template <class DT>
 class Heap{
 private:
     DT *A;
-    int size;
+
     int flag;
     /*
    * Description:     维持堆属性建堆
@@ -21,6 +21,7 @@ private:
     //递归法建堆
     void buildHeapMerge(int i);
 public:
+    int size;
     /*
     * Description:     建堆，非递归法建堆
     * Input:           flag     1:建最大堆，2：建最小堆
@@ -33,6 +34,7 @@ public:
 
     /*
     * Description:     非递归法建堆
+    *                  template <class DT> 数据类型要重载操作符>、<
     * Return:          返回建好堆的array
     */
     DT* buildHeap();

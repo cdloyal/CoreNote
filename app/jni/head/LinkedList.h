@@ -23,12 +23,12 @@ template <class T>
 class LinkedList{
 private:
     LinkedNode<T> *head;
-
 public:
+    int size;
     class LLIterator : public Iterator<T>{
     public:
-        LinkedNode<T> *head;
         LinkedNode<T> *current;
+        LinkedList<T> list;
         LLIterator(const LinkedList<T> &list);
         bool hasNext();
         T next();
@@ -43,6 +43,12 @@ public:
     LLIterator iterator(){
         return LinkedList::LLIterator(*this);
     }
+    /*
+    * Description:     linklist转array
+    * Input:           array   输出
+    * Return:          int     >=0成功返回array得实际长度，<失败
+    */
+    int toArray(T *&array);
 };
 
 
@@ -53,6 +59,7 @@ LinkedList<T>::LinkedList(){
     LinkedNode<T> *node = new LinkedNode<T>();
     node->next = node;
     node->pre = node;
+    size = 0;
     this->head= node;
 }
 
@@ -73,18 +80,40 @@ int LinkedList<T>::insert(const T &element) {
     node->pre = this->head->pre;
     this->head->pre->next = node;
     this->head->pre = node;
+    size++;
     return 0;
 }
+
+template<class T>
+int LinkedList<T>::toArray(T *&array) {
+    if(size==0){
+        LOGD("error toArray() LinkedList size 0");
+        return -1;
+    }
+    array = (T *)malloc(sizeof(T)*size);
+    if(array==NULL){
+        LOGD("error toArray() malloc array overflow");
+        return -1;
+    }
+    int i=0;
+    LLIterator it = iterator();
+    while (it.hasNext()){
+        array[i++]=it.next();
+    }
+    return size;
+}
+
 
 
 template<class T>
 LinkedList<T>::LLIterator::LLIterator(const LinkedList<T> &list) {
-    this->head = this->current = list.head;
+    this->list=list;
+    this->current = list.head;
 }
 
 template<class T>
 bool LinkedList<T>::LLIterator::hasNext() {
-    return current->next!= this->head;
+    return current->next!= list.head;
 }
 
 template<class T>
@@ -95,13 +124,14 @@ T LinkedList<T>::LLIterator::next() {
 
 template<class T>
 void LinkedList<T>::LLIterator::remove() {
-    if(current==head)
+    if(current==list.head)
         return;
     LinkedNode<T> *tmp = current->pre;
     tmp->next = current->next;
     current->next->pre = tmp;
     delete current;
     current = tmp;
+    list.size--;
 }
 
 #endif //CORENOTE_LINKEDLIST_H

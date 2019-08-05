@@ -60,4 +60,6 @@ public class JniTest {
     public static native void AmlGraph();
     //十字链表
     public static native void OLGraph();
+
+    public static native void haffman();
 }
