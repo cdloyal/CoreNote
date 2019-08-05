@@ -9,21 +9,25 @@
 /**
  * 哈夫曼树
  * */
-template <class T>
-struct HaffData{
+template<class T>
+struct HaffData {
     T data;
     int weight;
+
     bool operator>(const HaffData &haffData);
+
     bool operator<(const HaffData &haffData);
+
     bool operator==(const HaffData &haffData);
+
     char *haffCode;
 };
 
 /**
  * 哈夫曼编码表
  * */
-template <class T>
-struct HaffTable{
+template<class T>
+struct HaffTable {
     T data;
     char *code;
 };
@@ -31,8 +35,8 @@ struct HaffTable{
 /**
  * 建哈夫曼树
  * */
-template <class T>
-BiNode<HaffData<T>>* buildHaffTree(char *str, int size);
+template<class T>
+BiNode<HaffData<T>*> *buildHaffTree(char *str, int size);
 
 /**
  * 建哈夫曼表
@@ -51,50 +55,70 @@ BiNode<HaffData<T>>* buildHaffTree(char *str, int size);
 /**
  * 哈夫曼解码
  * */
-template <class T>
-char* haffDecode(BiTree<T> tree);
+template<class T>
+char *haffDecode(BiTree<T> tree);
 
 
 //=======================上面是声明，下面是定义============================//
 
 template<class T>
 bool HaffData<T>::operator>(const HaffData &haffData) {
-    return this->weight>haffData.weight;
+    return this->weight > haffData.weight;
 }
 
 template<class T>
 bool HaffData<T>::operator<(const HaffData &haffData) {
-    return this->weight<haffData.weight;
+    return this->weight < haffData.weight;
 }
+
 template<class T>
 bool HaffData<T>::operator==(const HaffData &haffData) {
-    return this->weight==haffData.weight;
+    return this->weight == haffData.weight;
+}
+
+template<class T>
+void visit(HaffData<T> *data) {
+    LOGD("HaffTree levelOrder data=%c, weight=%d", data->data,data->weight);
 }
 
 /**
  * 建哈夫曼树
  * */
-template <class T>
-BiNode<HaffData<T>>* buildHaffTree(char *str, int size){
+template<class T>
+BiNode<HaffData<T>*> *buildHaffTree(char *str, int size) {
     char *p = str;
-    typedef typename LinkedList<HaffData<T>>::LLIterator It;
-    LinkedList<HaffData<T>> list;
-    It it = list.iterator();
-    while(size--){
-        HaffData<T> dataStr = it.next();
-        if(it.hasNext() && dataStr.data==*p){
-            dataStr.weight++;
-        } else{
-            HaffData<T> haffData;
-            haffData.data = *p;
-            haffData.weight=1;
-            list.insert(haffData);
+    typedef typename LinkedList<HaffData<T>*>::LLIterator It;
+    LinkedList<HaffData<T>*> list;
+    while (size--) {
+        It it = list.iterator();
+        HaffData<T> *dataStr;
+        while (it.hasNext()) {
+            dataStr = it.next();
+            if (dataStr->data == *p) {
+                dataStr->weight++;
+                break;
+            }
         }
+
+        if (dataStr==NULL || dataStr->data != *p){
+            dataStr = (HaffData<T>*)malloc(sizeof(HaffData<T>));
+            dataStr->data = *p;
+            dataStr->weight = 1;
+            list.insert(dataStr);
+        }
+
         p++;
     }
 
     //有链表建一颗二叉树
-    BiNode<HaffData<T>>*  tree = creatBiTree_M(list);
+    BiNode<HaffData<T>*> *tree = creatBiTree_M(&list);
+    LOGD("HaffTree buildHeapMerge before");
+    levelOrder_M(tree,visit);
+    buildHeapMerge(1, tree);
+    LOGD("HaffTree buildHeapMerge after");
+    levelOrder_M(tree, visit);
+
+    return tree;
 
 //    //构造优先队列
 //    BiNode<HaffData<T>> *array;
@@ -130,22 +154,22 @@ BiNode<HaffData<T>>* buildHaffTree(char *str, int size){
 /**
  * 建哈夫曼表
  * */
-template <class T>
+template<class T>
 LinkedList<HaffTable<T>> buildHaffTable(BiTree<T> tree);
 
 
 /**
  * 哈夫曼编码
  * */
-template <class T>
-char* haffEncode(LinkedList<HaffTable<T>> tables,char *str, int size);
+template<class T>
+char *haffEncode(LinkedList<HaffTable<T>> tables, char *str, int size);
 
 
 /**
  * 哈夫曼解码
  * */
-template <class T>
-char* haffDecode(BiTree<T> tree);
+template<class T>
+char *haffDecode(BiTree<T> tree);
 
 
 #endif //CORENOTE_HAFFMAN_H

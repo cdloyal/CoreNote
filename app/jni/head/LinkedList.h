@@ -28,8 +28,8 @@ public:
     class LLIterator : public Iterator<T>{
     public:
         LinkedNode<T> *current;
-        LinkedList<T> list;
-        LLIterator(const LinkedList<T> &list);
+        LinkedList<T> *list;
+        LLIterator(LinkedList<T> *list);
         bool hasNext();
         T next();
         void remove();
@@ -41,7 +41,7 @@ public:
     int insert(const T &element);
     //获取游标
     LLIterator iterator(){
-        return LinkedList::LLIterator(*this);
+        return LinkedList::LLIterator(this);
     }
     /*
     * Description:     linklist转array
@@ -66,7 +66,8 @@ LinkedList<T>::LinkedList(){
 template<class T>
 LinkedList<T>::~LinkedList() {
     LLIterator it = iterator();
-    while (it.current !=head && it.hasNext()){
+    while (it.hasNext()){
+        it.next();
         it.remove();
     }
     delete head;
@@ -106,14 +107,14 @@ int LinkedList<T>::toArray(T *&array) {
 
 
 template<class T>
-LinkedList<T>::LLIterator::LLIterator(const LinkedList<T> &list) {
+LinkedList<T>::LLIterator::LLIterator(LinkedList<T> *list) {
     this->list=list;
-    this->current = list.head;
+    this->current = list->head;
 }
 
 template<class T>
 bool LinkedList<T>::LLIterator::hasNext() {
-    return current->next!= list.head;
+    return current->next!= list->head;
 }
 
 template<class T>
@@ -124,14 +125,14 @@ T LinkedList<T>::LLIterator::next() {
 
 template<class T>
 void LinkedList<T>::LLIterator::remove() {
-    if(current==list.head)
+    if(current==list->head)
         return;
     LinkedNode<T> *tmp = current->pre;
     tmp->next = current->next;
     current->next->pre = tmp;
     delete current;
     current = tmp;
-    list.size--;
+    list->size--;
 }
 
 #endif //CORENOTE_LINKEDLIST_H

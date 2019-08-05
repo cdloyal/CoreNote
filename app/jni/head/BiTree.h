@@ -19,30 +19,34 @@ struct BiNode{
 template <class DT>
 BiNode<DT>* creatBiTree_M(const DT *array, int size, int index);
 template <class DT>
-BiNode<DT>*  creatBiTree_M(LinkedList<DT> list){
+BiNode<DT>*  creatBiTree_M(LinkedList<DT> *list){
     LQueue* queue = creatLQueue(sizeof(BiNode<DT>*));
     typedef typename LinkedList<DT>::LLIterator It;
-    It it = list.iterator();
+    It it = list->iterator();
     if(!it.hasNext())
         return NULL;
     DT dt = it.next();
-    BiNode<DT> *tree;
+    BiNode<DT> *tree = (BiNode<DT> *)malloc(sizeof(BiNode<DT>));
+    tree->data = dt;
+    tree->rchild = NULL;
+    tree->lchild = NULL;
+
     BiNode<DT> *child;
-    BiNode<DT> *node = new BiNode<DT>();
-    node->data = dt;
-    node->rchild = NULL;
-    node->lchild = NULL;
-    tree = node;
-    enLQueue(queue,&node);
+    BiNode<DT> *node;
+    enLQueue(queue,&tree);
     while (it.hasNext()){
         deLQueue(queue,&node);
-        child = new BiNode<DT>();
+        child = (BiNode<DT> *)malloc(sizeof(BiNode<DT>));
         child->data = it.next();
+        child->rchild = NULL;
+        child->lchild = NULL;
         node->lchild = child;
         enLQueue(queue,&child);
         if(it.hasNext()){
-            child = new BiNode<DT>();
+            child = (BiNode<DT> *)malloc(sizeof(BiNode<DT>));
             child->data = it.next();
+            child->rchild = NULL;
+            child->lchild = NULL;
             node->rchild = child;
             enLQueue(queue,&child);
         }
@@ -105,7 +109,7 @@ void buildHeapMerge(int flag,BiNode<DT>* tree) {
         return;
     if(tree->lchild!=NULL)       //存在左子数
         buildHeapMerge(flag,tree->lchild);
-    if(tree->rchild==NULL)       //存在右子树
+    if(tree->rchild!=NULL)       //存在右子树
         buildHeapMerge(flag,tree->rchild);
     heap_M(flag,tree);
 }
@@ -130,7 +134,7 @@ public:
     * Return:          int     >=0成功，<失败
     */
     int creatBiTree(DT* array,int size);
-    int creatBiTree(LinkedList<DT> list);
+    int creatBiTree(LinkedList<DT> *list);
     void preOrder(void (*visit)(DT ,int ));
     void preOrder_stack(void (*visit)(DT ,int ));
     void levelOrder(void (*visit)(DT ));
@@ -239,7 +243,7 @@ int BiTree<DT>::creatBiTree(DT *array, int size) {
     return 0;
 }
 template<class DT>
-int BiTree<DT>::creatBiTree(LinkedList<DT> list) {
+int BiTree<DT>::creatBiTree(LinkedList<DT> *list) {
     tree = creatBiTree_M(list);
     return 0;
 }

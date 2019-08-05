@@ -40,8 +40,8 @@ CTest* CTest::operator=(const CTest &copy){
 void ctest(void){
 
     char ch1 = 'h';
-    char ch2 = 'b';
-    LOGD("(ch1==ch2)?%d",(ch1==ch2));
+    char ch2[] = "ah";
+    LOGD("(ch1==ch2)?%d",(ch1==ch2[1]));
 
     int ii = 6;
     pointerTemplate<int> pt1;
