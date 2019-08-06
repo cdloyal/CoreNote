@@ -445,6 +445,6 @@ JNIEXPORT void JNICALL
 Java_cd_note_others_JniTest_haffman(JNIEnv *env, jclass type) {
 
     char str[] = "111444447321323344626";
-    BiNode<HaffData<char>&> *tree =  buildHaffTree<char>(str, strlen(str));
+    BiNode<HaffData<char>> *tree =  buildHaffTree<char>(str, strlen(str));
 
 }

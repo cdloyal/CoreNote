@@ -21,6 +21,8 @@ struct HaffData {
     bool operator==(const HaffData &haffData);
 
     char *haffCode;
+
+    HaffData *lchild,*rchild;
 };
 
 /**
@@ -36,7 +38,9 @@ struct HaffTable {
  * 建哈夫曼树
  * */
 template<class T>
-BiNode<HaffData<T>*> *buildHaffTree(char *str, int size);
+//BiNode<HaffData<T>> *buildHaffTree(char *str, int size);
+
+HaffData<T> *buildHaffTree(char *str, int size);
 
 /**
  * 建哈夫曼表
@@ -76,51 +80,54 @@ bool HaffData<T>::operator==(const HaffData &haffData) {
     return this->weight == haffData.weight;
 }
 
+
 template<class T>
-void visit(HaffData<T> *data) {
-    LOGD("HaffTree levelOrder data=%c, weight=%d", data->data,data->weight);
+void visit(HaffData<T> data) {
+    LOGD("HaffTree levelOrder data=%c, weight=%d", data.data,data.weight);
 }
 
 /**
  * 建哈夫曼树
  * */
 template<class T>
-BiNode<HaffData<T>*> *buildHaffTree(char *str, int size) {
-    char *p = str;
-    typedef typename LinkedList<HaffData<T>*>::LLIterator It;
-    LinkedList<HaffData<T>*> list;
-    while (size--) {
-        It it = list.iterator();
-        HaffData<T> *dataStr;
-        while (it.hasNext()) {
-            dataStr = it.next();
-            if (dataStr->data == *p) {
-                dataStr->weight++;
-                break;
-            }
-        }
-
-        if (dataStr==NULL || dataStr->data != *p){
-            dataStr = (HaffData<T>*)malloc(sizeof(HaffData<T>));
-            dataStr->data = *p;
-            dataStr->weight = 1;
-            list.insert(dataStr);
-        }
-
-        p++;
-    }
-
+//BiNode<HaffData<T>> *buildHaffTree(char *str, int size) {
+//    if(size<1)
+//        return NULL;
+//    char *p = str;
+//    typedef typename LinkedList<HaffData<T>>::LLIterator It;
+//    LinkedList<HaffData<T>> list;
+//    while (size--) {
+//        It it = list.iterator();
+//        HaffData<T> dataStr;
+//        dataStr.weight=-1;
+//        while (it.hasNext()) {
+//            dataStr = it.next();
+//            if (dataStr.data == *p) {
+//                it.remove();
+//                dataStr.weight++;
+//                list.insert(dataStr);
+//                break;
+//            }
+//        }
+//
+//        if (dataStr.weight==-1 || dataStr.data != *p){
+//            dataStr.data = *p;
+//            dataStr.weight = 1;
+//            list.insert(dataStr);
+//        }
+//
+//        p++;
+//    }
     //有链表建一颗二叉树
-    BiNode<HaffData<T>*> *tree = creatBiTree_M(&list);
-    LOGD("HaffTree buildHeapMerge before");
-    levelOrder_M(tree,visit);
-    buildHeapMerge(1, tree);
-    LOGD("HaffTree buildHeapMerge after");
-    levelOrder_M(tree, visit);
+//    BiNode<HaffData<T>> *tree = creatBiTree_M(&list);
+//
+//    LOGD("HaffTree buildHeapMerge before");
+//    levelOrder_M(tree,visit);
+//    buildHeapMerge(2, tree);
+//    LOGD("HaffTree buildHeapMerge after");
+//    levelOrder_M(tree, visit);
 
-    return tree;
-
-//    //构造优先队列
+        //构造优先队列
 //    BiNode<HaffData<T>> *array;
 //    int arraySize = list.toArray(array);
 //    if(arraySize<=0 || array==NULL){
@@ -149,7 +156,8 @@ BiNode<HaffData<T>*> *buildHaffTree(char *str, int size) {
 //    delete heap;
 //
 //    return &tree;
-}
+
+//}
 
 /**
  * 建哈夫曼表

@@ -9,10 +9,17 @@
 #define CORENOTE_CTEST_H
 
 class CTest{
-    CTest * operator=(const CTest &copy);
 
 public:
     int a;
+    CTest();
+    CTest(const CTest &ctest);
+    ~CTest();
+    const CTest& operator=(const CTest &copy){
+        LOGD("cTest operator=");
+        a = copy.a;
+        return copy;
+    }
 };
 
 typedef struct strTest{

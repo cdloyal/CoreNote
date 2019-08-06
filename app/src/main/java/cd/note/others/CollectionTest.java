@@ -110,6 +110,23 @@ public class CollectionTest {
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void collectionStreamTest(){
 
+//        int A[] = {1, 1, 2, 3, 4, 5, 5, 6, 7, 8, 9};
+        int A[] = new int[1];
+        A[0] = 4;
+        Log.d(TAG,"al="+A);
+        ArrayList al = new ArrayList();
+        al.add(A[0]);
+        A[0] = 5;
+        Log.d(TAG,"al="+A);
+        Log.d(TAG,"al="+al);
+
+        Student stu1 = new Student("name1",5);
+        ArrayList<Student> all = new ArrayList();
+        all.add(stu1);
+        stu1.setName("name2");
+        stu1.setArg(6);
+        Log.d(TAG,"all="+all.get(0).getName()+all.get(0).getArg());
+
         //https://juejin.im/post/5b07f4536fb9a07ac90da4e5
         List<Integer> list = Arrays.asList(1, 1, 2, 3, 4, 5, 5, 6, 7, 8, 9);
         Log.d(TAG,"list="+list);

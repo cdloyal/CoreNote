@@ -4,6 +4,8 @@
 
 
 #include <vector>
+#include <CTest.h>
+
 using std::string;
 using std::vector;
 
@@ -31,13 +33,36 @@ int & fun5(){
     return a;
 }
 
-extern "C"
-CTest* CTest::operator=(const CTest &copy){
-    this->a=copy.a;
-    return this;
+class test2{
+    int a = 7;
+public:
+    int& getA(){
+        return a;
+    }
+};
+
+CTest::CTest() {
+    LOGD("cTest CTest()");
+}
+CTest::CTest(const CTest &ctest) {
+    LOGD("cTest CTest(const CTest &ctest)");
+    *this = ctest;
+}
+CTest::~CTest() {
+    LOGD("cTest ~CTest（）");
 }
 
+
+
 void ctest(void){
+
+    test2 t2;
+    int testa = t2.getA();
+    testa = 8;
+    LOGD("ctest t2.getA()=%d",t2.getA());
+    int &testa1 = t2.getA();
+    testa1 = 9;
+    LOGD("ctest t2.getA()=%d",t2.getA());
 
     char ch1 = 'h';
     char ch2[] = "ah";
@@ -94,8 +119,9 @@ void ctest(void){
     cTest1.a = 100;
     CTest cTest2=cTest1;
     LOGD("cTest2.a = %d",cTest2.a);
-    CTest *cTest3=&cTest1;
-    LOGD("cTest3 = %d",cTest3);
+    cTest2.a = 500;
+    CTest cTest3= cTest1;
+    LOGD("cTest3 = %d",cTest3.a);
     LOGD("&cTest1 = %d",&cTest1);
 
     strTest strTest1;

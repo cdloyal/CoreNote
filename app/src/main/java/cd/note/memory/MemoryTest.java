@@ -55,6 +55,18 @@ public class MemoryTest {
 
     private final static String TAG = "MemoryTest";
     public void test(){
+
+        A a1 = new A();
+        a1.num = 10;
+        A a2 = a1;
+        a1.num = 11;
+        Log.d(TAG,"MemoryTest a2.num="+a2.num);
+
+        int i1 =1;
+        int i2 = i1;
+        i1 = 2;
+        Log.d(TAG,"MemoryTest i2="+i2);
+
         A a = new A();
         B b = new B();
         a.num = 5;
@@ -65,6 +77,10 @@ public class MemoryTest {
 
     private class A{
         public int num;
+        A(){};
+        A(A a){
+            this.num = a.num;
+        }
     }
 
     private class B{
