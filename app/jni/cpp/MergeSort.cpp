@@ -1,5 +1,6 @@
 #include <jni.h>
 #include <cstring>
+#include <log.h>
 #include "MergeSort.h"
 //
 // Created by chenda on 2019/6/23.
@@ -162,20 +163,33 @@ void merge_sort(int* array,int start,int end){
     merge_sort(array,middle+1,end);
     //合并：合并两个已排序的子序列以产生已排序的答案
     merger(array,start,middle,end);
+
 }
 void merger(int* array,int start,int middle,int end){
     //合并：合并两个已排序的子序列以产生已排序的答案
     //两个已排序的子序列
+    if(start>=end)
+        return;
+
     int leftLen = middle-start+1;
-    int rightLen = end-start;
+    int rightLen = end-middle;
+//    T *left = (T *)malloc((leftLen)* sizeof(T));
+//    T *right= (T *)malloc((rightLen)* sizeof(T));
     int left[leftLen];
     int right[rightLen];
-    memcpy(left, array, (leftLen));
-    memcpy(right,array+start+1, (rightLen));
+    memcpy(left, array+start, (leftLen)* sizeof(int));
+    memcpy(right,array+middle+1, (rightLen)* sizeof(int));
+//    for(int i=0;i<leftLen;i++){
+//        left[i]=array[i+start];
+//    }
+//    for(int i=0;i<rightLen;i++){
+//        right[i]=array[i+middle+1];
+//    }
+
 
     int leftIndex=0;
     int rightIndex=0;
-    int i=0;
+    int i=start;
     while(leftIndex<leftLen && rightIndex<rightLen){
         if(left[leftIndex]<=right[rightIndex]){
             array[i]=left[leftIndex];
@@ -184,7 +198,10 @@ void merger(int* array,int start,int middle,int end){
             array[i]=right[rightIndex];
             rightIndex++;
         }
+        i++;
     }
+
+
 
     while (leftIndex<leftLen){
         array[i]=left[leftIndex];
@@ -192,12 +209,14 @@ void merger(int* array,int start,int middle,int end){
         leftIndex++;
     }
     while (rightIndex<rightLen){
-        array[i]=left[rightIndex];
+        array[i]=right[rightIndex];
         i++;
         rightIndex++;
     }
 
 
+
+}
 
     /**
      * 函数增长
@@ -232,4 +251,3 @@ void merger(int* array,int start,int middle,int end){
 
 
 
-}

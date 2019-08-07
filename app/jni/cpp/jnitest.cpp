@@ -22,6 +22,7 @@
 #include <BiTree.h>
 #include <Heap.h>
 #include <Haffman.h>
+#include <MergeSort.h>
 #include "HeapSort_PriorityQueue.h"
 #include "BinaryTree.h"
 //
@@ -108,6 +109,13 @@ Java_cd_note_others_JniTest_mergeSortTest(JNIEnv *env, jclass type) {
     intArray2String(array,sizeof(array)/ sizeof(int),string);
     LOGD("%s",string);
 
+
+    int array1[] = {4,7,1,4,3,2};
+    int *array2 = array1;
+    merge_sort(array2,0,sizeof(array1)/ sizeof(int)-1);
+    for(int i=0;i<sizeof(array1)/ sizeof(int);i++){
+        LOGD("mergeSort  array1=%d,", array1[i]);
+    }
 }
 void linkedListTest(){
     //抽象链表
@@ -438,6 +446,7 @@ Java_cd_note_others_JniTest_queueTest(JNIEnv *env, jclass type) {
     emptyLQueue(queue);
     destroyLQueue(queue);
 
+
 }
 
 extern "C"
@@ -445,6 +454,6 @@ JNIEXPORT void JNICALL
 Java_cd_note_others_JniTest_haffman(JNIEnv *env, jclass type) {
 
     char str[] = "111444447321323344626";
-    BiNode<HaffData<char>> *tree =  buildHaffTree<char>(str, strlen(str));
-
+//    BiNode<HaffData<char>> *tree =  buildHaffTree<char>(str, strlen(str));
+    HaffNode<char> *tree = buildHaffTree<char>(str, strlen(str));
 }

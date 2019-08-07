@@ -39,6 +39,8 @@ public:
     ~LinkedList();
     //在链表的表尾插入T &element
     int insert(const T &element);
+    T get(int index);
+    int set(int index,T t);
     //获取游标
     LLIterator iterator(){
         return LinkedList::LLIterator(this);
@@ -104,6 +106,34 @@ int LinkedList<T>::toArray(T *&array) {
     return size;
 }
 
+template<class T>
+T LinkedList<T>::get(int index) {
+    LinkedNode<T> *p = head;
+
+    if(size<=index || size==0){
+        LOGE("LinkedList get() out of index!");
+        __android_log_assert("", TAG, "LinkedList get() out of index!");
+    }
+
+    for(int i=0;i<=index;i++){
+       p = p->next;
+    }
+    return p->data;
+}
+
+template<class T>
+int LinkedList<T>::set(int index, T t) {
+    LinkedNode<T> *p = head;
+
+    if(size<=index || size==0)
+        return -1;
+
+    for(int i=0;i<=index;i++){
+        p = p->next;
+    }
+    p->data=t;
+    return 0;
+}
 
 
 template<class T>
