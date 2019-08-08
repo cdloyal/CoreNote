@@ -14,7 +14,7 @@
 #include <Random.h>
 #include <ThrBitNode.h>
 #include <Stack.h>
-#include <AmlGraph.hpp>
+#include <Graph_Aml.hpp>
 #include <queue>
 #include <LQueue.h>
 #include <CTest.h>
@@ -28,7 +28,7 @@
 //
 // Created by chenda on 2019/6/23.
 //
-#include "OLGraph.h"
+#include "Graph_Ol.h"
 
 extern "C"
 JNIEXPORT void JNICALL
@@ -455,5 +455,21 @@ Java_cd_note_others_JniTest_haffman(JNIEnv *env, jclass type) {
 
     char str[] = "111444447321323344626";
 //    BiNode<HaffData<char>> *tree =  buildHaffTree<char>(str, strlen(str));
-    HaffNode<char> *tree = buildHaffTree<char>(str, strlen(str));
+    HaffNode<char> *tree ;
+    LinkedList<HaffCode<char>> *table;
+    buildHaffTree<char>(str, strlen(str),tree,table);
+
+    typedef typename LinkedList<HaffCode<char>>::LLIterator It;
+    It it = table->iterator();
+    while (it.hasNext()){
+        HaffCode<char> code = it.next();
+        LOGD("haffTable data=%c,code=%s",code.data,code.code);
+    }
+
+    char *code;
+    haffEncode(table,"123467", 6,code);
+    LOGD("haffTable encode=%s",code);
+
+    char *decode = haffDecode(tree,code, strlen(code));
+    LOGD("haffTable decode=%s",decode);
 }

@@ -136,6 +136,22 @@ void ctest(void){
     pointerTemplate<int*> pt;
     pt.t = &h;
     LOGD("pt.t=%d,&h=%d",(pt.t),&h);
+
+    char c1[6] = "12233";
+    char *c2 = new char[2] ;
+    c2[0] = '1';
+    c2[1] = '\0';
+    LOGD("cTest c2.len=%d",strlen(c2));
+    LOGD("cTest c2.size=%d",sizeof(c2));
+    strcpy(c1,c2);
+    LOGD("cTest c1=%s",c1);
+
+    double limitDouble = std::numeric_limits<double>::infinity();
+    #define MAX (1.0/0.0)
+
+    LOGD("cTest limitDouble %f",limitDouble);
+    LOGD("cTest limitDouble>10000000000 ? %d",limitDouble>10000000000);
+    LOGD("cTest MAX>10000000000 ? %d",MAX>10000000000);
 }
 
 

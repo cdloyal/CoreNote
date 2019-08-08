@@ -31,7 +31,9 @@ struct HaffNode {
     int weight;
 
     HaffNode();
+
     HaffNode(const HaffNode<T> &haffData);
+
     ~HaffNode();
 
     bool operator>(const HaffNode &haffData);
@@ -41,9 +43,10 @@ struct HaffNode {
     bool operator==(const HaffNode &haffData);
 
     bool operator<=(const HaffNode &haffData);
+
     bool operator>=(const HaffNode &haffData);
 
-    HaffNode& operator=(const HaffNode &haffData);
+    HaffNode &operator=(const HaffNode &haffData);
 
     char *haffCode;
 
@@ -51,14 +54,12 @@ struct HaffNode {
 
 };
 
-/**
- * 内核链表  https://www.ibm.com/developerworks/cn/linux/kernel/l-chain/index.html
- * */
+
 /**
  * 哈夫曼编码表
  * */
 template<class T>
-struct HaffTable {
+struct HaffCode {
     T data;
     char *code;
 };
@@ -69,22 +70,21 @@ struct HaffTable {
 template<class T>
 //BiNode<HaffData<T>> *buildHaffTree(char *str, int size);
 
-int buildHaffTree(char *str, int size,HaffNode<T> *&tree,LinkedList<HaffTable<T>> *&table);
-
+int buildHaffTree(const char *str, int size, HaffNode<T> *&tree, LinkedList<HaffCode<T>> *&table);
 
 
 /**
  * 哈夫曼编码
  * */
-//template <class T>
-//char* haffEncode(LinkedList<HaffTable<T>> tables,char *str, int size);
+template<class T>
+int haffEncode(LinkedList<HaffCode<T>> *&table, const char *str, int size, char *&code);
 
 
 /**
  * 哈夫曼解码
  * */
 template<class T>
-char *haffDecode(BiTree<T> tree);
+char *haffDecode(HaffNode<T> *&tree, const char *str, int size);
 
 
 //=======================上面是声明，下面是定义============================//
@@ -118,45 +118,48 @@ template<class T>
 bool HaffNode<T>::operator==(const HaffNode &haffData) {
     return this->weight == haffData.weight;
 }
+
 template<class T>
 bool HaffNode<T>::operator<=(const HaffNode &haffData) {
-    return *this<haffData || *this==haffData;
+    return *this < haffData || *this == haffData;
 }
+
 template<class T>
 bool HaffNode<T>::operator>=(const HaffNode &haffData) {
-    return *this>haffData || *this==haffData;
+    return *this > haffData || *this == haffData;
 }
+
 template<class T>
 HaffNode<T> &HaffNode<T>::operator=(const HaffNode &haffData) {
-    this->rchild=haffData.rchild;
-    this->lchild=haffData.lchild;
-    this->data=haffData.data;
-    this->weight=haffData.weight;
-    this->haffCode=haffData.haffCode;
+    this->rchild = haffData.rchild;
+    this->lchild = haffData.lchild;
+    this->data = haffData.data;
+    this->weight = haffData.weight;
+    this->haffCode = haffData.haffCode;
     return *this;
 }
 
 template<class T>
 HaffNode<T>::HaffNode() {
-    this->rchild=NULL;
-    this->lchild=NULL;
-    this->weight=0;
-    this->haffCode=NULL;
+    this->rchild = NULL;
+    this->lchild = NULL;
+    this->weight = 0;
+    this->haffCode = NULL;
 }
 
 template<class T>
 HaffNode<T>::HaffNode(const HaffNode<T> &haffData) {
-    this->rchild=haffData.rchild;
-    this->lchild=haffData.lchild;
-    this->data=haffData.data;
-    this->weight=haffData.weight;
-    this->haffCode=haffData.haffCode;
+    this->rchild = haffData.rchild;
+    this->lchild = haffData.lchild;
+    this->data = haffData.data;
+    this->weight = haffData.weight;
+    this->haffCode = haffData.haffCode;
 }
 
 template<class T>
 HaffNode<T>::~HaffNode() {
-    this->rchild=NULL;
-    this->lchild=NULL;
+    this->rchild = NULL;
+    this->lchild = NULL;
 }
 
 
@@ -242,34 +245,38 @@ HaffNode<T>::~HaffNode() {
 //}
 
 template<class T>
-int buildHaffTree(char *str, int size,HaffNode<T> *&tree,LinkedList<HaffTable<T>> *&table){
+int buildHaffTree(const char *str, int size, HaffNode<T> *&tree, LinkedList<HaffCode<T>> *&table) {
 
     //建链表
-    if (size<1 || str==NULL)
+    if (size < 1 || str == NULL)
         return -1;
 
-    table = new LinkedList<HaffTable<T>>();
+    table = new LinkedList<HaffCode<T>>();
 
-    if(size == 1){
+    if (size == 1) {
         tree = new HaffNode<T>();
         tree->data = str[0];
         tree->weight = 1;
-        tree->haffCode=0;
-        table->insert();
+        tree->haffCode = 0;
+        HaffCode<T> haffCode;
+        haffCode.data = str[0];
+        haffCode.code = new char[2];
+        tree->haffCode[0] = '0';
+        table->insert(haffCode);
         return 0;
     }
 
-    char *p = str;
+    const char *p = str;
 
     LinkedList<HaffNode<T>> list;
     while (size--) {
-        HaffNode <T> dataStr;
+        HaffNode<T> dataStr;
         dataStr.weight = -1;
-        for(int i=0;i<list.size;i++){
+        for (int i = 0; i < list.size; i++) {
             dataStr = list.get(i);
             if (dataStr.data == *p) {
                 dataStr.weight++;
-                list.set(i,dataStr);
+                list.set(i, dataStr);
                 break;
             }
         }
@@ -286,33 +293,33 @@ int buildHaffTree(char *str, int size,HaffNode<T> *&tree,LinkedList<HaffTable<T>
     //链表转数组排序,归并排序
     HaffNode<T> *haffArray;
     int len = list.toArray(haffArray);
-    mergeSort(haffArray,0,len-1);
-    for(int i=0;i<len;i++){
-        LOGD("HaffTree mergeSort aft data=%c, weight=%d", haffArray[i].data,haffArray[i].weight);
-    }
+    mergeSort(haffArray, 0, len - 1);
+//    for(int i=0;i<len;i++){
+//        LOGD("HaffTree mergeSort aft data=%c, weight=%d", haffArray[i].data,haffArray[i].weight);
+//    }
 
     //建haffman树
     int sortIndex = 0;
     int head = 0;
-    while (head<len-1){
+    while (head < len - 1) {
         tree = new HaffNode<T>();
         HaffNode<T> *lNode = new HaffNode<T>();
         *lNode = haffArray[head];
         HaffNode<T> *rNode = new HaffNode<T>();
         *rNode = haffArray[++head];
-        tree->weight = lNode->weight+rNode->weight;
+        tree->weight = lNode->weight + rNode->weight;
         tree->lchild = lNode;
         tree->rchild = rNode;
         //重新排序
-        haffArray[head]=*tree;
+        haffArray[head] = *tree;
         sortIndex = head;
-        while (sortIndex<len-1){
-            if(haffArray[sortIndex]>haffArray[sortIndex+1]){
+        while (sortIndex < len - 1) {
+            if (haffArray[sortIndex] > haffArray[sortIndex + 1]) {
                 HaffNode<T> tmp = haffArray[sortIndex];
-                haffArray[sortIndex] = haffArray[sortIndex+1];
-                haffArray[sortIndex+1] = tmp;
+                haffArray[sortIndex] = haffArray[sortIndex + 1];
+                haffArray[sortIndex + 1] = tmp;
                 sortIndex++;
-            } else{
+            } else {
                 break;
             }
         }
@@ -321,48 +328,189 @@ int buildHaffTree(char *str, int size,HaffNode<T> *&tree,LinkedList<HaffTable<T>
 
     //建haffman表,层序遍历
     LQueue *lQueue = creatLQueue(sizeof(HaffNode<T>));
-
     HaffNode<T> *node = new HaffNode<T>();
     tree->haffCode = new char[1];
     tree->haffCode[0] = '\0';
     enLQueue(lQueue, tree);
-    while (!isLQueueEmpty(lQueue)){
-        deLQueue(lQueue,node);
-        if(node->lchild!=NULL){
-            node->lchild->haffCode = new char[strlen(node->haffCode)+1+1];
-            node->lchild->haffCode[0] = '0';
-            strcpy(node->lchild->haffCode+1,node->haffCode);
-            enLQueue(lQueue,node->lchild);
+    while (!isLQueueEmpty(lQueue)) {
+        deLQueue(lQueue, node);
+        if (node->lchild != NULL) {
+            node->lchild->haffCode = new char[strlen(node->haffCode) + 1 + 1];
+            strcpy(node->lchild->haffCode, node->haffCode);
+            node->lchild->haffCode[strlen(node->haffCode)] = '0';
+            node->lchild->haffCode[strlen(node->haffCode) + 1] = '\0';
+            enLQueue(lQueue, node->lchild);
         }
-        if(node->rchild!=NULL){
-            node->rchild->haffCode = new char[strlen(node->haffCode)+1+1];
-            node->rchild->haffCode[0] = '1';
-            strcpy(node->lchild->haffCode+1,node->haffCode);
-            enLQueue(lQueue,node->rchild);
+        if (node->rchild != NULL) {
+            node->rchild->haffCode = new char[strlen(node->haffCode) + 1 + 1];
+            strcpy(node->rchild->haffCode, node->haffCode);
+            node->rchild->haffCode[strlen(node->haffCode)] = '1';
+            node->rchild->haffCode[strlen(node->haffCode) + 1] = '\0';
+            enLQueue(lQueue, node->rchild);
         }
-        if(node->lchild==NULL && node->rchild==NULL){
-
+        //建表
+        if (node->lchild == NULL && node->rchild == NULL) {
+            HaffCode<T> haffCode;
+            haffCode.data = node->data;
+            haffCode.code = new char[strlen(node->haffCode) + 1];
+            strcpy(haffCode.code, node->haffCode);
+            table->insert(haffCode);
         }
     }
     delete node;
     destroyLQueue(lQueue);
 
-
+    return 0;
 }
 
+
+/*
+* Description:     增长
+* Input:           src      要增长得数据
+*                  OirByte  src目前长度
+*                  wanByte  要增长到多少
+* Return:          int     >=0成功返回array得实际长度，<失败
+*/
+template<class T>
+static int increate(T *&src, int OirByte, int wanByte) {
+    if (OirByte == 0 || src == NULL) {
+        src = (T *) malloc(wanByte);
+        if (src == NULL)
+            return -1;
+        return wanByte;
+    }
+    T *tmp = (T *) malloc(OirByte);
+    memcpy(tmp, src, OirByte);
+    free(src);
+    src = (T *) malloc(wanByte);
+    if (src == NULL) {
+        free(tmp);
+        return -1;
+    }
+    memcpy(src, tmp, OirByte);
+    free(tmp);
+    return wanByte;
+};
 
 /**
  * 哈夫曼编码
  * */
 template<class T>
-char *haffEncode(LinkedList<HaffTable<T>> tables, char *str, int size);
+int haffEncode(LinkedList<HaffCode<T>> *&table, const char *str, int size, char *&code) {
+    typedef typename LinkedList<HaffCode<T>>::LLIterator It;
+    const char *p = str;
+    int step = 1024;
+    int space = step;
+    if (size < 1 || str == NULL)
+        return -1;
+
+    if (strlen(str) < size)
+        size = strlen(str);
+
+    if ((space = increate<char>(code, 0, space)) < 0) {
+        LOGD("haffEncode ERROR overflow");
+        return -1;
+    }
+    memset(code, '\0', space);
+
+    while (size--) {
+        It it = table->iterator();
+        bool encode = false;
+        while (it.hasNext()) {
+            HaffCode<char> haffCode = it.next();
+            if (haffCode.data == *p) {
+                if (strlen(code) + strlen(haffCode.code) + 1 > space) {
+                    if ((space = increate<char>(code, space, space + step)) < 0) {
+                        LOGD("haffEncode ERROR overflow");
+                        free(code);
+                        return -1;
+                    }
+                }
+                strcpy(code + strlen(code), haffCode.code);
+                encode = true;
+                break;
+            }
+        }
+        if (!encode) {
+            free(code);
+            code = NULL;
+            LOGD("haffEncode ERROR %c", *p);
+            return -1;
+        }
+        p++;
+    }
+    return 0;
+}
 
 
 /**
  * 哈夫曼解码
  * */
 template<class T>
-char *haffDecode(BiTree<T> tree);
+char *haffDecode(HaffNode<T> *&tree, const char *str, int size) {
+    if (size < 1 || str == NULL)
+        return NULL;
+    const char *p = str;
+    HaffNode<T> *node = tree;
+    T *decode;
+
+    int step = 1024;
+    int space = step;
+    int current = 0;
+    if ((space = increate<char>(decode, 0, space)) < 0) {
+        LOGD("haffEncode ERROR overflow");
+        return NULL;
+    }
+    memset(decode, '\0', space);
+
+    while (size--) {
+        if (*p == '0') {
+            if (node->lchild != NULL) {
+                node = node->lchild;
+                p++;
+                continue;
+            }
+        } else if (*p == '1') {
+            if (node->rchild != NULL) {
+                node = node->rchild;
+                p++;
+                continue;
+            }
+        } else {
+            LOGD("Decode ERROR %c", *p);
+            free(decode);
+            decode = NULL;
+            return NULL;
+
+        }
+
+        if (current + sizeof(T) + 1 > space) {
+            if ((space = increate<char>(decode, space, space + step)) < 0) {
+                LOGD("haffEncode ERROR overflow");
+                free(decode);
+                return NULL;
+            }
+        }
+        memcpy(decode + current, &(node->data), sizeof(T));
+        current += sizeof(T);
+        node = tree;
+        size++;
+    }
+
+    if(current+sizeof(T)+1>space){
+        if((space=increate<char>(decode,space,space+step))<0){
+            LOGD("haffEncode ERROR overflow");
+            free(decode);
+            return NULL;
+        }
+    }
+    memcpy(decode+current,&(node->data), sizeof(T));
+    current+=sizeof(T);
+    node = tree;
+    size++;
+
+    return decode;
+}
 
 
 #endif //CORENOTE_HAFFMAN_H

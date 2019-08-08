@@ -30,6 +30,7 @@ public:
         LinkedNode<T> *current;
         LinkedList<T> *list;
         LLIterator(LinkedList<T> *list);
+        ~LLIterator();
         bool hasNext();
         T next();
         void remove();
@@ -163,6 +164,12 @@ void LinkedList<T>::LLIterator::remove() {
     delete current;
     current = tmp;
     list->size--;
+}
+
+template<class T>
+LinkedList<T>::LLIterator::~LLIterator() {
+    this->list=NULL;
+    this->current=NULL;
 }
 
 #endif //CORENOTE_LINKEDLIST_H

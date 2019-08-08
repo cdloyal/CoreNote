@@ -4,7 +4,7 @@
 
 #include <cstdlib>
 #include <log.h>
-#include "OLGraph.h"
+#include "Graph_Ol.h"
 
 //创建图
 int CreateOLGraph(OLGGraph *&olgGraph,OLGKind kind){
