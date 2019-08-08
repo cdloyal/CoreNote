@@ -8,12 +8,13 @@
 #ifndef CORENOTE_GRAPH_H
 #define CORENOTE_GRAPH_H
 
-/**
- * 邻接多重表（无向图）
- * */
 
-
+#include <limits>
+#include "LQueue.h"
 #include "LinkedList.h"
+#include "Utils.h"
+
+#define NO_EDGE 2147483647  //定义无边
 
 //访问标记
 typedef enum {unvisited,isvisited}VisitIf;
@@ -37,17 +38,33 @@ struct VexBox{
     EBox *firstarc;     //指向第一条依附于该顶点的边
 };
 
+/**
+ * 邻接多重表（无向图）
+ * */
 template <class T>
 struct AMLGraph{
     VexBox<T> *Vlist;
-    int vexnum,arcnum;  //顶点数量，边数量
+    int vexnum,arcnum,maxVexNum,defRiseNum;  //顶点数量，边数量
+    AmlKind kind;
+    //访问标志数组
+    int *visited;
+};
+
+/**
+ * 邻接矩阵
+ * */
+template <class T>
+struct MGraph{
+    T *Vlist;     //顶点数据
+    int **edge;
+    int vexnum;  //顶点数量，边数量
     AmlKind kind;
     //访问标志数组
     int *visited;
 };
 
 //创建图
-//defVexNum     初始化顶点数，
+//defVexNum     初始化最大顶点数，
 //defRiseNum    当插入顶点数>defVexNum，默认的增长数
 template <class T>
 int CreateGraph(AMLGraph<T> *&amlGraph,AmlKind kind,int defVexNum,int defRiseNum);
@@ -76,6 +93,9 @@ template <class T>
 int insertArc(AMLGraph<T> *amlGraph,T vi,T vj,int weight);
 
 //返回邻接矩阵
+//返回NULL或者
+template <class T>
+MGraph<T>* getMGraph(AMLGraph<T> *amlGraph);
 
 //返回顶点值为v的下一个邻接顶点的序号，否怎返回-1
 template <class T>
@@ -114,12 +134,12 @@ int BFSTraverse(AMLGraph<T> *G, void (*visit)(T));
 
 //创建图
 template <class T>
-int CreateGraph(AMLGraph<T> *&amlGraph,AmlKind kind){
-    amlGraph = (AMLGraph<T>*)malloc(sizeof(AMLGraph<T>));
-    if(amlGraph==NULL){
-        LOGD("OVERFLOW create graph error");
-        return -1;
-    }
+int CreateGraph(AMLGraph<T> *&amlGraph,AmlKind kind,int defVexNum,int defRiseNum){
+    amlGraph = new AMLGraph<T>();
+    amlGraph->maxVexNum = defVexNum;
+    amlGraph->defRiseNum = defRiseNum;
+    amlGraph->Vlist = new VexBox<T>[defVexNum]();
+    amlGraph->visited = new int[defVexNum]();
     amlGraph->kind=kind;
     amlGraph->arcnum=0;
     amlGraph->vexnum=0;
@@ -130,7 +150,7 @@ int CreateGraph(AMLGraph<T> *&amlGraph,AmlKind kind){
 template <class T>
 int locateVex(AMLGraph<T> amlGraph,T data){
     for (int i = 0; i < amlGraph.vexnum; ++i) {
-        if(amlGraph.Vlist.get(i).data == data){
+        if(amlGraph.Vlist[i].data == data){
             return i;
         }
     }
@@ -141,18 +161,25 @@ int locateVex(AMLGraph<T> amlGraph,T data){
 template <class T>
 int insertVex(AMLGraph<T> *amlGraph,T data){
     for(int i=0;i<amlGraph->vexnum;++i){
-        if(amlGraph->Vlist.get(i).data==data){
+        if(amlGraph->Vlist[i].data==data){
             LOGD("insertVex errot,vertex %d is exist!",data);
             return -1;
         }
     }
 
-    VexBox vexBox;
-    vexBox.data = data;
-    vexBox.firstarc = NULL;
-    amlGraph->Vlist.insert(vexBox);
+    if(amlGraph->arcnum>=amlGraph->maxVexNum){
+        VexBox<T> *list = new VexBox<T>[amlGraph->maxVexNum+amlGraph->defRiseNum];
+        for(int i=0;i<amlGraph->maxVexNum;i++){
+            list[i] = amlGraph->Vlist[i];
+            delete []amlGraph->Vlist;
+            amlGraph->Vlist = list;
+        }
+        amlGraph->maxVexNum+=amlGraph->defRiseNum;
+    }
 
-    amlGraph->visited.insert(unvisited);
+    amlGraph->Vlist[amlGraph->vexnum].data=data;
+    amlGraph->Vlist[amlGraph->vexnum].firstarc=NULL;
+    amlGraph->visited[amlGraph->vexnum]=unvisited;
     amlGraph->vexnum++;
 
     return 0;
@@ -181,27 +208,59 @@ int insertArc(AMLGraph<T> *amlGraph,T vi,T vj,int weight){
     EBox* eBox = (EBox*)malloc(sizeof(EBox));
     eBox->ivex = indexVi;
     eBox->jvex = indexVj;
+    eBox->iLink = amlGraph->Vlist[indexVi].firstarc;
+    eBox->jLink = amlGraph->Vlist[indexVj].firstarc;
+    amlGraph->Vlist[indexVi].firstarc = eBox;
+    amlGraph->Vlist[indexVj].firstarc = eBox;
     if(amlGraph->kind==UDN)
         eBox->weight = weight;
-    VexBox<T> vbi = amlGraph->Vlist.get(indexVi);
-    VexBox<T> vbj = amlGraph->Vlist.get(indexVj);
-    eBox->iLink = vbi.firstarc;
-    eBox->jLink = vbj.firstarc;
-    vbi.firstarc = eBox;
-    vbj.firstarc = eBox;
-    amlGraph->Vlist.set(indexVi,vbi);
-    amlGraph->Vlist.set(indexVi,vbj);
+    else
+        eBox->weight = 1;
     return 0;
 }
+
+template <class T>
+MGraph<T>*  getMGraph(AMLGraph<T> *amlGraph){
+    MGraph<T>* mGraph = new MGraph<T>();
+    mGraph->vexnum = amlGraph->vexnum;
+    mGraph->kind = amlGraph->kind;
+    mGraph->visited = new int[mGraph->vexnum];
+    mGraph->Vlist = new T[mGraph->vexnum];
+
+    for(int i=0;i<mGraph->vexnum;i++){
+        mGraph->Vlist[i] = amlGraph->Vlist[i].data;
+        mGraph->visited[i] = 0;
+        mGraph->edge = new int* [mGraph->vexnum];
+    }
+    for(int i=0;i<mGraph->vexnum;i++){
+        mGraph->edge[i] = new int[mGraph->vexnum];
+    }
+    for(int i=0;i<mGraph->vexnum;i++){
+        for(int j=0;j<mGraph->vexnum;j++){
+            mGraph->edge[i][j]=NO_EDGE;
+        }
+        mGraph->edge[i][i] = 0;
+
+        EBox *eBox = amlGraph->Vlist[i].firstarc;
+        while (eBox!=NULL){
+            int j = eBox->ivex==i?eBox->jvex:eBox->ivex;
+            mGraph->edge[i][i] = eBox->weight;
+            eBox=eBox->ivex==i?eBox->iLink:eBox->jLink;
+        }
+    }
+
+    return mGraph;
+}
+
 
 //递归实现深度遍历邻接点
 //连通图/子图
 template <class T>
 void DFS(AMLGraph<T> *G,int i,void (*visit)(T)){
     G->visited[i] = isvisited;
-    visit(G->adjmulist[i].data);
+    visit(G->Vlist[i].data);
 
-    EBox *eBox = G->adjmulist[i].firstarc;
+    EBox *eBox = G->Vlist[i].firstarc;
 
     while (eBox!=NULL){
         int j = eBox->ivex==i?eBox->jvex:eBox->ivex;
@@ -250,17 +309,17 @@ void BFS(AMLGraph<T> *G,int i,void (*visit)(T)){
     int vex;
     EBox *eBox;
 
-    visit(G->adjmulist[i].data);
+    visit(G->Vlist[i].data);
     G->visited[i] = isvisited;
     enLQueue(queue,&i);
 
     while (!isLQueueEmpty(queue)){
         deLQueue(queue,&vex);
-        eBox = G->adjmulist[vex].firstarc;
+        eBox = G->Vlist[vex].firstarc;
         while (eBox!=NULL){
             int j = eBox->ivex==vex?eBox->jvex:eBox->ivex;
             if(G->visited[j]!=isvisited){
-                visit(G->adjmulist[j].data);
+                visit(G->Vlist[j].data);
                 G->visited[j]=isvisited;
                 enLQueue(queue,&j);
             }

@@ -6,6 +6,7 @@
 #define CORENOTE_HAFFMAN_H
 
 #include "Merge-Sort.h"
+#include "Utils.h"
 /**
  * 哈夫曼树
  * */
@@ -84,7 +85,7 @@ int haffEncode(LinkedList<HaffCode<T>> *&table, const char *str, int size, char 
  * 哈夫曼解码
  * */
 template<class T>
-char *haffDecode(HaffNode<T> *&tree, const char *str, int size);
+T *haffDecode(HaffNode<T> *&tree, const char *str, int size);
 
 
 //=======================上面是声明，下面是定义============================//
@@ -364,33 +365,7 @@ int buildHaffTree(const char *str, int size, HaffNode<T> *&tree, LinkedList<Haff
 }
 
 
-/*
-* Description:     增长
-* Input:           src      要增长得数据
-*                  OirByte  src目前长度
-*                  wanByte  要增长到多少
-* Return:          int     >=0成功返回array得实际长度，<失败
-*/
-template<class T>
-static int increate(T *&src, int OirByte, int wanByte) {
-    if (OirByte == 0 || src == NULL) {
-        src = (T *) malloc(wanByte);
-        if (src == NULL)
-            return -1;
-        return wanByte;
-    }
-    T *tmp = (T *) malloc(OirByte);
-    memcpy(tmp, src, OirByte);
-    free(src);
-    src = (T *) malloc(wanByte);
-    if (src == NULL) {
-        free(tmp);
-        return -1;
-    }
-    memcpy(src, tmp, OirByte);
-    free(tmp);
-    return wanByte;
-};
+
 
 /**
  * 哈夫曼编码
@@ -447,7 +422,7 @@ int haffEncode(LinkedList<HaffCode<T>> *&table, const char *str, int size, char 
  * 哈夫曼解码
  * */
 template<class T>
-char *haffDecode(HaffNode<T> *&tree, const char *str, int size) {
+T *haffDecode(HaffNode<T> *&tree, const char *str, int size) {
     if (size < 1 || str == NULL)
         return NULL;
     const char *p = str;
@@ -485,7 +460,7 @@ char *haffDecode(HaffNode<T> *&tree, const char *str, int size) {
         }
 
         if (current + sizeof(T) + 1 > space) {
-            if ((space = increate<char>(decode, space, space + step)) < 0) {
+            if ((space = increate<T>(decode, space, space + step)) < 0) {
                 LOGD("haffEncode ERROR overflow");
                 free(decode);
                 return NULL;
@@ -498,7 +473,7 @@ char *haffDecode(HaffNode<T> *&tree, const char *str, int size) {
     }
 
     if(current+sizeof(T)+1>space){
-        if((space=increate<char>(decode,space,space+step))<0){
+        if((space=increate<T>(decode,space,space+step))<0){
             LOGD("haffEncode ERROR overflow");
             free(decode);
             return NULL;

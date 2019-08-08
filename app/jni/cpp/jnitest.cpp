@@ -372,15 +372,16 @@ Java_cd_note_others_JniTest_stackTest(JNIEnv *env, jclass type) {
     LOGD("isStackEmpty(stack)=%d",isStackEmpty(stack));
     stackDestory(stack);
 }
-void visitAMLGraph(AmlVexType data){
+template <class T>
+void visitAMLGraph(T data){
     LOGD("AmlGraph data=%d",data);
 }
 extern "C"
 JNIEXPORT void JNICALL
 Java_cd_note_others_JniTest_AmlGraph(JNIEnv *env, jclass type) {
 
-    AMLGraph *amlGraph;
-    CreateGraph(amlGraph,UDG);
+    AMLGraph<int> *amlGraph;
+    CreateGraph(amlGraph,UDG,20,20);
     insertVex(amlGraph,1);
     insertVex(amlGraph,2);
     insertVex(amlGraph,3);
@@ -396,8 +397,15 @@ Java_cd_note_others_JniTest_AmlGraph(JNIEnv *env, jclass type) {
 //    DFSTraverse(amlGraph,visitAMLGraph);
 
     BFSTraverse(amlGraph,visitAMLGraph);
+
+    MGraph<int>*  mGraph = getMGraph(amlGraph);
+    for(int i=0; i<mGraph->vexnum;i++){
+        for(int j=0; j<mGraph->vexnum;j++){
+            LOGD("AmlGraph edge[%d][%d]=%d",i,j,mGraph->edge[i][j]);
+        }
+    }
 }
-void visitOLGraph(AmlVexType data){
+void visitOLGraph(OLGVexType data){
     LOGD("OlGraph data=%d",data);
 }
 extern "C"

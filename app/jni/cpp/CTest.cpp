@@ -150,8 +150,17 @@ void ctest(void){
     #define MAX (1.0/0.0)
 
     LOGD("cTest limitDouble %f",limitDouble);
-    LOGD("cTest limitDouble>10000000000 ? %d",limitDouble>10000000000);
-    LOGD("cTest MAX>10000000000 ? %d",MAX>10000000000);
+    LOGD("cTest limitDouble>10000000000 ? %d",limitDouble>100);
+    LOGD("cTest MAX>10000000000 ? %d",MAX>100);
+
+    int **edge;
+    edge = new int* [2];
+    for(int i=0; i<2;i++)
+        edge[i] = new int[3];
+
+    edge[0][1]=3;
+    LOGD("cTest edge[0][1] = %d",edge[0][1]);
+    delete []edge;
 }
 
 
