@@ -13,6 +13,7 @@
 #include "LQueue.h"
 #include "LinkedList.h"
 #include "Utils.h"
+#include "Cmp.h"
 
 #define NO_EDGE 2147483647  //定义无边
 
@@ -29,6 +30,8 @@ typedef struct EBox{
     struct EBox *iLink; //指向依附于顶点1的下一条边，类似于起点相同的一条弧
     struct EBox *jLink; //指向依附于顶点2的下一条边，类似于终点点相同的一条弧
     int weight;         //权值
+
+    int operator-(const EBox &eBox);
 }EBox;
 
 //顶点结构
@@ -61,13 +64,14 @@ struct MGraph{
     AmlKind kind;
     //访问标志数组
     int *visited;
+
 };
 
 //创建图
 //defVexNum     初始化最大顶点数，
 //defRiseNum    当插入顶点数>defVexNum，默认的增长数
 template <class T>
-int CreateGraph(AMLGraph<T> *&amlGraph,AmlKind kind,int defVexNum,int defRiseNum);
+int initGraph(AMLGraph<T> &amlGraph, AmlKind kind, int defVexNum, int defRiseNum);
 //销毁图
 template <class T>
 int destroyGraph(AMLGraph<T> *amlGraph);
@@ -120,9 +124,12 @@ template <class T>
 int BFSTraverse(AMLGraph<T> *G, void (*visit)(T));
 
 
+//最小生成树  https://blog.csdn.net/luoshixian099/article/details/51908175
+//最小生成树:克鲁斯卡尔算法（kruskal）
+template <class T>
+int kruskal(const AMLGraph<T> graph,AMLGraph<T> &minTree);
 
-
-
+//最小生成树:普利姆算法（Prim）
 
 
 
@@ -134,8 +141,7 @@ int BFSTraverse(AMLGraph<T> *G, void (*visit)(T));
 
 //创建图
 template <class T>
-int CreateGraph(AMLGraph<T> *&amlGraph,AmlKind kind,int defVexNum,int defRiseNum){
-    amlGraph = new AMLGraph<T>();
+int initGraph(AMLGraph<T> *&amlGraph, AmlKind kind, int defVexNum, int defRiseNum){
     amlGraph->maxVexNum = defVexNum;
     amlGraph->defRiseNum = defRiseNum;
     amlGraph->Vlist = new VexBox<T>[defVexNum]();
@@ -167,7 +173,7 @@ int insertVex(AMLGraph<T> *amlGraph,T data){
         }
     }
 
-    if(amlGraph->arcnum>=amlGraph->maxVexNum){
+    if(amlGraph->vexnum>=amlGraph->maxVexNum){
         VexBox<T> *list = new VexBox<T>[amlGraph->maxVexNum+amlGraph->defRiseNum];
         for(int i=0;i<amlGraph->maxVexNum;i++){
             list[i] = amlGraph->Vlist[i];
@@ -216,6 +222,8 @@ int insertArc(AMLGraph<T> *amlGraph,T vi,T vj,int weight){
         eBox->weight = weight;
     else
         eBox->weight = 1;
+
+    amlGraph->arcnum++;
     return 0;
 }
 
@@ -244,7 +252,7 @@ MGraph<T>*  getMGraph(AMLGraph<T> *amlGraph){
         EBox *eBox = amlGraph->Vlist[i].firstarc;
         while (eBox!=NULL){
             int j = eBox->ivex==i?eBox->jvex:eBox->ivex;
-            mGraph->edge[i][i] = eBox->weight;
+            mGraph->edge[i][j] = eBox->weight;
             eBox=eBox->ivex==i?eBox->iLink:eBox->jLink;
         }
     }
@@ -346,4 +354,34 @@ int BFSTraverse(AMLGraph<T> *G, void (*visit)(T)){
     }
     return 0;
 }
+
+
+template <class T>
+int kruskal(const AMLGraph<T> graph,AMLGraph<T> &minTree){
+    //针对连通图，如果不是连通图，就先将图分开多个连接图，再用这个算法
+
+    //建一个数组由权值从小到大排序
+    //由权值由小到大选择边，边连接的两个顶点ui、vi应属于不同树，并将两颗树合并成一个树
+    //怎么判断两个顶点ui、vi属于不同树？
+
+    //建一个数组由权值从小到大排序
+    EBox* eBoxArray[graph.arcnum];
+    for(int i=0;i<graph.vexnum;i++){
+        EBox * eBox = graph.Vlist[i].firstarc;
+        while (eBox!=NULL){
+            eBoxArray[i] = eBox;
+            eBox = eBox->ivex==i?eBox->iLink:eBox->jLink;
+        }
+    }
+
+    std::qsort(eBoxArray,graph.arcnum, sizeof(eBoxArray[0]),cmp_ptr<EBox *>);
+
+    for(int i=0;i<graph.arcnum;i++){
+//        eBoxArray[i]
+        LOGD("%d->%d weight = %d",eBoxArray[i]->ivex,eBoxArray[i]->jvex,eBoxArray[i]->weight);
+    }
+
+    return 0;
+}
+
 #endif //CORENOTE_GRAPH_H

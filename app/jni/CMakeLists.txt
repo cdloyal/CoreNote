@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.4.1)
 
+set(CMAKE_CXX_STANDARD 11)
+
 # 添加头文件路径
 include_directories(./head)
 
@@ -26,6 +28,9 @@ target_link_libraries( corenote
 
                        ${log-lib})
 
+
+#设置生成的so动态库最后输出的路径
+#set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/src/main/jniLibs/${ANDROID_ABI})
 
 # 生成静态库文件
 #add_library(corenote_s

@@ -380,8 +380,8 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_cd_note_others_JniTest_AmlGraph(JNIEnv *env, jclass type) {
 
-    AMLGraph<int> *amlGraph;
-    CreateGraph(amlGraph,UDG,20,20);
+    AMLGraph<int> *amlGraph = new AMLGraph<int>();
+    initGraph(amlGraph, UDG, 20, 20);
     insertVex(amlGraph,1);
     insertVex(amlGraph,2);
     insertVex(amlGraph,3);
@@ -404,6 +404,13 @@ Java_cd_note_others_JniTest_AmlGraph(JNIEnv *env, jclass type) {
             LOGD("AmlGraph edge[%d][%d]=%d",i,j,mGraph->edge[i][j]);
         }
     }
+
+    AMLGraph<int> minTree;
+    kruskal(*amlGraph,minTree);
+
+    delete mGraph;
+    delete amlGraph;
+
 }
 void visitOLGraph(OLGVexType data){
     LOGD("OlGraph data=%d",data);

@@ -2,12 +2,12 @@
 #include <cstdlib>
 #include "CTest.h"
 
-
+#include <set>
 #include <vector>
 #include <CTest.h>
 
-using std::string;
-using std::vector;
+#include <istream>
+#include "Cmp.h"
 
 /**
  * 作者：chenda
@@ -54,7 +54,25 @@ CTest::~CTest() {
 
 
 
+std::unique_ptr<std::string> demo(const char * s)
+
+{
+
+    std::unique_ptr<std::string> temp (new std::string(s));
+    return temp;
+
+}
+
 void ctest(void){
+
+    int num[10] = {8,2,6,3,5,1,8,3,5,7};
+    qsort(num,10,sizeof(num[0]),cmp<int>);
+    for(int i=0;i<10;i++){
+        LOGD("ctest num[%d]=%d",i,num[i]);
+    }
+
+    //智能指针使用 https://blog.csdn.net/weixin_34186931/article/details/87121070
+    std::unique_ptr<std::string> ps(new std::string("1212"));
 
     test2 t2;
     int testa = t2.getA();
@@ -68,6 +86,7 @@ void ctest(void){
     char ch2[] = "ah";
     LOGD("(ch1==ch2)?%d",(ch1==ch2[1]));
 
+    auto *pt0 = static_cast<pointerTemplate<int> *>(malloc(sizeof(pointerTemplate<int>)));
     int ii = 6;
     pointerTemplate<int> pt1;
     pt1.t = 1;
@@ -83,7 +102,7 @@ void ctest(void){
     //https://blog.csdn.net/x
     // ingjiarong/article/details/47282255
 //    char *str = "acbcdef";
-//    str[3]='x'; //运行时出错，str指向的是常量区，常量区的值不能被修改
+//    str[3]='x'; //运行时出错,str指向的是常量区,常量区的值不能被修改
 
 //    const char *str = "acbcdef";
 //    str[3]='x'; //编辑时提示出错
@@ -93,7 +112,7 @@ void ctest(void){
     const int *b = &a;
     int const *c = &a;
     a=6;
-    //指针常量,不能修改指针，可以修改指针指向的值
+    //指针常量,不能修改指针,可以修改指针指向的值
     int* const d = &a;
     //指向常量的常指针
     const int* const p = &a;

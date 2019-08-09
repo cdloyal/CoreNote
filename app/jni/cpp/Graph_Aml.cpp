@@ -4,6 +4,8 @@
 #include <cstdlib>
 #include <log.h>
 #include <LQueue.h>
+#include <Graph_Aml.hpp>
+
 #include "Graph_Aml.hpp"
 
 /**
@@ -127,3 +129,6 @@
 
 
 
+int EBox::operator-(const EBox &eBox) {
+    return this->weight-eBox.weight;
+}
