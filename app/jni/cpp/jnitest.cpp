@@ -381,36 +381,43 @@ JNIEXPORT void JNICALL
 Java_cd_note_others_JniTest_AmlGraph(JNIEnv *env, jclass type) {
 
     AMLGraph<int> *amlGraph = new AMLGraph<int>();
-    initGraph(amlGraph, UDG, 20, 20);
+    initGraph(amlGraph, UDN, 20, 20);
     insertVex(amlGraph,1);
     insertVex(amlGraph,2);
     insertVex(amlGraph,3);
     insertVex(amlGraph,4);
     insertVex(amlGraph,5);
+    insertVex(amlGraph,6);
+    insertVex(amlGraph,7);
 
-    insertArc(amlGraph,1,2,0);
-    insertArc(amlGraph,1,3,0);
-    insertArc(amlGraph,2,5,0);
-    insertArc(amlGraph,2,3,0);
-    insertArc(amlGraph,3,5,0);
+    insertArc(amlGraph,1,2,2);
+    insertArc(amlGraph,1,3,3);
+    insertArc(amlGraph,2,5,1);
+    insertArc(amlGraph,2,3,7);
+    insertArc(amlGraph,3,5,3);
+    insertArc(amlGraph,4,6,5);
+    insertArc(amlGraph,4,7,8);
+    insertArc(amlGraph,6,7,4);
 
 //    DFSTraverse(amlGraph,visitAMLGraph);
 
     BFSTraverse(amlGraph,visitAMLGraph);
 
-    MGraph<int>*  mGraph = getMGraph(amlGraph);
+    MGraph<int>*  mGraph = getMGraph(*amlGraph);
     for(int i=0; i<mGraph->vexnum;i++){
         for(int j=0; j<mGraph->vexnum;j++){
             LOGD("AmlGraph edge[%d][%d]=%d",i,j,mGraph->edge[i][j]);
         }
     }
 
-    AMLGraph<int> minTree;
+    auto *minTree = new AMLGraph<int>();
+    initGraph(minTree, UDN, 20, 20);
     kruskal(*amlGraph,minTree);
+    Dijkstra(*amlGraph,1);
 
     delete mGraph;
     delete amlGraph;
-
+    delete minTree;
 }
 void visitOLGraph(OLGVexType data){
     LOGD("OlGraph data=%d",data);

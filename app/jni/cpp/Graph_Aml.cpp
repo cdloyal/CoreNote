@@ -132,3 +132,11 @@
 int EBox::operator-(const EBox &eBox) {
     return this->weight-eBox.weight;
 }
+
+int getFather_Graph(int u, int *road){
+    int father_u = u;
+    while(road[father_u]!=father_u){
+        father_u = road[father_u];
+    }
+    return father_u;
+}

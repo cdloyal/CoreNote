@@ -7,6 +7,7 @@
 #include <CTest.h>
 
 #include <istream>
+#include <deque>
 #include "Cmp.h"
 
 /**
@@ -64,6 +65,19 @@ std::unique_ptr<std::string> demo(const char * s)
 }
 
 void ctest(void){
+
+    std::deque<int> list;
+    list.push_front(1);
+    list.push_front(2);
+    list.push_front(7);
+    list.push_front(5);
+    auto it  =list.rend();
+    while(it != list.rbegin()){
+        LOGD("ctest rit=%d",(*--it));
+    }
+
+
+    std::shared_ptr<int> ptr = std::make_shared<int>(88);
 
     int num[10] = {8,2,6,3,5,1,8,3,5,7};
     qsort(num,10,sizeof(num[0]),cmp<int>);
