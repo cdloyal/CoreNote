@@ -393,11 +393,11 @@ Java_cd_note_others_JniTest_AmlGraph(JNIEnv *env, jclass type) {
     insertArc(amlGraph,1,2,2);
     insertArc(amlGraph,1,3,3);
     insertArc(amlGraph,2,5,1);
-//    insertArc(amlGraph,2,3,7);
-//    insertArc(amlGraph,3,5,3);
-//    insertArc(amlGraph,4,6,5);
-//    insertArc(amlGraph,4,7,8);
-//    insertArc(amlGraph,6,7,4);
+    insertArc(amlGraph,2,3,7);
+    insertArc(amlGraph,3,5,3);
+    insertArc(amlGraph,4,6,5);
+    insertArc(amlGraph,4,7,8);
+    insertArc(amlGraph,6,7,4);
 
 //    DFSTraverse(amlGraph,visitAMLGraph);
 
@@ -413,7 +413,7 @@ Java_cd_note_others_JniTest_AmlGraph(JNIEnv *env, jclass type) {
     auto *minTree = new AMLGraph<int>();
     initGraph(minTree, UDN, 20, 20);
     kruskal(*amlGraph,minTree);
-    Dijkstra(*amlGraph,1);
+    Dijkstra(*amlGraph,1,2);
     floyd(*amlGraph);
     Kahn(*amlGraph);
 

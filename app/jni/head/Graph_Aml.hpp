@@ -151,19 +151,23 @@ int kruskal(const AMLGraph<T> graph, AMLGraph<T> *minTree);
 //迪杰斯特拉算法 https://blog.csdn.net/qq_35644234/article/details/60870719
 //顶点head到图上个顶点的最短路径
 template<class T>
-void Dijkstra(const AMLGraph<T> graph, T head);
+void Dijkstra(const AMLGraph<T> graph, T head, int flag);
 
 //弗洛伊德算法
 template<class T>
 void floyd(const AMLGraph<T> graph);
 
 /**
+ * https://blog.csdn.net/qinzhaokun/article/details/48541117
  * 拓扑结构：
  *  将有向图中的顶点以线性方式进行排序。
  *  假设我非常想学习一门机器学习的课程，但是在修这么课程之前，我们必须要学习一些基础课程，
  *  比如计算机科学概论，C语言程序设计，数据结构，算法等等。那么这个制定选修课程顺序的过程，
  *  实际上就是一个拓扑排序的过程，每门课程相当于有向图中的一个顶点，而连接顶点之间的有向边
  *  就是课程学习的先后关系。不存在环，相互依赖的情况
+ *
+ * 顶点表示活动、边表示活动间先后关系的有向图称做顶点活动网(Activity On Vertex network)，简称AOV网
+ * 顶点表示事件，以有向边表示活动，边上的权值表示活动的开销（如该活动持续的时间），则此带权的有向无环图称为AOE网
  *
  * 拓扑算法：
  * 1、Kahn算法 :   找入度为0的顶点i，存在以顶点i为头，j为尾的边，顶点j的入度数减1；重复。找不到入度为0的顶点，如果还存在没有访问的顶点，代表有环
@@ -181,7 +185,7 @@ void floyd(const AMLGraph<T> graph);
  *      else
  *          return L (a topologically sortedorder)
  *
- * 2、DFS：图的深度遍历+判断是否存在环
+ * 2、DFS：图的深度遍历+遍历到的结点要判断入度+判断是否存在环
  *      L ← Empty list that will contain the sorted nodes
  *      S ← Set of all nodes with no outgoing edges
  *      for each node n in S do
@@ -195,7 +199,31 @@ void floyd(const AMLGraph<T> graph);
  * */
 
 template<class T>
-void Kahn(const AMLGraph<T> graph);
+int Kahn(const AMLGraph<T> graph);
+
+/**
+ * https://blog.csdn.net/qq_35644234/article/details/52664108
+ * 关键路径：
+ * 顶点表示事件，以有向边表示活动，边上的权值表示活动的开销（如该活动持续的时间），则此带权的有向无环图称为AOE网
+ *  AOE网，只有一个起点（入度为0的顶点）和一个终点（出度为0的顶点），研究：
+ *  完成整个工程需要的时间
+ *  哪些活动是影响工程进度的关键
+ *
+ * 活动最早发生时间e(i)：V0到Vi最长路径的长度。最长路径，因为要等Vi前面所有活动做完才能开始下一活动
+ * 活动最迟发生时间l(i)：不推迟工期的最晚开工时间。
+ * 关键活动：e(i)=l(i)的活动
+ *
+ * 活动最早发生时间e(i)：V0到Vi的最长路径。假设终点最早发生时间e(m)
+ *                       节点i前可能有多个活动h1、h2，
+ *                       e(i) = max(e(h1)+dut(<i,h1>)、e(h2)-dut(<i,h2>))
+ * 活动最迟发生时间l(i)：不推迟工期终点最迟发生时间l(m)=e(m),反推个节点的最迟发生时间
+ *                       节点i后可能有多个活动j1、j2，
+ *                       l(i) = min(l(j1)-dut(<i,j1>)、l(j2)-dut(<i,j2>))
+ *
+ *
+ * */
+template<class T>
+int criticalPath(const AMLGraph<T> graph);
 
 
 //创建图
@@ -479,8 +507,10 @@ int kruskal(const AMLGraph<T> graph, AMLGraph<T> *minTree) {
     return 0;
 }
 
+//flag==1   最小路径
+//flag==2   最大路径    取反操作？
 template<class T>
-void Dijkstra(const AMLGraph<T> graph, T head) {
+void Dijkstra(const AMLGraph<T> graph, T head, int flag) {
     int hIndex = locateVex(graph, head);
     if (hIndex == -1)
         return;
@@ -497,6 +527,15 @@ void Dijkstra(const AMLGraph<T> graph, T head) {
     int vers_size = 0;
 
     for (int i = 0; i < vexnum; i++) {
+        if (flag == 2) {
+            for (int j = 0; j < vexnum; j++) {
+                if (mGraph->edge[i][j] != NO_EDGE)
+                    mGraph->edge[i][j] = -mGraph->edge[i][j];
+                if(mGraph->edge[i][j] == 0)
+                    mGraph->edge[i][j] = -NO_EDGE;
+            }
+        }
+
         weight[i] = mGraph->edge[hIndex][i];
         path[i] = hIndex;
     }
@@ -506,11 +545,10 @@ void Dijkstra(const AMLGraph<T> graph, T head) {
     vers[vers_size++] = lastIndex;
 
     char string[128];
-
-    for (int i = 0; i < vexnum; i++) {
-        intArray2String(mGraph->edge[i], vexnum, string);
+//    for (int i = 0; i < vexnum; i++) {
+//        intArray2String(mGraph->edge[i], vexnum, string);
 //        LOGD("edge weight ： %s", string);
-    }
+//    }
 
     while (vers_size != vexnum) {
         int miniW = NO_EDGE;  //
@@ -537,8 +575,8 @@ void Dijkstra(const AMLGraph<T> graph, T head) {
             }
         }
         intArray2String(weight, vexnum, string);
-//        LOGD("Dijkstra weight ： %s", string);
-//        LOGD("Dijkstra miniIndex = %d", miniIndex);
+        LOGD("Dijkstra weight ： %s", string);
+        LOGD("Dijkstra miniIndex = %d", miniIndex);
 
         vers[vers_size++] = miniIndex;
         path[miniIndex] = hIndex;
@@ -557,6 +595,16 @@ void Dijkstra(const AMLGraph<T> graph, T head) {
         }
     }
 
+
+    if (flag == 2) {
+        for (int i = 0; i < vexnum; i++) {
+            for (int j = 0; j < vexnum; j++) {
+                if (mGraph->edge[i][j] != NO_EDGE)
+                    mGraph->edge[i][j] = -mGraph->edge[i][j];
+            }
+        }
+    }
+
     for (int i = 0; i < vexnum; i++) {
         std::string pt;
         std::deque<int> list;
@@ -570,8 +618,7 @@ void Dijkstra(const AMLGraph<T> graph, T head) {
         while (it != list.rbegin()) {
             pt.append((*it++) + " ");
         }
-
-        LOGD("AMLGraph %d->%d ,path=%s miniWeight=%d", hIndex, i, pt.c_str(), weight[i]);
+        LOGD("Dijkstra %d->%d ,path=%s miniWeight=%d", hIndex, i, pt.c_str(), weight[i]);
     }
 }
 
@@ -632,7 +679,7 @@ void floyd(const AMLGraph<T> graph) {
 
 
 template<class T>
-void Kahn(const AMLGraph<T> graph) {
+int Kahn(const AMLGraph<T> graph) {
 
     int *indegrees = new int[graph.vexnum](); // 记录每个顶点当前的入度
     int *list = new int[graph.vexnum];  //拓扑顺序结果
@@ -666,7 +713,7 @@ void Kahn(const AMLGraph<T> graph) {
         while (eBox != NULL) {
             if (eBox->ivex == list[visitIndex]) {
                 eBox->isvisit = isvisited;    //边设置为访问
-                if((--indegrees[eBox->jvex]) == 0)
+                if ((--indegrees[eBox->jvex]) == 0)
                     list[listSize++] = eBox->jvex;
                 eBox = eBox->iLink;
             } else {
@@ -682,7 +729,7 @@ void Kahn(const AMLGraph<T> graph) {
             if (eBox->isvisit == unvisited) {
                 LOGD("Kahn 拓扑排序出错，拓扑结构存在环");
                 delete[]indegrees;
-                return;
+                return -1;
             }
             eBox = eBox->ivex == i ? eBox->iLink : eBox->jLink;
         }
@@ -693,6 +740,27 @@ void Kahn(const AMLGraph<T> graph) {
     LOGD("Kahn = %s", string);
 
     delete[]indegrees;
+
+    return 0;
+}
+
+template<class T>
+int criticalPath(const AMLGraph<T> graph) {
+    if (Kahn(graph) == -1) {
+        LOGD("图存在环，不是拓扑结构");
+        return -1;
+    }
+
+    /**
+    * 活动最早发生时间e(i)：V0到Vi的最长路径。假设终点最早发生时间e(m)
+    *                       节点i前可能有多个活动h1、h2，
+    *                       e(i) = max(e(h1)+dut(<i,h1>)、e(h2)-dut(<i,h2>))
+    * 活动最迟发生时间l(i)：不推迟工期终点最迟发生时间l(m)=e(m),反推个节点的最迟发生时间
+    *                       节点i后可能有多个活动j1、j2，
+    *                       l(i) = min(l(j1)-dut(<i,j1>)、l(j2)-dut(<i,j2>))
+
+    * */
+
 
 }
 
