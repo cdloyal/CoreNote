@@ -8,6 +8,7 @@
 
 #include <istream>
 #include <deque>
+#include <list>
 #include "Cmp.h"
 
 /**
@@ -66,16 +67,25 @@ std::unique_ptr<std::string> demo(const char * s)
 
 void ctest(void){
 
-    std::deque<int> list;
+    std::list<int> list;
     list.push_front(1);
     list.push_front(2);
     list.push_front(7);
     list.push_front(5);
-    auto it  =list.rend();
-    while(it != list.rbegin()){
-        LOGD("ctest rit=%d",(*--it));
+//    auto it  =list.rend();
+//    while(it != list.rbegin()){
+//        LOGD("ctest rit=%d",(*--it));
+//    }
+//    auto it  =list.rbegin();
+//    while(it != list.rend()){
+//        LOGD("ctest rit=%d",(*it++));
+//    }
+    list.pop_back();
+    list.pop_back();
+    auto it  =list.rbegin();
+    while(it != list.rend()){
+        LOGD("ctest rit=%d",(*it++));
     }
-
 
     std::shared_ptr<int> ptr = std::make_shared<int>(88);
 
@@ -181,8 +191,9 @@ void ctest(void){
 
     double limitDouble = std::numeric_limits<double>::infinity();
     #define MAX (1.0/0.0)
-
+    double dd = limitDouble+1000;
     LOGD("cTest limitDouble %f",limitDouble);
+    LOGD("cTest dd %f",dd);
     LOGD("cTest limitDouble>10000000000 ? %d",limitDouble>100);
     LOGD("cTest MAX>10000000000 ? %d",MAX>100);
 

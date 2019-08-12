@@ -15,6 +15,7 @@
 #include "LinkedList.h"
 #include "Utils.h"
 #include "Cmp.h"
+#include "PrintUtils.h"
 #include <list>
 #include <string>
 #include <forward_list>
@@ -33,7 +34,7 @@ typedef enum {
 
 //边结构
 typedef struct EBox {
-    VisitIf mark;       //访问标记
+    VisitIf isvisit;       //访问标记
     int ivex;           //边顶点1
     int jvex;           //边顶点2
     struct EBox *iLink; //指向依附于顶点1的下一条边，类似于起点相同的一条弧
@@ -151,6 +152,50 @@ int kruskal(const AMLGraph<T> graph, AMLGraph<T> *minTree);
 //顶点head到图上个顶点的最短路径
 template<class T>
 void Dijkstra(const AMLGraph<T> graph, T head);
+
+//弗洛伊德算法
+template<class T>
+void floyd(const AMLGraph<T> graph);
+
+/**
+ * 拓扑结构：
+ *  将有向图中的顶点以线性方式进行排序。
+ *  假设我非常想学习一门机器学习的课程，但是在修这么课程之前，我们必须要学习一些基础课程，
+ *  比如计算机科学概论，C语言程序设计，数据结构，算法等等。那么这个制定选修课程顺序的过程，
+ *  实际上就是一个拓扑排序的过程，每门课程相当于有向图中的一个顶点，而连接顶点之间的有向边
+ *  就是课程学习的先后关系。不存在环，相互依赖的情况
+ *
+ * 拓扑算法：
+ * 1、Kahn算法 :   找入度为0的顶点i，存在以顶点i为头，j为尾的边，顶点j的入度数减1；重复。找不到入度为0的顶点，如果还存在没有访问的顶点，代表有环
+ *      L← Empty list that will contain the sorted elements
+ *      S ← Set of all nodes with no incoming edges
+ *      while S is non-empty do
+ *          remove a node n from S
+ *          insert n into L
+ *          foreach node m with an edge e from nto m do
+ *              remove edge e from thegraph
+ *              ifm has no other incoming edges then
+ *                  insert m into S
+ *      if graph has edges then
+ *          return error (graph has at least onecycle)
+ *      else
+ *          return L (a topologically sortedorder)
+ *
+ * 2、DFS：图的深度遍历+判断是否存在环
+ *      L ← Empty list that will contain the sorted nodes
+ *      S ← Set of all nodes with no outgoing edges
+ *      for each node n in S do
+ *          visit(n)
+ *      function visit(node n)
+ *          if n has not been visited yet then
+ *              mark n as visited
+ *              for each node m with an edgefrom m to ndo
+ *                  visit(m)
+ *              add n to L
+ * */
+
+template<class T>
+void Kahn(const AMLGraph<T> graph);
 
 
 //创建图
@@ -448,34 +493,62 @@ void Dijkstra(const AMLGraph<T> graph, T head) {
     int vexnum = mGraph->vexnum;
     int *weight = new int[vexnum];  //存放当前head到个顶点的最短路径的值
     int *path = new int[vexnum];    //存放迭代路径
-    std::list<int> vexs;            //存放已经找到最短路径的点
-
-    vexs.push_back(hIndex);
+    int *vers = new int[vexnum];    //存放已经找到最短路径的结点
+    int vers_size = 0;
 
     for (int i = 0; i < vexnum; i++) {
         weight[i] = mGraph->edge[hIndex][i];
         path[i] = hIndex;
     }
 
-    int lastIndex = hIndex;  //刚刚求出的最短路径的结点
-    int miniIndex = lastIndex;
+    int lastIndex = hIndex;     //刚刚求出的最短路径的结点
+    int miniIndex = lastIndex;  //暂存，用于比较
+    vers[vers_size++] = lastIndex;
 
-    while (vexs.size() != vexnum) {
+    char string[128];
+
+    for (int i = 0; i < vexnum; i++) {
+        intArray2String(mGraph->edge[i], vexnum, string);
+//        LOGD("edge weight ： %s", string);
+    }
+
+    while (vers_size != vexnum) {
         int miniW = NO_EDGE;  //
+
+//        intArray2String(vers, vers_size, string);
+//        LOGD("Dijkstra vers ： %s", string);
+
         for (int i = 0; i < vexnum; i++) {
-            if (weight[lastIndex] < weight[i] && miniW > weight[i]) {
+            int j = 0;
+            for (; j < vers_size; j++) {
+                if (vers[j] == i)
+                    break;
+            }
+
+            if (vers[j] == i) {
+//                LOGD("Dijkstra (vers[j]==i) i=%d", i);
+                continue;
+            }
+
+//            LOGD("Dijkstra i=%d", i);
+            if (weight[lastIndex] <= weight[i] && miniW >= weight[i]) {
                 miniW = weight[i];
                 miniIndex = i;
             }
         }
-        lastIndex = miniW;
-        vexs.push_front(lastIndex);
+        intArray2String(weight, vexnum, string);
+//        LOGD("Dijkstra weight ： %s", string);
+//        LOGD("Dijkstra miniIndex = %d", miniIndex);
+
+        vers[vers_size++] = miniIndex;
         path[miniIndex] = hIndex;
         weight[miniIndex] = miniW;
-
+        lastIndex = miniIndex;
 
         //找miniIndex出度
         for (int i = 0; i < vexnum; i++) {
+            if (weight[miniIndex] == NO_EDGE || mGraph->edge[miniIndex][i] == NO_EDGE)
+                continue;
             int tmp = weight[miniIndex] + mGraph->edge[miniIndex][i];
             if (tmp < weight[i]) {
                 weight[i] = tmp;
@@ -484,23 +557,144 @@ void Dijkstra(const AMLGraph<T> graph, T head) {
         }
     }
 
-    for (int i = 0; i < vexnum; i++){
+    for (int i = 0; i < vexnum; i++) {
         std::string pt;
         std::deque<int> list;
-        int j=i;
-        while (path[j]!=hIndex){
+        int j = i;
+        while (path[j] != hIndex) {
             list.push_front(path[i]);
-            j=path[j];
+            j = path[j];
         }
 
-        auto it  =list.rend();
-        while(it != list.rbegin()){
-            pt.append((*it++)+" ");
+        auto it = list.rend();
+        while (it != list.rbegin()) {
+            pt.append((*it++) + " ");
         }
 
-        LOGD("AMLGraph %d->%d ,path=%s miniWeight=%d",hIndex,i,pt.c_str(),weight[i]);
+        LOGD("AMLGraph %d->%d ,path=%s miniWeight=%d", hIndex, i, pt.c_str(), weight[i]);
+    }
+}
+
+template<class T>
+void floyd(const AMLGraph<T> graph) {
+    /**
+     * 佛洛依德算法：
+     *
+     * D[i][j] = (D[i][j]>D[i][k]+D[k][j])?D[i][k]+D[k][j]:D[i][j]
+     * 有N个顶点就迭代N次
+     *
+     * D[i][j] 表示顶点i(第i个顶点)到顶点j(第j个顶点)的距离
+     * P[i][j] 表示顶点i到顶点j经过了P[i][j]记录的值所表示的顶点,即上面的k
+     * */
+
+    MGraph<T> *mGraph = getMGraph(graph);
+    if (mGraph == NULL)
+        return;
+
+    int vexnum = mGraph->vexnum;
+    int **D, **P;
+    for (int i = 0; i < vexnum; i++) {
+        D = new int *[vexnum];
+        P = new int *[vexnum];
+    }
+    for (int i = 0; i < vexnum; i++) {
+        D[i] = new int[vexnum];
+        P[i] = new int[vexnum];
+    }
+    for (int i = 0; i < vexnum; i++) {
+        for (int j = 0; j < vexnum; j++) {
+            D[i][j] = mGraph->edge[i][j];
+            P[i][j] = j;
+        }
     }
 
+    for (int k = 0; k < vexnum; k++) {
+        for (int i = 0; i < vexnum; i++) {
+            for (int j = 0; j < vexnum; j++) {
+                if (D[i][k] == NO_EDGE || D[k][j] == NO_EDGE)
+                    continue;
+                if (D[i][j] > D[i][k] + D[k][j]) {
+                    D[i][j] = D[i][k] + D[k][j];
+                    P[i][j] = k;
+                }
+            }
+        }
+    }
+
+//    char string[128];
+//    for (int i = 0; i < vexnum; i++) {
+//        intArray2String(D[i], vexnum, string);
+//        LOGD("floyd D[%d] = %s", i,string);
+//        intArray2String(P[i], vexnum, string);
+//        LOGD("floyd P[%d] = %s", i,string);
+//    }
 }
+
+
+template<class T>
+void Kahn(const AMLGraph<T> graph) {
+
+    int *indegrees = new int[graph.vexnum](); // 记录每个顶点当前的入度
+    int *list = new int[graph.vexnum];  //拓扑顺序结果
+    int visitIndex = 0, listSize = 0;
+
+    for (int i = 0; i < graph.vexnum; i++) {
+        EBox *eBox = graph.Vlist[i].firstarc;
+        while (eBox != NULL) {
+            eBox->isvisit = unvisited;    //边设置为未访问
+            if (eBox->ivex == i) {
+                indegrees[eBox->jvex]++;
+                eBox = eBox->iLink;
+            } else {
+                eBox = eBox->jLink;
+            }
+        }
+
+//        graph.visited[i] = unvisited;   //顶点设置为未访问
+        list[i] = -1;
+    }
+
+    for (int i = 0; i < graph.vexnum; i++) {
+        if (indegrees[i] == 0) {
+            list[listSize++] = i;
+            graph.visited[i] = isvisited;
+        }
+    }
+
+    while (visitIndex != listSize) {
+        EBox *eBox = graph.Vlist[list[visitIndex]].firstarc;
+        while (eBox != NULL) {
+            if (eBox->ivex == list[visitIndex]) {
+                eBox->isvisit = isvisited;    //边设置为访问
+                if((--indegrees[eBox->jvex]) == 0)
+                    list[listSize++] = eBox->jvex;
+                eBox = eBox->iLink;
+            } else {
+                eBox = eBox->jLink;
+            }
+        }
+        visitIndex++;
+    }
+
+    for (int i = 0; i < graph.vexnum; i++) {
+        EBox *eBox = graph.Vlist[i].firstarc;
+        while (eBox != NULL) {
+            if (eBox->isvisit == unvisited) {
+                LOGD("Kahn 拓扑排序出错，拓扑结构存在环");
+                delete[]indegrees;
+                return;
+            }
+            eBox = eBox->ivex == i ? eBox->iLink : eBox->jLink;
+        }
+    }
+
+    char string[128];
+    intArray2String(list, listSize, string);
+    LOGD("Kahn = %s", string);
+
+    delete[]indegrees;
+
+}
+
 
 #endif //CORENOTE_GRAPH_H
