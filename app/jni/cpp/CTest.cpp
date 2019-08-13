@@ -11,6 +11,9 @@
 #include <list>
 #include "Cmp.h"
 
+#include<iostream>
+#include<stack>
+
 /**
  * 作者：chenda
  * 时间：2019/8/1:9:18
@@ -72,6 +75,7 @@ void ctest(void){
     list.push_front(2);
     list.push_front(7);
     list.push_front(5);
+    list.push_front(8);
 //    auto it  =list.rend();
 //    while(it != list.rbegin()){
 //        LOGD("ctest rit=%d",(*--it));
@@ -85,6 +89,10 @@ void ctest(void){
     auto it  =list.rbegin();
     while(it != list.rend()){
         LOGD("ctest rit=%d",(*it++));
+    }
+    auto it1 = list.begin();
+    while(it1 != list.end()){
+        LOGD("ctest rit=%d",(*it1++));
     }
 
     std::shared_ptr<int> ptr = std::make_shared<int>(88);
@@ -192,6 +200,8 @@ void ctest(void){
     double limitDouble = std::numeric_limits<double>::infinity();
     #define MAX (1.0/0.0)
     double dd = limitDouble+1000;
+    int maxx = std::numeric_limits<double>::infinity();
+    LOGD("cTest maxx = %d",maxx);
     LOGD("cTest limitDouble %f",limitDouble);
     LOGD("cTest dd %f",dd);
     LOGD("cTest limitDouble>10000000000 ? %d",limitDouble>100);
@@ -205,6 +215,8 @@ void ctest(void){
     edge[0][1]=3;
     LOGD("cTest edge[0][1] = %d",edge[0][1]);
     delete []edge;
+
+    std::stack<int> s;
 }
 
 

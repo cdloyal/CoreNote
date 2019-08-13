@@ -413,7 +413,7 @@ Java_cd_note_others_JniTest_AmlGraph(JNIEnv *env, jclass type) {
     auto *minTree = new AMLGraph<int>();
     initGraph(minTree, UDN, 20, 20);
     kruskal(*amlGraph,minTree);
-    Dijkstra(*amlGraph,1,2);
+    Dijkstra(*amlGraph,2);
     floyd(*amlGraph);
     Kahn(*amlGraph);
 

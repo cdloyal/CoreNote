@@ -20,6 +20,7 @@
 #include <string>
 #include <forward_list>
 #include <deque>
+#include <queue>
 
 #define NO_EDGE 2147483647  //定义无边
 
@@ -146,19 +147,24 @@ int kruskal(const AMLGraph<T> graph, AMLGraph<T> *minTree);
 //最小生成树:普利姆算法（Prim）
 
 
-//最短路径
+//最短路径  https://www.cnblogs.com/thousfeet/p/9229395.html
 
 //迪杰斯特拉算法 https://blog.csdn.net/qq_35644234/article/details/60870719
 //顶点head到图上个顶点的最短路径
 template<class T>
-void Dijkstra(const AMLGraph<T> graph, T head, int flag);
+void Dijkstra(const AMLGraph<T> graph, T head);
 
 //弗洛伊德算法
 template<class T>
 void floyd(const AMLGraph<T> graph);
 
+//Bellman-Ford算法
+template<class T>
+void bellman_Ford(const AMLGraph<T> graph);
+
 /**
  * https://blog.csdn.net/qinzhaokun/article/details/48541117
+ * https://blog.csdn.net/qq_35644234/article/details/52664108
  * 拓扑结构：
  *  将有向图中的顶点以线性方式进行排序。
  *  假设我非常想学习一门机器学习的课程，但是在修这么课程之前，我们必须要学习一些基础课程，
@@ -187,11 +193,11 @@ void floyd(const AMLGraph<T> graph);
  *
  * 2、DFS：图的深度遍历+遍历到的结点要判断入度+判断是否存在环
  *      L ← Empty list that will contain the sorted nodes
- *      S ← Set of all nodes with no outgoing edges
+ *      S ← Set of all nodes with no ingoing edges
  *      for each node n in S do
  *          visit(n)
  *      function visit(node n)
- *          if n has not been visited yet then
+ *          if n has not been visited yet && n with noingoing edges then
  *              mark n as visited
  *              for each node m with an edgefrom m to ndo
  *                  visit(m)
@@ -318,7 +324,7 @@ template<class T>
 MGraph<T> *getMGraph(const AMLGraph<T> &amlGraph) {
     MGraph<T> *mGraph = new MGraph<T>();
     mGraph->vexnum = amlGraph.vexnum;
-    mGraph->kind = amlGraph.kind;
+    mGraph->kind = amlGraph.kind;   //TODO 有向边，下面要改的
     mGraph->visited = new int[mGraph->vexnum];
     mGraph->Vlist = new T[mGraph->vexnum];
 
@@ -510,10 +516,13 @@ int kruskal(const AMLGraph<T> graph, AMLGraph<T> *minTree) {
 //flag==1   最小路径
 //flag==2   最大路径    取反操作？
 template<class T>
-void Dijkstra(const AMLGraph<T> graph, T head, int flag) {
+void Dijkstra(const AMLGraph<T> graph, T head) {
     int hIndex = locateVex(graph, head);
-    if (hIndex == -1)
+    if (hIndex == -1){
+        LOGD("can not find parm head");
         return;
+    }
+
 
     MGraph<T> *mGraph = getMGraph(graph);
     if (mGraph == NULL)
@@ -527,24 +536,23 @@ void Dijkstra(const AMLGraph<T> graph, T head, int flag) {
     int vers_size = 0;
 
     for (int i = 0; i < vexnum; i++) {
-        if (flag == 2) {
-            for (int j = 0; j < vexnum; j++) {
-                if (mGraph->edge[i][j] != NO_EDGE)
-                    mGraph->edge[i][j] = -mGraph->edge[i][j];
-                if(mGraph->edge[i][j] == 0)
-                    mGraph->edge[i][j] = -NO_EDGE;
-            }
-        }
+//        if (flag == 2) {
+//            for (int j = 0; j < vexnum; j++) {
+//                if (mGraph->edge[i][j] != NO_EDGE)
+//                    mGraph->edge[i][j] = -mGraph->edge[i][j];
+//                if(mGraph->edge[i][j] == 0)
+//                    mGraph->edge[i][j] = -NO_EDGE;
+//            }
+//        }
 
         weight[i] = mGraph->edge[hIndex][i];
         path[i] = hIndex;
     }
 
-    int lastIndex = hIndex;     //刚刚求出的最短路径的结点
-    int miniIndex = lastIndex;  //暂存，用于比较
-    vers[vers_size++] = lastIndex;
+    int miniIndex = hIndex;  //暂存，用于比较
+    vers[vers_size++] = miniIndex;
 
-    char string[128];
+//    char string[128];
 //    for (int i = 0; i < vexnum; i++) {
 //        intArray2String(mGraph->edge[i], vexnum, string);
 //        LOGD("edge weight ： %s", string);
@@ -568,22 +576,42 @@ void Dijkstra(const AMLGraph<T> graph, T head, int flag) {
                 continue;
             }
 
-//            LOGD("Dijkstra i=%d", i);
-            if (weight[lastIndex] <= weight[i] && miniW >= weight[i]) {
+//            if (weight[lastIndex] <= weight[i] && miniW >= weight[i]) {
+            if (miniW >= weight[i]) {
                 miniW = weight[i];
                 miniIndex = i;
             }
         }
-        intArray2String(weight, vexnum, string);
-        LOGD("Dijkstra weight ： %s", string);
-        LOGD("Dijkstra miniIndex = %d", miniIndex);
+
+//        intArray2String(weight, vexnum, string);
+//        LOGD("Dijkstra weight ： %s", string);
+//        LOGD("Dijkstra miniIndex = %d", miniIndex);
 
         vers[vers_size++] = miniIndex;
-        path[miniIndex] = hIndex;
         weight[miniIndex] = miniW;
-        lastIndex = miniIndex;
 
         //找miniIndex出度
+//        for (int i = 0; i < vexnum; i++) {
+//            int j = 0;
+//            for (; j < vers_size; j++) {
+//                if (vers[j] == i)
+//                    break;
+//            }
+//
+//            if (vers[j] == i) {
+////                LOGD("Dijkstra (vers[j]==i) i=%d", i);
+//                continue;
+//            }
+//            if (weight[miniIndex] == NO_EDGE || mGraph->edge[miniIndex][i] == NO_EDGE)
+//                continue;
+//            int tmp = weight[miniIndex] + mGraph->edge[miniIndex][i];
+//            if (tmp < weight[i]) {
+//                weight[i] = tmp;
+//                path[i] = miniIndex;
+//            }
+//        }
+
+        //贪心策略
         for (int i = 0; i < vexnum; i++) {
             if (weight[miniIndex] == NO_EDGE || mGraph->edge[miniIndex][i] == NO_EDGE)
                 continue;
@@ -593,30 +621,46 @@ void Dijkstra(const AMLGraph<T> graph, T head, int flag) {
                 path[i] = miniIndex;
             }
         }
+
     }
 
 
-    if (flag == 2) {
-        for (int i = 0; i < vexnum; i++) {
-            for (int j = 0; j < vexnum; j++) {
-                if (mGraph->edge[i][j] != NO_EDGE)
-                    mGraph->edge[i][j] = -mGraph->edge[i][j];
-            }
-        }
-    }
+//    if (flag == 2) {
+//        for (int i = 0; i < vexnum; i++) {
+//            for (int j = 0; j < vexnum; j++) {
+//                if(mGraph->edge[i][j] == -NO_EDGE)
+//                    mGraph->edge[i][j] = 0;
+//                if (mGraph->edge[i][j] != NO_EDGE)
+//                    mGraph->edge[i][j] = -mGraph->edge[i][j];
+//            }
+//
+//            if(weight[i] == -NO_EDGE)
+//                weight[i] = 0;
+//            if (weight[i] != NO_EDGE)
+//                weight[i] = -weight[i];
+//        }
+//    }
 
     for (int i = 0; i < vexnum; i++) {
-        std::string pt;
+//        LOGD("Dijkstra path[%d]=%d", i, path[i]);
+
+        std::string pt("");
         std::deque<int> list;
         int j = i;
+        list.push_front(j);
         while (path[j] != hIndex) {
-            list.push_front(path[i]);
+            list.push_front(path[j]);
             j = path[j];
         }
+        list.push_front(hIndex);
 
-        auto it = list.rend();
-        while (it != list.rbegin()) {
-            pt.append((*it++) + " ");
+        auto it = list.begin();
+        while (it != list.end()) {
+//            LOGD("Dijkstra (*it++) + \" \" = %d", (*it));
+            pt += std::to_string((*it));
+            pt += " ";
+            it++;
+//            pt.append((*it++) + " ");
         }
         LOGD("Dijkstra %d->%d ,path=%s miniWeight=%d", hIndex, i, pt.c_str(), weight[i]);
     }
@@ -760,6 +804,13 @@ int criticalPath(const AMLGraph<T> graph) {
     *                       l(i) = min(l(j1)-dut(<i,j1>)、l(j2)-dut(<i,j2>))
 
     * */
+
+    //用DFS拓扑排序获得活动最早发生时间e(i)
+
+
+    //逆拓扑排序求活动最迟发生时间l(i)
+
+    //比较e(i)==l(i)，求出关键路径
 
 
 }
