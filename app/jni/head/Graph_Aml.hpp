@@ -21,6 +21,7 @@
 #include <forward_list>
 #include <deque>
 #include <queue>
+#include <stack>
 
 #define NO_EDGE 2147483647  //定义无边
 
@@ -206,6 +207,9 @@ void bellman_Ford(const AMLGraph<T> graph);
 
 template<class T>
 int Kahn(const AMLGraph<T> graph);
+
+template<class T>
+int dfsTopo(const AMLGraph<T> graph);
 
 /**
  * https://blog.csdn.net/qq_35644234/article/details/52664108
@@ -518,7 +522,7 @@ int kruskal(const AMLGraph<T> graph, AMLGraph<T> *minTree) {
 template<class T>
 void Dijkstra(const AMLGraph<T> graph, T head) {
     int hIndex = locateVex(graph, head);
-    if (hIndex == -1){
+    if (hIndex == -1) {
         LOGD("can not find parm head");
         return;
     }
@@ -767,16 +771,23 @@ int Kahn(const AMLGraph<T> graph) {
         visitIndex++;
     }
 
-    for (int i = 0; i < graph.vexnum; i++) {
-        EBox *eBox = graph.Vlist[i].firstarc;
-        while (eBox != NULL) {
-            if (eBox->isvisit == unvisited) {
-                LOGD("Kahn 拓扑排序出错，拓扑结构存在环");
-                delete[]indegrees;
-                return -1;
-            }
-            eBox = eBox->ivex == i ? eBox->iLink : eBox->jLink;
-        }
+    //檢查邊的方法，效率低。如果存在环，肯定还有顶点没有排序，可以比较顶点数
+//    for (int i = 0; i < graph.vexnum; i++) {
+//        EBox *eBox = graph.Vlist[i].firstarc;
+//        while (eBox != NULL) {
+//            if (eBox->isvisit == unvisited) {
+//                LOGD("Kahn 拓扑排序出错，拓扑结构存在环");
+//                delete[]indegrees;
+//                return -1;
+//            }
+//            eBox = eBox->ivex == i ? eBox->iLink : eBox->jLink;
+//        }
+//    }
+
+    if(listSize!=graph.vexnum){
+        LOGD("Kahn 拓扑排序出错，拓扑结构存在环");
+        delete[]indegrees;
+        return -1;
     }
 
     char string[128];
@@ -789,12 +800,67 @@ int Kahn(const AMLGraph<T> graph) {
 }
 
 template<class T>
-int criticalPath(const AMLGraph<T> graph) {
-    if (Kahn(graph) == -1) {
-        LOGD("图存在环，不是拓扑结构");
-        return -1;
+int dfsTopo(const AMLGraph<T> graph) {
+
+    int *indegrees = new int[graph.vexnum](); // 记录每个顶点当前的入度
+    int *list = new int[graph.vexnum];        //拓扑顺序结果
+    int listSize = 0;
+    std::stack<int> stack;
+
+    for (int i = 0; i < graph.vexnum; i++) {
+        EBox *eBox = graph.Vlist[i].firstarc;
+        while (eBox != NULL) {
+            if (eBox->ivex == i) {
+                indegrees[eBox->jvex]++;
+                eBox = eBox->iLink;
+            } else {
+                eBox = eBox->jLink;
+            }
+        }
+
+//        graph.visited[i] = unvisited;   //顶点设置为未访问
+        list[i] = -1;
     }
 
+    for (int i = 0; i < graph.vexnum; i++) {
+        if (indegrees[i] == 0) {
+            stack.push(i);
+        }
+    }
+
+    int pop;
+    while (stack.size() != 0) {
+        pop = stack.top();
+        stack.pop();
+        list[listSize++] = pop;
+        EBox *eBox = graph.Vlist[pop].firstarc;
+        while (eBox != NULL) {
+            if (eBox->ivex == pop) {
+                if ((--indegrees[eBox->jvex]) == 0)
+                    stack.push(eBox->jvex);
+                eBox = eBox->iLink;
+            } else {
+                eBox = eBox->jLink;
+            }
+        }
+    }
+
+    if(listSize!=graph.vexnum){
+        LOGD("Kahn 拓扑排序出错，拓扑结构存在环");
+        delete[]indegrees;
+        return -1;
+    }
+    char string[128];
+    intArray2String(list, listSize, string);
+    LOGD("Kahn = %s", string);
+
+    delete[]indegrees;
+
+    return 0;
+}
+
+template<class T>
+int criticalPath(const AMLGraph<T> graph) {
     /**
     * 活动最早发生时间e(i)：V0到Vi的最长路径。假设终点最早发生时间e(m)
     *                       节点i前可能有多个活动h1、h2，
@@ -806,13 +872,114 @@ int criticalPath(const AMLGraph<T> graph) {
     * */
 
     //用DFS拓扑排序获得活动最早发生时间e(i)
+    int *indegrees = new int[graph.vexnum](); // 记录每个顶点当前的入度
+    int *e = new int[graph.vexnum]();           //记录活动最早发生时间e(i)
+    int listSize = 0;
+    std::stack<int> stack;
 
+    for (int i = 0; i < graph.vexnum; i++) {
+        EBox *eBox = graph.Vlist[i].firstarc;
+        while (eBox != NULL) {
+            if (eBox->ivex == i) {
+                indegrees[eBox->jvex]++;
+                eBox = eBox->iLink;
+            } else {
+                eBox = eBox->jLink;
+            }
+        }
+    }
+
+    for (int i = 0; i < graph.vexnum; i++) {
+        if (indegrees[i] == 0) {
+            stack.push(i);
+            e[i]=0;
+        }
+    }
+
+    //确保单源的
+    if(stack.size()!=1 ){
+        LOGD("Kahn 拓扑排序出错，结构非单源");
+        delete []indegrees;
+        delete []e;
+        return -1;
+    }
+
+    int pop;
+    while (stack.size() != 0) {
+        pop = stack.top();
+        stack.pop();
+        listSize++;
+        EBox *eBox = graph.Vlist[pop].firstarc;
+        while (eBox != NULL) {
+            if (eBox->ivex == pop) {
+                if(e[eBox->jvex]<e[eBox->ivex]+eBox->weight)
+                    e[eBox->jvex] = e[eBox->ivex]+eBox->weight;
+                if ((--indegrees[eBox->jvex]) == 0)
+                    stack.push(eBox->jvex);
+                eBox = eBox->iLink;
+            } else {
+                eBox = eBox->jLink;
+            }
+        }
+    }
+
+    if(listSize!=graph.vexnum){
+        LOGD("Kahn 拓扑排序出错，拓扑结构存在环");
+        delete []indegrees;
+        delete []e;
+        return -1;
+    }
+
+    char string[128];
+    intArray2String(e, listSize, string);
+    LOGD("criticalPath e[] = %s", string);
 
     //逆拓扑排序求活动最迟发生时间l(i)
+    int *l = new int[graph.vexnum];
+    for (int i = 0; i < graph.vexnum; i++) {
+        l[i] = e[graph.vexnum-1];
+        EBox *eBox = graph.Vlist[i].firstarc;
+        while (eBox != NULL) {
+            if (eBox->ivex == i) {
+                indegrees[eBox->ivex]++;    //代表出度
+                eBox = eBox->iLink;
+            } else {
+                eBox = eBox->jLink;
+            }
+        }
+    }
+
+    for (int i = 0; i < graph.vexnum; i++) {
+        if (indegrees[i] == 0) {
+            stack.push(i);
+        }
+    }
+
+    while (stack.size() != 0) {
+        pop = stack.top();
+        stack.pop();
+        EBox *eBox = graph.Vlist[pop].firstarc;
+        while (eBox != NULL) {
+            if (eBox->jvex == pop) {
+                if(l[eBox->ivex]>l[eBox->jvex]-eBox->weight)
+                    l[eBox->ivex] = l[eBox->jvex]-eBox->weight;
+                if ((--indegrees[eBox->ivex]) == 0)
+                    stack.push(eBox->ivex);
+                eBox = eBox->jLink;
+            } else{
+                eBox = eBox->iLink;
+            }
+        }
+    }
+
+    intArray2String(l, listSize, string);
+    LOGD("criticalPath l[] = %s", string);
+
 
     //比较e(i)==l(i)，求出关键路径
 
 
+    return 0;
 }
 
 
