@@ -168,6 +168,19 @@ BiNode<DT>*  creatBiTree_M(LinkedList<DT> *list){
 
 template <class DT>
 void insertBiTree_M(BiNode<DT> *&tree, DT &newData){
+    /**
+     * 平衡二叉树
+     *  要么是空树；要么它的左子树和右子树都是平衡二叉排序树，且左右子树的深度相差1
+     *
+     * 平衡因子BF：二叉树上结点上的左子树深度减去右子树的深度
+     * 平衡二叉树所有结点的平衡因子小于等于1的树
+     *
+     * https://www.cnblogs.com/sgatbl/p/9426394.html
+     * */
+}
+
+template <class DT>
+void insertBiTree_M(BiNode<DT> *&tree, DT &newData){
     BiNode<DT> *parent = tree;
     BiNode<DT> *p = tree;
     if(tree==NULL){
@@ -211,42 +224,52 @@ int deleteBiTree_M(BiNode<DT> *&tree, DT &deleteData){
     //                  father.child=newchild;  delete child;
     //2、要删除的结点指针    node **child = &father.child;
     //我们父结点已经有一个指向
-    BiNode<DT> **pre,**curr=tree;
+    BiNode<DT> *tmp,*tmpTree=tree;
+    BiNode<DT> **pre=&tmpTree,**curr=&tmpTree;
+
     //用栈进行中序遍历
     std::stack<BiNode<DT> **> stack;
 
-    while (curr->lchild!=NULL){
+    //中序遍历
+    while ((*curr)!=NULL){
         stack.push(curr);
-        curr = curr->lchild;
+        curr = &(*curr)->lchild;
     }
-
-    curr = stack.top();
-    stack.pop();
-
-    if(curr->data==deleteData){
-        if(curr->lchild==NULL || curr->rchild==NULL){
-            pre
-        }
-    }else{
-        pre = curr;
-        if(curr->rchild==NULL){
-            curr = stack.top();
-            stack.pop();
-        } else{
-            curr = curr->rchild;
-        }
-    }
-    pre = &curr->lchild;
-
-
     while (stack.size()!=0){
         curr = stack.top();
         stack.pop();
-        if(curr->data==deleteData){
-
+        //visit
+        if((*curr)->data==deleteData){
+            if((*curr)->lchild!=NULL && (*curr)->rchild!=NULL){
+                (*curr)->data = (*pre)->data;
+                tmp = *pre;
+                *pre = (*pre)->lchild;
+                free(tmp);
+            } else if((*curr)->lchild!=NULL){
+                tmp = *curr;
+                *curr = (*curr)->lchild;
+                free(tmp);
+            } else if((*curr)->rchild!=NULL){
+                tmp = *curr;
+                *curr = (*curr)->rchild;
+                free(tmp);
+            } else{
+            }
+            return 0;
+        }
+        pre = curr;
+        //end visit
+        if((*curr)->rchild!=NULL){
+            curr = &(*curr)->rchild;
+            while ((*curr)!=NULL){
+                stack.push(curr);
+                curr = &(*curr)->lchild;
+            }
         }
     }
 
+    LOGD("删除结点出错，没找到结点");
+    return -1;
 }
 
 template<class DT>

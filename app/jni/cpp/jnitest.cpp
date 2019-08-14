@@ -329,24 +329,40 @@ Java_cd_note_others_JniTest_biTreeTest(JNIEnv *env, jclass type) {
     bitreeTest();
 
 
-    BiNode<int> *tree;
-    int in = 5;
+    BiNode<int> *tree = NULL;
+    int in = 10;
     insertBiTree_M<int>(tree, in);
-    in = 8;
+    in = 5;
     insertBiTree_M<int>(tree, in);
     in = 7;
     insertBiTree_M<int>(tree, in);
-    in = 2;
+    in = 6;
     insertBiTree_M<int>(tree, in);
     in = 3;
     insertBiTree_M<int>(tree, in);
-    in = 10;
+    in = 4;
     insertBiTree_M<int>(tree, in);
+    in = 18;
+    insertBiTree_M<int>(tree, in);
+    in = 14;
+    insertBiTree_M<int>(tree, in);
+    in = 16;
+    insertBiTree_M<int>(tree, in);
+    in = 15;
+    insertBiTree_M<int>(tree, in);
+    in = 22;
+    insertBiTree_M<int>(tree, in);
+    int del = 7;
+    deleteBiTree_M(tree,del);
+    del = 3;
+    deleteBiTree_M(tree,del);
+    del = 18;
+    deleteBiTree_M(tree,del);
     levelOrder_M(tree,visitBiTree2);
+
     destroyBiTree_M(tree);
 
 }
-
 void visit_thr(TElemType data){
     LOGD("thrBiTree data=%c",data);
 }
