@@ -287,7 +287,11 @@ void visitBiTree(DT data){
 }
 template <class DT>
 void visitBiTree1(DT data,int level){
-    LOGD("visitBiTree data=%c",data);
+    LOGD("visitBiTree1 data=%c",data);
+}
+template <class DT>
+void visitBiTree2(DT data){
+    LOGD("visitBiTree2 data=%d",data);
 }
 void bitreeTest(){
     /**
@@ -303,6 +307,7 @@ void bitreeTest(){
     biTree.creatBiTree(c,strlen(c));
     biTree.preOrder(visitBiTree1);
     biTree.levelOrder(visitBiTree);
+
 }
 extern "C"
 JNIEXPORT void JNICALL
@@ -322,6 +327,24 @@ Java_cd_note_others_JniTest_biTreeTest(JNIEnv *env, jclass type) {
     destroyBitTree(biTree);
 
     bitreeTest();
+
+
+    BiNode<int> *tree;
+    int in = 5;
+    insertBiTree_M<int>(tree, in);
+    in = 8;
+    insertBiTree_M<int>(tree, in);
+    in = 7;
+    insertBiTree_M<int>(tree, in);
+    in = 2;
+    insertBiTree_M<int>(tree, in);
+    in = 3;
+    insertBiTree_M<int>(tree, in);
+    in = 10;
+    insertBiTree_M<int>(tree, in);
+    levelOrder_M(tree,visitBiTree2);
+    destroyBiTree_M(tree);
+
 }
 
 void visit_thr(TElemType data){

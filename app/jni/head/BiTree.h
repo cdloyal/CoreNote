@@ -10,6 +10,7 @@
 
 #include "Stack.h"
 #include "LQueue.h"
+#include <stack>
 
 template <class DT>
 struct BiNode{
@@ -30,6 +31,12 @@ BiNode<DT>*  creatBiTree_M(LinkedList<DT> *list);
  * */
 template <class DT>
 void insertBiTree_M(BiNode<DT> *&tree, DT &newData);
+
+/**
+ * 二叉搜索树删除
+ * */
+template <class DT>
+int deleteBiTree_M(BiNode<DT> *&tree, DT &deleteData);
 
 //前序递归遍历二叉树,level当前层数,visit每次遍历到节点要做的事情
 template <class DT>
@@ -169,10 +176,10 @@ void insertBiTree_M(BiNode<DT> *&tree, DT &newData){
     }
     while (p){
         parent = p;
-        if(tree->data>newData){
-            p = tree->lchild;
+        if(parent->data>newData){
+            p = parent->lchild;
         } else{
-            p = tree->rchild;
+            p = parent->rchild;
         }
     }
     BiNode<DT> *node = createBiTreeNode_M(newData);
@@ -181,6 +188,65 @@ void insertBiTree_M(BiNode<DT> *&tree, DT &newData){
     } else{
         parent->rchild = node;
     }
+}
+
+template <class DT>
+int deleteBiTree_M(BiNode<DT> *&tree, DT &deleteData){
+    /**
+     * 根据二叉排序树性质：
+     *  1、如果要删除的结点是叶子节点，直接删除
+     *  2、如果要删除的结点只存在左子树或者右子树，删除结点后，将它的左子树或者右子树整个移动到删除结点的位置
+     *  3、如果删除的结点存在左子树和右子树
+     *      3-1 找到直接前驱（即左子树的最右边子树），如果直接前驱有左孩子，则将直接前驱代替要删除的结点，将直接前驱的左孩子代替直接前驱
+     *      3-2 找到直接后继（即右子树的最左边子树），如果直接后继有右孩子，则将直接后继代替要删除的结点，将直接后继的右孩子代替直接前驱
+     * */
+
+    if(tree==NULL){
+        LOGD("删除结点出错，二叉树为空");
+        return -1;
+    }
+
+    //因为我们要删除结点，然后让父节点的结点指针指向新的结点
+    //1、使用两个指针，一个指向父结点的指针node *father，一个指向要删除的结点指针node *child。这个就麻烦在要记录父结点的指针
+    //                  father.child=newchild;  delete child;
+    //2、要删除的结点指针    node **child = &father.child;
+    //我们父结点已经有一个指向
+    BiNode<DT> **pre,**curr=tree;
+    //用栈进行中序遍历
+    std::stack<BiNode<DT> **> stack;
+
+    while (curr->lchild!=NULL){
+        stack.push(curr);
+        curr = curr->lchild;
+    }
+
+    curr = stack.top();
+    stack.pop();
+
+    if(curr->data==deleteData){
+        if(curr->lchild==NULL || curr->rchild==NULL){
+            pre
+        }
+    }else{
+        pre = curr;
+        if(curr->rchild==NULL){
+            curr = stack.top();
+            stack.pop();
+        } else{
+            curr = curr->rchild;
+        }
+    }
+    pre = &curr->lchild;
+
+
+    while (stack.size()!=0){
+        curr = stack.top();
+        stack.pop();
+        if(curr->data==deleteData){
+
+        }
+    }
+
 }
 
 template<class DT>
