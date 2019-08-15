@@ -358,9 +358,15 @@ Java_cd_note_others_JniTest_biTreeTest(JNIEnv *env, jclass type) {
     deleteBiTree_M(tree,del);
     del = 18;
     deleteBiTree_M(tree,del);
-    levelOrder_M(tree,visitBiTree2);
-
+//    levelOrder_M(tree,visitBiTree2);
     destroyBiTree_M(tree);
+
+    BiNode<int> *avl = NULL;
+    int avlIn[] = {3,2,1,4,5,6,7,10,9,8};
+    for(int i=0;i< sizeof(avlIn)/ sizeof(int);i++)
+        insertAVL_M<int>(avl, avlIn[i]);
+    levelOrder_M(avl,visitBiTree2);
+    destroyBiTree_M(avl);
 
 }
 void visit_thr(TElemType data){

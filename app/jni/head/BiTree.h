@@ -15,6 +15,7 @@
 template <class DT>
 struct BiNode{
     DT data;
+    int height; //二叉平衡树用到
     BiNode *lchild,*rchild;
 };
 
@@ -166,21 +167,113 @@ BiNode<DT>*  creatBiTree_M(LinkedList<DT> *list){
     return tree;
 }
 
+
 template <class DT>
-void insertBiTree_M(BiNode<DT> *&tree, DT &newData){
+int getHeigh(BiNode<DT> *node){
+    if(node==NULL)
+        return 0;
+    return node->height;
+}
+
+template <class DT>
+void updateAVLHeigh(BiNode<DT> *node){
+    node->height = getHeigh(node->lchild)>=getHeigh(node->rchild)?getHeigh(node->lchild)+1:getHeigh(node->rchild)+1;
+}
+
+template <class DT>
+void leftRotation(BiNode<DT> *&tree){
+    BiNode<DT> *tmp = tree->rchild;
+    tree->rchild = tmp->lchild;
+    tmp->lchild=tree;
+    updateAVLHeigh(tree);
+    updateAVLHeigh(tmp);
+    tree=tmp;
+}
+
+template <class DT>
+void rightRotation(BiNode<DT> *&tree){
+    BiNode<DT> *tmp = tree->lchild;
+    tree->lchild = tmp->rchild;
+    tmp->rchild=tree;
+    updateAVLHeigh(tree);
+    updateAVLHeigh(tmp);
+    tree=tmp;
+}
+
+template <class DT>
+void insertAVL_M(BiNode<DT> *&tree, DT &newData){
     /**
      * 平衡二叉树
      *  要么是空树；要么它的左子树和右子树都是平衡二叉排序树，且左右子树的深度相差1
      *
+     * 二叉查找树和平衡二叉树的中序遍历都是有序的
+     *
      * 平衡因子BF：二叉树上结点上的左子树深度减去右子树的深度
      * 平衡二叉树所有结点的平衡因子小于等于1的树
      *
+     * https://blog.csdn.net/qq_25940921/article/details/82183093
      * https://www.cnblogs.com/sgatbl/p/9426394.html
+     *
+     * 输入：平衡二叉树tree，要插入的数据newData
+     * 输出：插入新的结点得到新的平衡二叉树
+     *
+     * 分解：根结点、平衡二叉左子树、平衡二叉右子树
+     * 解决：根结点和要插入数据的大小判断，递归调用，得到新的平衡二叉子树。退出条件，tree==null，插入新的结点
+     * 合并：判断左右子树的深度，进行旋转
+     *
+     * 实际应用要讨论相同元素问题,可以用一个freq结点变量记录
+     *
+     * 平衡二叉树删除结点比较麻烦，后面后中和谐更好的红黑树
      * */
+
+    if(tree==NULL){
+        tree = new BiNode<DT>();
+        tree->lchild=NULL;
+        tree->rchild=NULL;
+        tree->data=newData;
+        tree->height=1;
+        return;
+    }
+    if(tree->data>newData){
+        insertAVL_M(tree->lchild,newData);
+    } else if(tree->data<newData){
+        insertAVL_M(tree->rchild,newData);
+    } else{
+        LOGD("已经存在新插入的结点");
+        return;
+    }
+
+    //更新自己的高度
+    updateAVLHeigh(tree);
+    //判断左右子树高度
+    if(getHeigh(tree->lchild)-getHeigh(tree->rchild)==2){
+        //判断左左，还是左右
+        BiNode<DT> *l = tree->lchild;
+        if(getHeigh(l->lchild)-getHeigh(l->rchild)==1){
+            //左左:右旋
+            rightRotation(tree);
+        }else{
+            //左右：左旋右旋
+            leftRotation(tree->lchild);
+            rightRotation(tree);
+        }
+    } else if(getHeigh(tree->rchild)-getHeigh(tree->lchild)==2){
+        BiNode<DT> *r = tree->rchild;
+        if(getHeigh(r->rchild)-getHeigh(r->lchild)==1){
+            //右右：左旋
+            leftRotation(tree);
+        }else{
+            //右左：右旋左旋
+            rightRotation(tree->rchild);
+            leftRotation(tree);
+        }
+    }
+
 }
 
 template <class DT>
 void insertBiTree_M(BiNode<DT> *&tree, DT &newData){
+    //实际应用要讨论相同元素问题
     BiNode<DT> *parent = tree;
     BiNode<DT> *p = tree;
     if(tree==NULL){
@@ -223,7 +316,7 @@ int deleteBiTree_M(BiNode<DT> *&tree, DT &deleteData){
     //1、使用两个指针，一个指向父结点的指针node *father，一个指向要删除的结点指针node *child。这个就麻烦在要记录父结点的指针
     //                  father.child=newchild;  delete child;
     //2、要删除的结点指针    node **child = &father.child;
-    //我们父结点已经有一个指向
+    //突然想到与其使用指针的指针操作前驱结点，不如用后继结点
     BiNode<DT> *tmp,*tmpTree=tree;
     BiNode<DT> **pre=&tmpTree,**curr=&tmpTree;
 
