@@ -79,6 +79,7 @@ public class MemoryTest {
         public int num;
         A(){};
         A(A a){
+            Log.d(TAG,"A(A a)");
             this.num = a.num;
         }
     }

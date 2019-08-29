@@ -1,10 +1,11 @@
-package cd.note;
+package cd.note.activity;
 
 import android.os.Build;
-import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 
+import cd.note.R;
 import cd.note.Rxjava.RxjavaTest;
 import cd.note.Thread.AsyncTaskTest;
 import cd.note.Thread.HandlerTest;
@@ -19,13 +20,13 @@ import cd.note.others.GenericTest;
 import cd.note.others.JniTest;
 import cd.note.sqlite.SqliteTest;
 
-public class MainActivity extends AppCompatActivity {
+public class TestActivity extends AppCompatActivity {
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_test);
 
         //浅拷贝
         Clone.shallowCloneTest();
@@ -119,5 +120,4 @@ public class MainActivity extends AppCompatActivity {
         //哈夫曼编码
         JniTest.haffman();
     }
-
 }
