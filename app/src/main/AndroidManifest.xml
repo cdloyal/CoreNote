@@ -16,6 +16,7 @@
         tools:ignore="GoogleAppIndexingWarning">
         <activity android:name=".activity.HandlerActivity"></activity>
         <activity android:name=".activity.TestActivity" />
+        <activity android:name=".activity.OkHttpActivity" />
         <activity android:name=".activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
