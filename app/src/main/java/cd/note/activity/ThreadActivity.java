@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import cd.libcorenote.LogUtil;
 import cd.note.R;
@@ -99,7 +100,37 @@ public class ThreadActivity extends AppCompatActivity {
         LogUtil.d("Thread "+Thread.currentThread().getName()+" update myData.atonumber="+myData.atonumber);
     }
 
-    public void cas(View view) {
+
+    public void ABA(View view) {
+        /**
+         * ABA问题
+         *
+         * 线程one从主存取出A，线程two也从主存取出A，线程two将A改成了B，又将B改成了A,(A是对象的引用，重新改为A前，将A里的成员改变了)
+         * 此时线程one的进行CAS操作发现内存中仍是A，认为没修改，那么线程one取出的A就是修改过后的A
+         * */
+        MyData A = new MyData();
+        A.number = 1;
+        MyData B = new MyData();
+        B.number = 2;
+
+        AtomicReference<MyData> atomicReference = new AtomicReference<>();
+        atomicReference.set(A);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                atomicReference.compareAndSet(A,B); //这里线程one中间挂起了
+            }
+        },"one").start();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                atomicReference.compareAndSet(A,B);
+                A.number = 3;
+                atomicReference.compareAndSet(B,A); //线程one重新获得CPU时间片段，此时的A其实已经被修改过
+            }
+        },"two").start();
 
     }
 

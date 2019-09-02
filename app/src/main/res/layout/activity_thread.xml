@@ -18,10 +18,11 @@
         android:onClick="automic"
         android:text="automic" />
 
+
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="cas"
-        android:text="cas" />
+        android:onClick="ABA"
+        android:text="ABA" />
 
 </LinearLayout>
