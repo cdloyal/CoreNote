@@ -4,32 +4,24 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical"
-    tools:context=".activity.MainActivity">
+    tools:context=".activity.ThreadActivity">
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="test"
-        android:text="test" />
+        android:onClick="visibility"
+        android:text="visibility" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="handler"
-        android:text="handler" />
+        android:onClick="automic"
+        android:text="automic" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="okhttp"
-        android:text="okhttp" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="Thread"
-        android:text="Thread" />
+        android:onClick="cas"
+        android:text="cas" />
 
 </LinearLayout>

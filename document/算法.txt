@@ -1,4 +1,4 @@
-﻿查找算法
+查找算法
     顺序查找
     二分查找        min = low+(high-low)/2
     插值查找        min = low+(key-a[low])/(a[high]-a[low])*(high-low)
@@ -85,4 +85,151 @@ RADIX-SORT(A)
     MAXIMUM(S)
     SUCCESSOR(S,x)  找到x，返回x的前一个指针
     PREDECRSSOR(S,x)
+
+
+为什么会线程不安全
+可见性
+原子性
+指令重排
+开始举例子说明
+解决方法
+可见性、指令重排可以用volatile解决
+原子性不可以用
+原子性可以用原子变量解决
+为什么
+原子变量的内部实现是通过Unsafe变量jni直接写主内存中的变量，而且写操作的时候是原子性的
+
+示例：cd.note.activity.ThreadActivity
+
+1、Volatile  volatile是java虚拟机提供的轻量级的同步机制
+    保证可见性
+    不保证原子性
+    禁止指令重排
+
+JVM(java虚拟机)
+JMM(java内存模型)
+
+JMM：是抽象概念并不真实存在，是一组规范或规则，通过这组规范定义了程序中各个变量
+（包括示例字段，静态字段和构成数组对象的元素）的访问方式
+
+JMM关于同步的规定
+    1、线程解锁前，必须把共享变量的值刷新回主内存
+    2、线程加锁前，必须读取主内存的最新值到自己的工作内存
+    3、加锁解锁是同一把锁
+这个规定就是要求程序：可见性、原子性、有序性
+
+
+硬盘<内存<CPU
+    CPU到内存间还有缓存
+
+
+JVM运行程序的实体是线程，每个线程创建时JVM都会为其创建一个工作内存
+每个线程的工作内存都是私有数据区域，不可以共享
+而我们程序的所有变量都存在主内存当中，主内存的变量是可以共享的。
+线程对变量的操作，将主内存的变量拷贝到自己的工作内存，修改这个变量后，
+再将这个变量写回到主内存。
+线程间的通信必须通过主内存来完成。
+
+可见性：线程将自己修改的值写回到主内存后，其它线程马上知道该变量被修改了
+
+原子性：不可分割，完整性，要么成功，要么失败。1000张票，20窗口售票，
+        非原子性可能3个线程同时售出1张票，理论总票数要减3，却只减了1.
+        n--;每条从主内存取值、计算、返回主内存，同时取值，同时修改，同时返回
+
+        解决方法：1、synchronized
+                 2、AtomicInteger
+
+指令重排:
+    源代码--编译器优化重排--指令并行重排--内存系统重排--最终执行指令重排
+
+数据依赖性
+fun(){
+    int a = 1;  //语句1
+    int b = 2;  //语句2
+    a = a * a;  //语句3
+    b = a + 6;  //语句4
+}
+编译器优化顺序可以：1234、2134、1324
+
+
+int a=b=x=y=0;
+线程1                     线程2
+x=a;                      y=b;
+b=1;                      a=2;
+同时执行输出结果，x=0;y=0
+假如编译器优化后，语句顺序改变
+线程1                     线程2
+b=1;                      a=2;
+x=a;                      y=b;
+同时执行输出结果，x=2;y=1
+
+多线程环境中线程交替执行，由于编译器优化重排的存在，
+两个线程中使用的变量能否保证一致性是无法确定的，结果无法预测
+public class ResortSeqDemo{
+    int a = 0
+    boolean flag = false;
+
+    public void method1(){
+        a = 1;              //指令重排的结果有可能这两句指令顺序调转
+        flag = true;        //指令重排后，多线程环境下，假如一个线程先执行了flag = true;
+                            //a=1;未来得及执行，另一个线程执行了method2();输出的结果就是a=5;而不是=6
+                            //和存钱是不是一样
+                            //volatile 写屏障，禁止将volatile变量前的普通写操作放到volatile写操作后
+                            //volatile 读屏障，禁止将volatile变量后的普通读操作放到volatile读操作后
+    }
+
+    public void method2(){
+        if(flag){
+            a = a+5;
+            log.d(a);
+        }
+    }
+}
+
+
+看单例cd.note.designmode.SingleTon，双端检测的情况下，加个volatile
+new一个对象分3步
+    memory = allocate();    //分配内存空间
+    instance(memory);       //初始化对象
+    instance = memory;      //设置instance指向刚分配的内存地址
+
+步骤2和步骤3不存在数据依赖关系，
+重排后步骤2和步骤3调转，
+执行完步骤instance!=null,但实际上未初始化，
+多线程环境下，有的线程可能就得到了未初始化对象，这个未初始化对象里的成员数据就可能是乱的
+
+
+原子变量
+2、CAS：compare and swap   比较并交换
+    java线程操作的是工作内存的拷贝变量，
+    我们的原子类（AtomicInteger）类里有Integer变量，AtomicInteger类在实例化的时候回计算得到Integer变量在主存中的地址
+    UnSafe类通过jni直接读取和修改这个地址的值。
+    Java不能直接修改内存的值，C可以
+
+    public final int getAndIncrement(){
+        return unsafe.getAndAddInt(this,valueOffset,1);
+    }
+
+    getAndAddInt(this,valueOffset,1){                       //分为两步了，多线程下读和写之间可能，读和写步连续
+        int var5;                                           //compareAndSwapInt()，你给我的值var5和主内存相等的时候才修改
+        do{                                                 //var5是在你自己线程中获得的。
+            var5 = getIntVolatile(this,valueOffset);        //get出来
+        }while(!compareAndSwapInt(var1,var2,var5,var5+1));  //再修改，要确保修改的时候，我要返回的值没有被修改
+                                                            //假如上面用synchronized，就不用while
+                                                            //ABA问题说明compareAndSwapInt()还不是原子的？
+        return var5;
+    }
+
+CAS是一条CPU并发原语，执行过程是连续的，不允许被中断。
+
+为什么用CAS，不用synchronized
+
+
+CAS缺点：
+    循环时间长、开销大，上例修改前先获得目前的值，比较不成功就要循环，比较成功才修改，修改后返回当前值
+    ABA问题
+
+ CAS --- UnSafe --- CAS底层思想 --- ABA问题 --- 原子引用问题 --- 如何规避ABA问题
+    线程one从主存取出A，线程two也从主存取出A，线程two将将A改成了B，又将B改成了A，
+    此时线程one的进行CAS操作发现内存中仍是A，认为没修改，然后线程one操作成功
 
