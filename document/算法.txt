@@ -1,4 +1,4 @@
-查找算法
+﻿查找算法
     顺序查找
     二分查找        min = low+(high-low)/2
     插值查找        min = low+(key-a[low])/(a[high]-a[low])*(high-low)
@@ -85,3 +85,4 @@ RADIX-SORT(A)
     MAXIMUM(S)
     SUCCESSOR(S,x)  找到x，返回x的前一个指针
     PREDECRSSOR(S,x)
+
