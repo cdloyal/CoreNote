@@ -1,7 +1,7 @@
 package cd.note.others;
 
 import android.os.Build;
-import android.support.annotation.RequiresApi;
+import androidx.annotation.RequiresApi;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -159,6 +159,8 @@ public class CollectionTest {
         Log.d(TAG,"list map(3)="+map);
 
         list.iterator();
+
+
     }
 
     private interface MyPredicate<T>{
@@ -205,6 +207,7 @@ public class CollectionTest {
         public Student(String name, int arg) {
             this.name = name;
             this.arg = arg;
+
         }
 
         public String getName() {
@@ -246,6 +249,8 @@ public class CollectionTest {
 
             return 0;
         }
+
+
     }
 
 }

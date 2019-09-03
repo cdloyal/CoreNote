@@ -87,6 +87,47 @@ RADIX-SORT(A)
     PREDECRSSOR(S,x)
 
 
+=================================================bufferknife=============================================
+
+1、省略findViewById
+Activity:
+@InjectView(R.id.xxx)
+TextView mTextView;     //不能用static，private修饰
+布局设置好之后调用
+ButterKnife.inject(this)
+
+Fragment
+@InjectView(R.id.xxx)
+TextView mTextView;     //不能用static，private修饰
+View view = View.inflate(R.layout.simple,container,false);
+BufferKnife.inject(this,view);
+
+ViewHolder中使用
+static class ViewHolder{
+    @InjectView(R.id.xxx)
+    TextView mTextView;     //不能用static，private修饰
+
+    public ViewHolder(view){
+        BufferKnife.inject(this,view);
+    }
+}
+
+2、省略setOnclickListener()
+@OnClick(R.id.xxx)
+void xxx(View v){}
+
+3、@OnItemClick、@OnCheckedChanged
+
+4、@OnClick{R.id.xxx、R.id.yyy}
+void xxx(View v){}  //同一个处理函数
+
+=================================================多线程==================================================
+线程状态
+create--可运行--获得锁、获得CPU时间片段运行态--终止
+create--可运行--未获得锁进入阻塞态--获得CPU时间片段运行态--终止
+create--可运行--等待其它线程执行完--获得CPU时间片段运行态--终止
+
+
 为什么会线程不安全
 可见性
 原子性
@@ -237,3 +278,83 @@ CAS缺点：
 
 AtomicStampedReference<V>
 带时间戳的原子引用
+
+
+====================================================集合类=============================================================
+
+线程非安全                       线程安全
+ArrayList                       sector
+                                Collectioins.synchronizedList
+
+set                             Collectioins.synchronizedSet
+
+map                             Collectioins.synchronizedMap
+
+
+List、Set、Map大的区别
+List、Set继承Collection接口
+List有ArrayList、LinkList、Vector都是基于数组和链表的，元素可以重复,有序的
+Set有HashSet、LinkedHashSet、TreeSet。首先他们的元素是唯一的，跟他们的equal方法有关，元素存放的位置跟他们的hashcode值有关。
+HashSet就是基于HashMap
+
+Map未继承Collection接口，是独立的接口
+Map有HashMap、LinkedHashMap、TreeMap、HashTable
+HashMap存放的是键值对，内部有一个链表数组，根据元素的键值，通过hash函数计算出一个数组的下标，然后存进这个到相应的链表里。
+LinkedHashMap内部有一个链表的链表
+TreeMap
+
+
+线程安全
+ArrayList--Vector--Collections.synchronizedList()--CopyOnWriteArrayList<T>
+
+Collections.synchronizedList()实际上是SynchronizedList<T>,内部读和写都synchronized
+
+CopyOnWriteArrayList<T>写时复制上锁，不影响读
+
+HashSet--Collections.synchronizedSet()--CopyOnWriteHashSet<T>
+
+HashMap--ConcurrentHashMap<T>
+
+
+==============================================================================================================
+
+保证数据一致性，保证并发性
+
+公平锁：先来后到，排队，先来申请锁的先获得锁，order pocify
+非公平锁：需要竞争，可能造成优先级反转或者饥饿现象
+ReentrantLock默认非公平锁，吞吐量大
+synchronized也是一种非公平锁
+
+可重入锁（递归锁）
+同一线程外层函数获得锁之后，内层递归函数仍然能够获得该锁的代码
+线程可以进入任何一个它已经拥有的锁所同步着的代码
+ReentrantLock、synchronized都是可重入锁
+避免死锁
+
+自旋锁 使用AtomicReference<Thread>
+尝试获得锁的线程不会立即阻塞，而是采用循环的方式去尝试获得锁，
+好处：减少线程上下文切换的消耗
+缺点：循环会销毁CPU
+
+独占锁(写锁)/共享锁(读锁) ReentrantReadWriteLock
+并发读
+读写、写读、写写过程是互斥的
+
+其实还可以向CopyOnWriteHashSet一样，写的时候复制一份，写完后再填回去。
+
+==============================================================================================================
+同步减数器     CountDownLatch    Latch门闩
+    m个线程等待n个线程完成后再干其它的事
+    同时起步
+
+同步加数器     CyclicBarrier     循环屏障
+    等待n个线程再干其它的事
+
+信号量         Semaphore
+    资源少（停车位少），多个线程抢资源（很多车过来停车）
+信号量的使用目的：   1个或多个共享资源的互斥使用
+                    并发线程数的控制
+
+CountDownLatch、CyclicBarrier，只能使用1次
+
+Semaphore可多次使用
