@@ -358,3 +358,32 @@ ReentrantLock、synchronized都是可重入锁
 CountDownLatch、CyclicBarrier，只能使用1次
 
 Semaphore可多次使用
+
+==============================================================================================================
+阻塞队列方法
+
+        抛出异常            特殊值     阻塞          超时
+插入      add()           offer(e)     put(e)     offer(e,time,unit)
+删除      remove()        poll()       take()     poll(time,unit)
+检查      element()       peek()      不可用      不可用
+
+队列为满，add()插入异常    poll() 返回false    put(e)阻塞    offer(e,time,unit)阻塞一定时间，超时返回false
+队列为空，remove()删除异常 offer(e)返回false   take()阻塞    poll(e,time,unit)阻塞一定时间，超时返回false
+
+BlockingQueue
+BlockingArrayList
+BlockingLinkedList
+SynchronousQueue    不存储元素的阻塞队列
+
+生产者和消费者模式
+线程池
+消息中间件
+
+
+        sync                                    lock                            a
+                            -->                                     -->
+
+wait             notify                 await           singal
+
+    object.wait()/notify                      reentrantlock
+    synchronized

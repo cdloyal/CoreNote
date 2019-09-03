@@ -6,6 +6,7 @@ import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.HashMap;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.CyclicBarrier;
@@ -172,6 +173,7 @@ public class ThreadActivity extends AppCompatActivity {
     }
 
     private void spinUnlock() {
+
         Thread thread = Thread.currentThread();
         spinLock.compareAndSet(thread, null);
     }
