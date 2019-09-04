@@ -6,13 +6,14 @@ import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.HashMap;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -347,8 +348,205 @@ public class ThreadActivity extends AppCompatActivity {
         }
     }
 
+    private class MuchCond{
+        /**
+         * 线程1执行完，才能执行线程2;线程2执行完，才能执行线程3；线程3执行完，才能执行线程1；
+         * */
+        private int next = 1;   //下一个要执行的线程
+        private ReentrantLock lock = new ReentrantLock();
+        private Condition c1 = lock.newCondition();
+        private Condition c2 = lock.newCondition();
+        private Condition c3 = lock.newCondition();
+
+        private void excute1(){     //线程1要干的事
+            lock.lock();
+            try {
+                while (next!=1){
+                    c1.await();
+                }
+
+                LogUtil.d(Thread.currentThread().getName() + "执行完");
+                next = 2;       //下面两句关键
+                c2.signal();
+            }catch (Exception e){
+                e.printStackTrace();
+            }finally {
+                lock.unlock();
+            }
+        }
+
+        private void excute2(){     //线程2要干的事
+            lock.lock();
+            try {
+                while (next!=2){
+                    c2.await();
+                }
+
+                LogUtil.d(Thread.currentThread().getName() + "执行完");
+                next = 3;
+                c3.signal();
+            }catch (Exception e){
+                e.printStackTrace();
+            }finally {
+                lock.unlock();
+            }
+        }
+
+        private void excute3(){     //线程3要干的事
+            lock.lock();
+            try {
+                while (next!=3){
+                    c3.await();
+                }
+
+                LogUtil.d(Thread.currentThread().getName() + "执行完");
+                next = 1;
+                c1.signal();
+            }catch (Exception e){
+                e.printStackTrace();
+            }finally {
+                lock.unlock();
+            }
+        }
+    }
+
+    public void muchcond(View view) {
+        MuchCond muchCond = new MuchCond();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                muchCond.excute2();
+            }
+        },"线程2").start();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                muchCond.excute3();
+            }
+        },"线程3").start();
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                        muchCond.excute1();
+                }
+            },"线程1").start();
+
+    }
+
+
+    private class ProdCons{
+        LinkedBlockingDeque e;
+
+        private volatile int rice = 0;   //煮了多少饭
+        //原子性问题
+        private AtomicInteger atomicRice = new AtomicInteger(0);   //煮了多少饭
+
+        private ReentrantLock lock = new ReentrantLock();
+        private Condition condition = lock.newCondition();
+
+        public void cook(int add){      //要再煮多少饭
+            rice += add;
+
+            LogUtil.d(Thread.currentThread().getName() + ",煮了饭，rice="+rice);
+        }
+        public boolean eat(int cut){       //要吃多少饭
+            if(rice-cut<0)
+                return false;   //不够吃
+
+            rice -=cut;
+            LogUtil.d(Thread.currentThread().getName() + ",吃了饭，rice="+rice);
+            return true;
+        }
+
+        public void cookLock(int add){      //要再煮多少饭
+            lock.lock();
+            try {
+                rice += add;
+                LogUtil.d(Thread.currentThread().getName() + ",煮了饭，rice="+rice);
+                condition.signal();
+            }catch (Exception e){
+                e.printStackTrace();
+            }finally {
+                lock.unlock();
+            }
+        }
+        public boolean eatLock(int cut){       //要吃多少饭
+            lock.lock();
+            try {
+//                if(rice-cut<0)
+//                    return false;   //不够吃,要加condition
+                while (rice-cut<0){
+                    condition.await();
+                }
+
+                rice -=cut;
+                LogUtil.d(Thread.currentThread().getName() + ",吃了饭，rice="+rice);
+
+            }catch (Exception e){
+                e.printStackTrace();
+            }finally {
+                lock.unlock();
+            }
+            return true;
+        }
+
+        public void atomicCook(int add){      //要再煮多少饭
+//            LogUtil.d(Thread.currentThread().getName() + ",煮了饭，atomicRice="+atomicRice.addAndGet(add)); //打印会延后
+            atomicRice.addAndGet(add);
+        }
+        public void atomicEat(int cut){
+//            LogUtil.d(Thread.currentThread().getName() + ",吃了饭，atomicRice="+atomicRice.addAndGet(-cut));    //<0,没有condition
+            int temp;
+            while (!((temp=atomicRice.get())>cut) && !atomicRice.compareAndSet(temp,temp-cut)){     //这个就是自旋
+
+            }
+//            LogUtil.d(Thread.currentThread().getName() + ",吃了饭，atomicRice="+(temp-cut));
+        }
+
+
+
+    }
+
+    public void prodConsumer(View view) {
+        ProdCons prodCons = new ProdCons();
+        for(int i=0;i<6;i++){
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+//                    while (!prodCons.eat(5));
+//                    prodCons.atomicEat(5);
+                    prodCons.eatLock(5);
+                }
+            },"人"+i).start();   //code从1开始
+        }
+
+        for(int i=0;i<6;i++){
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+//                    prodCons.cook(5);
+//                    prodCons.atomicCook(5);
+                    prodCons.cookLock(5);
+                }
+            },"人"+i).start();   //code从1开始
+        }
+
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+//        LogUtil.d("剩下多少饭?"+prodCons.atomicRice.get());
+
+    }
+
 
     class MyData {
+
+
         volatile int number = 0;
 
         public void addTO60() {
@@ -364,7 +562,6 @@ public class ThreadActivity extends AppCompatActivity {
 
         public void atomicAdd() {
             atonumber = atomicInteger.incrementAndGet();
-
 
 //            while (!atomicInteger.compareAndSet(0,1)){ //==0代表没有被锁住
 //            }

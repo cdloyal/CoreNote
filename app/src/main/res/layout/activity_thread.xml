@@ -58,4 +58,16 @@
         android:onClick="semaphone"
         android:text="semaphone" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="prodConsumer"
+        android:text="prodConsumer" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="muchcond"
+        android:text="muchcond" />
+
 </LinearLayout>

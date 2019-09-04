@@ -325,7 +325,7 @@ HashMap--ConcurrentHashMap<T>
 ReentrantLock默认非公平锁，吞吐量大
 synchronized也是一种非公平锁
 
-可重入锁（递归锁）
+偏向锁/可重入锁（递归锁）
 同一线程外层函数获得锁之后，内层递归函数仍然能够获得该锁的代码
 线程可以进入任何一个它已经拥有的锁所同步着的代码
 ReentrantLock、synchronized都是可重入锁
@@ -370,10 +370,17 @@ Semaphore可多次使用
 队列为满，add()插入异常    poll() 返回false    put(e)阻塞    offer(e,time,unit)阻塞一定时间，超时返回false
 队列为空，remove()删除异常 offer(e)返回false   take()阻塞    poll(e,time,unit)阻塞一定时间，超时返回false
 
+生产消费模式
+
+生产多少个，消费多少个
+阻塞队列内部还是使用ReentrantLock进行同步
 BlockingQueue
-BlockingArrayList
-BlockingLinkedList
-SynchronousQueue    不存储元素的阻塞队列
+ArrayBlockingList
+LinkedBlockingList
+
+同一时间只能生产1个，消费1个
+内部Transferer， Spin和CAS，自适应自旋，后阻塞
+SynchronousQueue    不存储元素的阻塞队列,单个元素的队列
 
 生产者和消费者模式
 线程池
@@ -387,3 +394,110 @@ wait             notify                 await           singal
 
     object.wait()/notify                      reentrantlock
     synchronized
+
+
+
+
+生产者和消费者模式
+    什么是生产者和消费者？有的线程生产资源（资源增加），有的线程消费资源（资源减少），没有着两个特性就不是生产消费模式了
+    比如要有人煮饭，其它人才可以吃饭
+
+传统生产消费模式:
+生产：
+    竞争锁                 //为什么先竞争锁，而不是先判断？如果先判断后获取锁，判断到获取锁中间可能会被修改了，那么，获取锁后要重新判断
+        获得锁：进入下一步
+        没获得锁：阻塞
+    满足条件生产？
+        满足：生产
+        不满足：等待，释放锁，阻塞的锁和等待的锁竞争锁。等待唤醒。有可能是虚假唤醒，while重新判断释放满足生产条件
+
+消费也是同样的道理
+
+新型生产消费模式
+生产：
+    ArrayBlockingList.put()     //我要生产，内部Lock，满足条件吗？不满足就阻塞
+    ArrayBlockingList.take()
+
+
+
+多个条件控制，控制线程执行顺序
+
+==============================================================================================================
+https://www.cnblogs.com/jinshuai86/p/9291033.html
+
+获取锁、释放锁都是要消耗资源的
+阻塞状态，挂起到恢复需要再用户态和内核态之间切换
+
+Synchronized底层实现原理
+JDK1.6之后，Synchronized锁状态有无所状态、偏向锁、轻量级锁、自适应自旋锁和重量级锁
+无所状态就是不上锁
+偏向锁：不存在锁竞争，只会有同一个线程进入临界区，为了减少同一线程获取锁消耗的资源，所以当进入临界区前不会先去获取重量级锁
+轻量级锁：多个线程交替进入临界区，不存在锁竞争状态，为了减少阻塞状态下，挂起到恢复需要在用户态到内核态之间的切换
+自适应自旋锁：也是为了减少阻塞状态下，挂起到恢复需要在用户态到内核态之间的切换。自旋锁在没有获取到锁，不会马上挂起，而是循环获取锁，消耗CPU资源
+重量级锁：就是获取不到就挂起
+
+java对象由对象头、示例数据和对其填充数据组成
+Synchronized(Object),Object的有MarkWord字段和Monitor对象，记录了锁状态和当前线程获取的锁计数、等待的线程数、阻塞的线程数、获得锁当前线程
+
+
+
+synchronized的不足
+1、synchronized是非公平锁
+2、synchronized加锁前无法获取锁的状态，无法做如果有其它线程获取到锁，我就不阻塞等待了，一旦获取不到锁就阻塞
+3、synchronized不能做超时等待
+4、synchronized不可中断
+5、synchronized不可多个条件变量
+
+
+造成并发问题的原因
+可见性问题
+代码重排序问题
+原子性问题
+
+
+可见性问题、代码重排序问题可以用volitale解决，不能解决原子性问题
+
+原子性问题可以通过CAS、上锁解决
+
+CAS：compare and swap，比较并交换。AtomicInteger内部就是通过CAS保证数据原子性。CAS是Unsafe类的方法
+CAS缺点：while循环，消耗CPU资源
+        ABA问题用AtomicStampedReference/AtomicMarkableReference添加版本号解决
+
+上锁：
+    synchronized()关键字，偏向锁--轻量级锁--自适应自旋锁--重量级锁
+
+    synchronized缺点：
+        不是公平锁
+        无法获取锁状态
+        不能阻塞超时
+        多条件等待
+        不可中断
+
+    ReentrantLock可以解决上面的问题
+
+
+java基于CAS、synchronized、Lock实现了很多同步类
+AtomicInteger、AtomicReference等原子类型基于CAS，
+
+CountDownLatch基于CAS、CyclicBarrier基于ReentrantLock,semaphore基于CAS
+
+copyOnWrityArrayList,阻塞队列，都是基于CAS和锁解决的
+
+
+使用这些同步类的同步方法
+    1、单纯修改数据，就不需要重新上锁了。例如AtomicInteger.decrement();
+    2、修改数据以获取资源，例如boolean AtomicInteger.compareAndSet()，获取不到就退出，或者while循环获取。也是CAS了
+                          例如CountDownLatch.countDown()，基于CAS循环等待其它线程完成
+                          例如CyclicBarrier.await(),基于ReentrantLock就线程进入等待状态
+                          所以基于CAS，数据修改不成功则循环
+                              基于synchrone,就是阻塞（Collections.synchroniedArrayList）
+                              基于Lock，数据修改不成功则进入等待或者阻塞
+
+基于CAS的都是一个自旋锁了
+
+
+CAS、上锁都可以解决线程并发、原子性问题，只是各有优缺点
+
+
+==============================================================================================================
+
