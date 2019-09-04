@@ -375,8 +375,8 @@ Semaphore可多次使用
 生产多少个，消费多少个
 阻塞队列内部还是使用ReentrantLock进行同步
 BlockingQueue
-ArrayBlockingList
-LinkedBlockingList
+ArrayBlockingQueue
+LinkedBlockingQueue
 
 同一时间只能生产1个，消费1个
 内部Transferer， Spin和CAS，自适应自旋，后阻塞
@@ -500,4 +500,64 @@ CAS、上锁都可以解决线程并发、原子性问题，只是各有优缺�
 
 
 ==============================================================================================================
+多线程的实现方式
+1、继承Thread类，重新run方法
+2、实现Runnable接口，重写run方法，交给Thread
+3、通过Callable和FeatureTask创建线程
+4、通过线程池创建线程
+
+
+单个线程数的线程池
+固定线程数的线程池
+可缓存的线程池
+
+ThreadPoolExcutor(corePoolSize,maximumPoolSize,keepAliveTime,unit,workQueue,threadFaceory,handler)
+    corePoolSize:核心线程数，任务过来马上执行
+    maximumPoolSize：核心线程后被占用，任务进入阻塞队列，队列满了但不大于maximumPoolSize，threadFaceory生成工作线程，
+                     从workQueue取队列。当进来的任务大于maximumPoolSize，handler拒绝进来
+                     线程池执行完了，等待keepAliveTime后，判断现在线程数是否大于corePoolSize，是就停掉
+    threadFaceory:生成工作线程的工厂
+    handler:拒绝策略
+
+拒绝策略：等待队列已满，线程池的活动线程数达到了最大值，就要使用拒绝策略
+    AbortPolicy：直接抛出RejectedExcutionException
+    CallerRunsPolicy:不处理任务，不抛出异常，返回给调用者
+    DiscardOldestPolicy:抛弃等待最长的任务，提交当前任务
+    DiscardPolicy:直接丢弃当前任务
+
+
+public static ExecutorService newFixedThreadPool(int nThreads) {
+    return new ThreadPoolExecutor(nThreads, nThreads,
+                                  0L, TimeUnit.MILLISECONDS,
+                                  new LinkedBlockingQueue<Runnable>());
+}
+
+1.核心线程数为零    2.最大线程数为无限  3.无任务时，线程存活的最大时间为60s
+4.任务队列为同步移交队列，该队列没有缓冲区，即不会有任务会在该队列中排队，
+每当有任务要入队时，队列都会将任务移交给一个可用的线程
+public static ExecutorService newCachedThreadPool() {
+    return new ThreadPoolExecutor(0, Integer.MAX_VALUE,
+                                  60L, TimeUnit.SECONDS,
+                                  new SynchronousQueue<Runnable>());
+}
+
+public static ExecutorService newSingleThreadExecutor() {
+    return new FinalizableDelegatedExecutorService
+        (new ThreadPoolExecutor(1, 1,
+                                0L, TimeUnit.MILLISECONDS,
+                                new LinkedBlockingQueue<Runnable>()));
+}
+
+public ThreadPoolExecutor(int corePoolSize,
+                              int maximumPoolSize,
+                              long keepAliveTime,   //线程干完后休眠多长时间
+                              TimeUnit unit,
+                              BlockingQueue<Runnable> workQueue)
+
+
+线程资源必须通过线程池提供，不允许应用中自行显示创建线程。线程创建开销大
+
+线程池不允许使用Executors去创建，通过ThreadPoolExecutor的方式，明确拒绝方式
+    FixedTheadPool和SingleTheadPool;允许请求队列长度对Integer.MAX_VALUE,堆积大量请求，导致OOM
+    CacheTheadPool和ScheduledThreadPool;允许创建线程数对Integer.MAX_VALUE,导致OOM
 

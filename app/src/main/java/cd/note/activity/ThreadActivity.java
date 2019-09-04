@@ -7,8 +7,16 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.HashMap;
 import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletionService;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -174,7 +182,6 @@ public class ThreadActivity extends AppCompatActivity {
     }
 
     private void spinUnlock() {
-
         Thread thread = Thread.currentThread();
         spinLock.compareAndSet(thread, null);
     }
@@ -346,6 +353,63 @@ public class ThreadActivity extends AppCompatActivity {
                 }
             },"车"+i).start();   //code从1开始
         }
+    }
+
+    public void callable_feature(View view) {
+        //Callable and FeatureTask
+        AtomicInteger aaa= new AtomicInteger(444);
+        Callable callable = (Callable<Integer>) () -> {LogUtil.d("Enter callable");return aaa.incrementAndGet();};
+        FutureTask futureTask = new FutureTask<Integer>(callable);
+        FutureTask futureTask1 = new FutureTask<Integer>(callable);
+        new Thread(futureTask).start();
+//        new Thread(futureTask).start(); //不会执行两次相同的task
+        new Thread(futureTask1).start();
+
+//        while (!futureTask.isDone()){
+//
+//        }
+        try {
+            LogUtil.d("futureTask.get()="+futureTask.get());
+            LogUtil.d("futureTask1.get()="+futureTask1.get());
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+
+        AtomicInteger bbb= new AtomicInteger(555);
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        Future feature = executorService.submit(() -> bbb.incrementAndGet());
+        feature = executorService.submit(() -> bbb.incrementAndGet());
+        executorService.
+        try {
+            LogUtil.d("feature.get()="+feature.get());
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        executorService = Executors.newCachedThreadPool();
+        CompletionService completionService = new ExecutorCompletionService(executorService);
+        for(int i=0;i<5;i++){
+            int finalI = i;
+            completionService.submit(()->finalI);
+        }
+        for(int i=0;i<5;i++){
+            try {
+                LogUtil.d("completionService.take().get()="+completionService.take().get());        //按完成顺序排序
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        Executors.newFixedThreadPool()
+        Executors.newCachedThreadPool()
+        Executors.newSingleThreadExecutor()
     }
 
     private class MuchCond{

@@ -12,7 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="visibility"
-        android:text="visibility" />
+        android:text="可见性" />
 
     <Button
         android:layout_width="wrap_content"
@@ -31,43 +31,49 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="readwritelock"
-        android:text="readwritelock" />
+        android:text="读写锁" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="spinlock"
-        android:text="spinlock" />
+        android:text="子旋锁" />
 
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="countdownlatch"
-        android:text="countdownlatch" />
+        android:text="减数器" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="cyclicbarrier"
-        android:text="cyclicbarrier" />
+        android:text="加数器" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="semaphone"
-        android:text="semaphone" />
+        android:text="信号量" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="prodConsumer"
-        android:text="prodConsumer" />
+        android:text="生产消费" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="muchcond"
-        android:text="muchcond" />
+        android:text="多条件控制" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="callable_feature"
+        android:text="带返回值的多线程" />
 
 </LinearLayout>
