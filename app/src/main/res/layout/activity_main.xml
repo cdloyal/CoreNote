@@ -32,4 +32,10 @@
         android:onClick="Thread"
         android:text="Thread" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="jvm"
+        android:text="jvm" />
+
 </LinearLayout>

@@ -18,7 +18,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Condition;
@@ -382,7 +385,7 @@ public class ThreadActivity extends AppCompatActivity {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         Future feature = executorService.submit(() -> bbb.incrementAndGet());
         feature = executorService.submit(() -> bbb.incrementAndGet());
-        executorService.
+
         try {
             LogUtil.d("feature.get()="+feature.get());
         } catch (ExecutionException e) {
@@ -407,9 +410,94 @@ public class ThreadActivity extends AppCompatActivity {
             }
         }
 
-        Executors.newFixedThreadPool()
-        Executors.newCachedThreadPool()
-        Executors.newSingleThreadExecutor()
+    }
+
+    public void Executors(View view) {
+        //通过ThreadPoolExecutor示例线程池，明确核心线程数，最大线程数，线程执行完的等待时间，线程生产工厂、拒绝策略
+
+
+
+        ExecutorService service = new ThreadPoolExecutor(
+                2,
+                5,
+                1,
+                TimeUnit.SECONDS,
+                new LinkedBlockingQueue<>(3),
+                Executors.defaultThreadFactory(),
+//                new ThreadPoolExecutor.AbortPolicy());  //任务数大于8，抛出异常java.util.concurrent.RejectedExecutionException
+//                new ThreadPoolExecutor.CallerRunsPolicy());  //任务数大于8，交给调用者执行
+//                new ThreadPoolExecutor.DiscardOldestPolicy());  //任务数大于8，抛弃等待时间最长的
+                new ThreadPoolExecutor.DiscardPolicy());  //任务数大于8，抛弃刚来的
+
+        CompletionService completionService = new ExecutorCompletionService(service);
+        for (int i=0;i<12;i++){
+            int finalI = i;
+            completionService.submit(new Callable<Integer>() {
+                @Override
+                public Integer call() throws Exception {
+                    LogUtil.d("Thread "+Thread.currentThread().getName()+" come in thread");
+                    return finalI;
+                }
+            });
+        }
+    }
+
+    public void deadLock(View view) {
+        ExecutorService service = new ThreadPoolExecutor(
+                2,
+                2,
+                0,
+                TimeUnit.MILLISECONDS,
+                new LinkedBlockingQueue<>(2),
+                Executors.defaultThreadFactory(),
+                new ThreadPoolExecutor.CallerRunsPolicy());
+//        ReentrantLock lock1 = new ReentrantLock();
+//        ReentrantLock lock2 = new ReentrantLock();
+        String s1 = "s1";
+        String s2 = "s2";
+        Callable callable1 = new Callable<Integer>(){
+            @Override
+            public Integer call() throws Exception {
+//                lock1.lock();
+//                LogUtil.d("Thread "+Thread.currentThread().getName()+" lock1");
+//                Thread.sleep(300);  //等待线程2上锁
+//                lock2.lock();
+//                LogUtil.d("Thread "+Thread.currentThread().getName()+" lock2");
+//                lock2.unlock();
+//                lock1.unlock();
+                synchronized (s1){
+                    LogUtil.d("Thread "+Thread.currentThread().getName()+" lock1");
+                    Thread.sleep(300);  //等待线程2上锁
+                    synchronized (s2){
+                        LogUtil.d("Thread "+Thread.currentThread().getName()+" lock2");
+                    }
+                }
+
+                return 1;
+            }
+        };
+        Callable callable2 = new Callable<Integer>(){
+            @Override
+            public Integer call() throws Exception {
+//                lock2.lock();
+//                LogUtil.d("Thread "+Thread.currentThread().getName()+" lock2");
+//                Thread.sleep(300);  //等待线程1上锁
+//                lock1.lock();
+//                LogUtil.d("Thread "+Thread.currentThread().getName()+" lock1");
+//                lock1.unlock();
+//                lock2.unlock();
+                synchronized (s2){
+                    LogUtil.d("Thread "+Thread.currentThread().getName()+" lock2");
+                    Thread.sleep(300);  //等待线程2上锁
+                    synchronized (s1){
+                        LogUtil.d("Thread "+Thread.currentThread().getName()+" lock1");
+                    }
+                }
+                return 2;
+            }
+        };
+        service.submit(callable1);
+        service.submit(callable2);
     }
 
     private class MuchCond{
