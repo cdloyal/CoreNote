@@ -11,7 +11,7 @@ import java.lang.ref.WeakReference;
 import cd.libcorenote.LogUtil;
 import cd.note.R;
 
-public class JVM extends AppCompatActivity {
+public class JvmActivity extends AppCompatActivity {
 
     private static MyJvm myJvm = new MyJvm();
 

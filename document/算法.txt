@@ -622,7 +622,13 @@ CPU空闲的时候自动进行回收
 标记清除：标记需要回收的对象，同一回收，垃圾碎片，效率低
 复制算法：分成两块空间，一块空间满了之后，将存活的对象拷贝到另一块空间，同意清除，浪费空间
 标记整理：标记清除后，进行排列整理
-分代收集：新生区（eden、survivor0、survivor1）区--复制算法；老年代--标记清除、标记整理；永久代存放静态文件，java类、方法等、元空间
+分代收集：新生区（eden、survivor0、survivor1）区--复制算法；老年代--标记清除、标记整理；
+          永久代存放静态文件，java类、方法等,在虚拟机中
+          元空间并不在虚拟机中，而是在本地内存中，大小受本地内存影响
+            虚拟机加载的类信息
+            常量池
+            静态变量
+            即时编译后的代码
 
 jvm的参数类型
     标配参数    java -version java --help
@@ -656,6 +662,29 @@ https://blog.csdn.net/junjunba2689/article/details/80601729
 弱引用：当你想引用一个对象，但是这个对象有自己的生命周期，你不想介入这个对象的生命周期，这时候你就是用弱引用。
     我们在handler、runnable已经用过了
 
+
+-Xms 为jvm启动时分配的内存，比如-Xms200m，表示分配200M
+
+-Xmx 为jvm运行过程中分配的最大内存，比如-Xms500m，表示jvm进程最多只能够占用500M内存
+
+-Xss 为jvm启动的每个线程分配的内存大小，默认JDK1.4中是256K，JDK1.5+中是1M
+
+=====================================================OOM=========================================================
+cd.note.activity.OomActivity
+
+Error、Exception
+
+java.lang.StackOverflowError  栈溢出异常，中断，递归要用的栈保存现场，有可能栈异常
+
+java.lang.OutOfMemoryError:lava heap space  堆内存溢出
+
+java.lang.OutOfMemoryError:GC overhead limit exceeded   超过98%的时间都在GC回收，并且回收不到2%的堆内存
+
+java.lang.OutOfMemoryError:Direct buffer memory  NIO程序经常使用ByteBuffer来读取写入本地数据。本地内存溢出异常
+
+java.lang.OutOfMemoryError:unable to create new native thread
+
+java.lang.OutOfMemoryError:Metaspace
 
 
 

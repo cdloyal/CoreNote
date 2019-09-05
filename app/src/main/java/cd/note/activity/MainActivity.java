@@ -42,6 +42,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void jvm(View view) {
-        startActivity(new Intent(this,JVM.class));
+        startActivity(new Intent(this, JvmActivity.class));
+    }
+
+
+    public void oom(View view) {
+        startActivity(new Intent(this,OomActivity.class));
     }
 }

@@ -14,7 +14,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".activity.JVM"></activity>
+        <activity android:name=".activity.OomActivity"></activity>
+        <activity android:name=".activity.JvmActivity" />
         <activity android:name=".activity.ThreadActivity" />
         <activity android:name=".activity.HandlerActivity" />
         <activity android:name=".activity.TestActivity" />
