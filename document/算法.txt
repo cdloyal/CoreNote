@@ -630,6 +630,17 @@ CPU空闲的时候自动进行回收
             静态变量
             即时编译后的代码
 
+垃圾回收器
+    没有完整的收集器，更加没有万能收集器，只是针对具体应用最合适的收集器，合适的分代收集器
+    Serial:串行，为单线程环境设计且只使用一个线程进行垃圾回收，会暂停所有的用户线程。
+    Parallel:并行，多个垃圾收集线程并行工作，此时用户线程是暂停的，适用于科学计算/大数据处理首台处理等弱交换场景
+    CMS:并发，用户线程和垃圾收集同时执行，不一定并行，可能交替执行，不需要停顿
+    G1:java8，将堆内存分割成不同的区域然后并发的对垃圾进行回收
+
+    查看默认垃圾回收器
+    java -xx:+PrintCommandLineFlags -version
+
+
 jvm的参数类型
     标配参数    java -version java --help
     x参数
@@ -687,5 +698,253 @@ java.lang.OutOfMemoryError:unable to create new native thread
 java.lang.OutOfMemoryError:Metaspace
 
 
+
+=====================================================Linux=========================================================
+ps -ef|grep java
+pidstat -u 1 -p [pid]   每1秒查看pid的CPU使用状况
+pidstat -r 1 -p [pid]   每1秒查看pid的内存使用状况
+pidstat -d 1 -p [pid]   每1秒查看pid的内存使用状况
+
+整机：top、uptime精简版
+    load average    系统负载均衡值，三个值分别系统的1分钟、5分钟、15分钟，三个值相加/3 * 100% > 60%， 负载压力大
+    Cpu(s),按键盘e，CPU(e)，查看各个CPU的评价负载
+    看各个进程的CPU，MEM
+CPU：vmstat、mpstat
+    vmstat -n 2 3   //没2秒查看一次，查看3次
+    procs -----------memory---------- ---swap-- -----io---- -system-- ----cpu----
+     r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa
+     1  0      0 772804  41964 175320    0   32     5   143   22   14  0  0 99  0
+     0  0      0 772796  41964 175320    0    0     0     0   24   14  0  0 100  0
+     0  0      0 772796  41964 175320    0    0     0     0   22   15  0  0 100  0
+    r:运行等待CPU时间片的进程数，原则上整个系统运行队列不能超过总核数的2倍，否则代表系统压力过大
+    b:等待资源的进程数
+    us:用户经常消耗CPU时间百分比，us值长期大于50%，用户进程消耗CPU时间过多，优化程序
+    sy:内核进程消耗CPU时间百分比
+        us+sy>80%，可能内存不足
+    id:idle值，CPU空闲率
+
+    mpstat -p ALL 2
+    Linux 2.6.18-164.el5 (server.sys.com)    01/04/2010
+    09:34:20 PM CPU   %user   %nice    %sys %iowait    %irq   %soft %steal   %idle    intr/s
+    09:34:22 PM all    0.00    0.00    0.00    0.00    0.00    0.00    0.00 100.00   1001.49
+    09:34:22 PM    0    0.00    0.00    0.50    0.00    0.00    0.00    0.00   99.50
+
+内存：free
+    free -m
+
+硬盘：df
+    df -h
+
+磁盘IO：iostat
+    iostat  -xdk 2 3
+    %util列每秒钟百分几的时间用于I/O操作，接近100%，需要优化
+
+网络IO：ifstat
+    ifstat 1
+    观察各个网卡的in\out
+    负载情况
+    读写是否正常
+
+
+top找出CPU占比最高的
+ps -ef或者jps进一步等我哪个程序
+定位到具体线程或代码，strace/  ps -mp [pid] -o THREAD,tid,time
+将上面的tid转换为16进制格式数
+jstack [pid] | grep tid -A60
+
+
+=====================================================Github=========================================================
+1、查找优秀开源框架
+    watch:持续收到项目动态
+    fork：复制某个项目到自己的Github仓库
+    star：点赞
+    clone：下载到本地
+    follow：关注感兴趣的作者
+
+    xxx关键字 in:name/in:description/in:readme 组合in:description,readme
+
+    [xxx] stars:>/:<=   100..200    100到200之间
+
+    [xxx] forks:>/:<=
+
+    awesome [xxx]
+
+    高亮文件某一行，1行--url后跟#L数字，多行--url后跟#L数字-L数字2
+
+    项目内搜索，英文t，出现源代码文件列表
+
+    搜索某个地区内的大佬
+        location:beijing
+        language:java
+
+=====================================================OKHttp=========================================================
+支持HTTP2/SPDY黑科技
+socket自动选择最好路线，并支持自动重连
+拥有自动维护的socket连接池，减少握手次数
+拥有队列线程池，轻松写并发
+拥有Interceptors截获器轻松处理请求与相应（比如GZIP压缩，转换）
+基于Headers的缓存策略
+
+SPDY
+    是google开发的基于传输控制协议(TCP)的应用层协议，SPDY协议旨在通过压缩、多路复用和优先级来缩短网页的加载时间和提高安全性
+    SPDY和HTTP关系，SPDY协议只是在性能上对HTTP做了很大的优化，核心思想是尽量减少连接个数，而对http语义并没有做太大修改。
+    SPDY使用了HTTP的方法和页尾，但是删除了一些头并重写了HTTP中管理连接和数据转移格式的部分，兼容HTTP。
+    多路复用 请求优化
+    支持服务器推送技术
+    SPDY压缩了HTTP头        --舍弃了一些不必要的头信息，经过压缩之后可以节省多余数据传输带来的等待时间和宽带
+    强制使用ssl传输协议     ssl加密
+
+
+client:应用层
+    ConnectionPool:client连接池、Dispatcher:Dispatcher分发器、Call:Client、Interceptors截获器
+
+engine:业务逻辑层
+    sendRequest:engine，readRespone:engine,routeSelector:engine路线选择器
+
+stream:链路层
+    connection:Connection连接、HttpSteam:Steam流、StreamAllocation:Stream流分配
+
+应用层
+构造Request请求 Request,Call
+请求方式同步exceute，异步enqueue?
+同步：加入Dispatch分发器中
+异步：加入runningCall
+创建截获器ApplicationInterceptorChain，对请求进行压缩、修改编码等处理
+
+业务逻辑层
+数据缓存：
+    缓存数据没有过期，直接使用缓存
+    缓存过期，先用过期的，然后再去网络请求数据，并更改本地数据
+    缓存数据没有，去网络直接获取
+底层使用连接池
+路线选择器
+网络截获器可以有多个
+
+链路层
+    底层是socket
+
+
+=====================================================RecycleView====================================================
+RecycleView替代listview、gridview
+
+
+=====================================================Gridle=========================================================
+图片加载框架
+Gridle
+    使用简单
+    可配置度高，自适应程度高
+    支持常用图片格式Jpg png gif webp
+    支持多种数据源，网络、本地、资源、assets
+    高速缓存策略，支持Memory和disk图片缓存，默认Bitmap格式采样RGB_565内存使用至少减少一般
+    生命周期继承，根据Activity/Fragment生命周期自动管理请求
+    高效处理bitmap，使用Bitmap Pool使得Bitmap复用，主动recycle回收需要回收的Bitmap,减少系统压力
+
+.with(Context); //内部使用了ApplicationContext，不受Activity/Fragment生命周期影响
+.with(Activity);
+.with(FragmentActivity);
+.with(app.Fragment);
+.with(v4.Fragment);
+
+.load(filePath)
+.load("file:///android_asset/f.jpg")    assets资源
+.load("Android.resource://com.frank.glide/raw/raw_1")或者.load("Android.resource://com.frank.glide/raw/"+R.raw.)
+.load("Android.resource://com.frank.glide/drawable/dr")或者.load("Android.resource://com.frank.glide/drawable/"+R.drawable.)
+.load("content://media/external/images/media/138465")
+.load("http://...")
+.load("https://...")
+不只是String类型
+
+重要功能
+    禁止内存缓存：.skipMemoryCache(true)
+    清除内存缓存：.get(context).clearMemory() Ui线程
+    禁止磁盘缓存：.diskCacheStrategy(DiskCacheStrategy.NONE)
+    清除磁盘缓存：.get(context).cleardiskCache()   后台线程，结合清除内存缓存使用，
+    获取缓存大小：new GetDiakCacheSizeTask(textView).execute(new File(getCacheDir()),DiskCache.Factory.DEFAULT_DISK_CACHE_DIR)
+    资源加载的优先顺序：.priority(Priority.HIGH)、.priority(Priority.LOW)
+    缩略图：.thumbnail(0.1f)，先显示0.1倍，   .thumbnail(DrawableRequestBuilder)
+    对图片进行裁剪、模糊、滤镜等处理
+    请求状态监听
+    下载进度监听
+
+
+=====================================================多渠道打包=========================================================
+打包就是根据签名和其它标识生成安装包
+
+签名：
+    在APK中保存一个特别字符串
+    标识不同的应用开发者
+    一个应用开发者开发的多款应用使用同一个签名
+
+为什么要签名？
+    系统要求
+    不同开发者开发的应用包名可能会相同，导致一个应用覆盖另一个应用,加入签名后会安装不成功提示签名不一样
+        签名文件不能不见了啊，不见了只能重新签名，应用市场排行变成0
+
+
+默认签名：debug.keystore，不同电脑的debug.keystore不同，这是为什么换了电脑重新卸载安装
+Eclipse生成：xxx.keystore，
+android生成：xxx.jks
+
+签名文件：
+    签名密码、Alias别名、Alias密码、有效期、
+    签名文件信息（name、组织、部门、国家、城市）
+
+
+多渠道打包
+   在安装包中添加渠道信息channel，对应不同的渠道
+
+为什么要多渠道打包
+   在安装包中添加渠道信息channel，应用在请求网络的时候携带渠道信息，方便后台做运营统计
+
+多渠道打包原理
+    一般来说，这个渠道标识放在AndroidManifest.xml的Application的一个Metadata。通过api获取这个变量
+
+如何实现
+友盟
+        gradle--productFlavors--AndroidManifest.xml引用--java获取--返回给服务器、
+
+        productFlavors{
+            wandoujia{
+            //manifestplaceholders = [UMENG_CHANNEL_VALUE: "wandoujia"]
+            }
+            xiaomi{}
+
+            productFlavors.all{ flavor ->
+                flavor.manifestplaceholders = [UMENG_CHANNEL_VALUE: name]
+            }
+
+            applicationVariants.all{ variant ->
+                variant.outputs.each { output ->
+                    def outputFile = output.outputFile
+                    if(outputFile !=null && outputFile.name.endsWith('.apk')){
+                        def fileName = outputFile.name.replace(".apk","-${defaultConfig.versionName}.apk")
+                        output.outputFile = new File(outputFile.parent,fileName);
+                    }
+                }
+            }
+        }
+
+        <meta-data
+            android:name="UMENG_CHANNEL"
+            android:value="${UMENG_CHANNEL_VALUE}"
+        />
+
+        java -- getChannnel(){}
+
+ 美团
+    把Android应用当作zip解压，在签名生成的目录下META-INF添加一个空文件，文件名就是渠道名
+    缺点：google修改规则
+         不法渠道商通过网络劫持和篡改的组合方式来获取暴利
+    工具：MultiChannelBuildTool.py
+
+360
+    zip文件可以添加comment(摘要)的数据结构特点，在文件末尾写入任意数据，而不用重新解压zip文件
+    邀请码，分享信息
+
+    MCPTool.bat
+
+
+
+https://blog.csdn.net/TellH/article/details/71534704
 
 

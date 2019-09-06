@@ -29,6 +29,8 @@ public class JvmActivity extends AppCompatActivity {
 
     }
 
+
+
     static class MyJvm{
         public int test;
     }
