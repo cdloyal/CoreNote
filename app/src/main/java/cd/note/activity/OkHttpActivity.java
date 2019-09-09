@@ -2,10 +2,16 @@ package cd.note.activity;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import cd.note.R;
 import io.reactivex.Observable;
@@ -14,11 +20,17 @@ import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import okhttp3.Cache;
+import okhttp3.Headers;
+import okhttp3.HttpUrl;
+import okhttp3.Interceptor;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
+import okio.Buffer;
 
 /**
  * @Description: java类作用描述
@@ -140,6 +152,148 @@ public class OkHttpActivity extends Activity implements View.OnClickListener {
                 .build();
         Response response = client.newCall(request).execute();
         return response.body().string();
+    }
+
+    public void cacheTimeoutInterceptor(){
+        Cache cache = new Cache(this.getCacheDir(),10*1024*1024);
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .addInterceptor(new myInterceptor(3))
+//                .retryOnConnectionFailure(true)//默认重试一次，若需要重试N次，则要实现拦截器。
+                .addNetworkInterceptor(new myNetworkInterceptor(20))
+                .cache(cache)
+                .connectTimeout(10, TimeUnit.SECONDS)
+                .readTimeout(20, TimeUnit.SECONDS)
+                .writeTimeout(20, TimeUnit.SECONDS)
+                .build();
+    }
+
+    class myNetworkInterceptor implements Interceptor{
+
+        private int maxCacheTimeSecond = 0;
+
+        public myNetworkInterceptor(int maxCacheTimeSecond) {
+            this.maxCacheTimeSecond = maxCacheTimeSecond;
+        }
+
+        @NotNull
+        @Override
+        public Response intercept(@NotNull Chain chain) throws IOException {
+            /**
+             * 设置在有网络的情况下的缓存时间
+             *  在有网络的时候，会优先获取缓存
+             * 通过：addNetworkInterceptor 设置
+             */
+            Request request = chain.request();
+            Response originalResponse = chain.proceed(request);
+            return originalResponse.newBuilder()
+                    .removeHeader("Pragma")// 清除头信息，因为服务器如果不支持，会返回一些干扰信息，不清除下面无法生效
+                    .removeHeader("Cache-Control")
+                    .header("Cache-Control", "public, max-age=" + maxCacheTimeSecond)
+                    .build();
+
+        }
+    }
+
+    class myInterceptor implements Interceptor{
+        public int maxRetry;//最大重试次数
+        private int retryNum = 0;//假如设置为3次重试的话，则最大可能请求4次（默认1次+3次重试）
+
+        public myInterceptor(int maxRetry) {
+            this.maxRetry = maxRetry;
+        }
+
+        @NotNull
+        @Override
+        public Response intercept(@NotNull Chain chain) throws IOException {
+            Request request = chain.request();
+
+            //设置没有网络的情况下，缓存时间
+//            if (!NetworkUtils.isConnected(applicationContext)) {
+//                CacheControl tempCacheControl = new CacheControl.Builder()
+//                        .onlyIfCached()
+//                        .maxStale(maxCacheTimeSecond, TimeUnit.SECONDS)
+//                        .build();
+//                request = request.newBuilder()
+//                        .cacheControl(tempCacheControl)
+//                        .build();
+//            }
+
+            //http://127.0.0.1/test/upload/img?userName=xiaoming&userPassword=12345
+            StringBuffer sb = new StringBuffer();
+            String newUrl;
+
+            //URL重定向
+            HttpUrl httpUrl = request.url();
+            String scheme = httpUrl.scheme();
+            String host = httpUrl.host();            //127.0.0.1
+            String path = httpUrl.encodedPath();    //  /test/upload/img
+            String query = httpUrl.encodedQuery();  //  userName=xiaoming&userPassword=12345
+            sb.setLength(0);
+            newUrl = sb.append(scheme).append(host).append(path).append("?").append(query).toString();
+
+            //加密数据
+            Set<String> queqyList = httpUrl.queryParameterNames();
+            Iterator iterator = queqyList.iterator();
+            sb.setLength(0);
+            sb.append(scheme).append(host).append(path).append("?");
+            for(int i=0;i<queqyList.size();i++){
+                String name = (String) iterator.next();
+                String value = httpUrl.queryParameter(name);
+                String newValue = value + 1;    //加密新数据
+                sb.append(name).append("=").append(newValue);
+                if(iterator.hasNext()){
+                    sb.append("&");
+                }
+            }
+            RequestBody body = request.body();
+            Buffer buffer = new Buffer();
+            body.writeTo(buffer);
+            String s = buffer.readUtf8();
+            //Gson to Java bean
+            //Java bean 字段加密
+            //Java bean to Gson
+            RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"),s);
+
+            Request.Builder build = request.newBuilder()
+                    .post(requestBody)
+                    .url(newUrl);
+
+            //Head动态添加
+            switch (path){
+                case "/test/upload/img":
+                    build.addHeader("token","token");
+                break;
+            }
+
+
+            //增加日志
+            Response response = chain.proceed(build.build());
+            if (response != null) {
+                ResponseBody responseBody = response.body();
+                long contentLength = responseBody.contentLength();
+                String bodySize = contentLength != -1 ? contentLength + "-byte" : "unknown-length";
+
+                Log.e("chenda",response.code() + ' '
+                        + response.message() + ' '
+                        + response.request().url()+' '
+                        + bodySize
+                );
+
+                Headers headers = response.headers();
+                for (int i = 0, count = headers.size(); i < count; i++) {
+                    Log.e("chenda",headers.name(i) + ": " + headers.value(i));
+                }
+            }
+
+            //重试
+//            while (!response.isSuccessful() && retryNum < maxRetry) {
+//                retryNum++;
+//                Log.i("Retry","num:"+retryNum);
+//                response = chain.proceed(request);
+//            }
+
+            return response;
+        }
     }
 
 
