@@ -9,10 +9,18 @@
     tools:context=".activity.MainActivity">
 
     <Button
+
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="test"
         android:text="test" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="uiTest"
+        android:text="uiTest" />
+
 
     <Button
         android:layout_width="wrap_content"

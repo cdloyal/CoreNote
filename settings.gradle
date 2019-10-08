@@ -1,1 +1,1 @@
-include ':app', ':libcorenote'
+include ':app', ':libcorenote', ':myapplication'

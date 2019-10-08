@@ -1,7 +1,6 @@
 CoreNote项目是一个用来学习的项目，包含设计模式、数据结构、算法、以及java特性等等知识
 
 
-
 =================================================多线程==================================================
 线程状态
 create--可运行--获得锁、获得CPU时间片段运行态--终止
@@ -511,6 +510,9 @@ CPU空闲的时候自动进行回收
 ​            静态变量
 ​            即时编译后的代码
 
+当存活对象比较多，内存碎片少，使用标记清除
+当存活对象比较少，内存碎片多，使用标记整理或者复制算法
+
 垃圾回收器
 ​    没有完整的收集器，更加没有万能收集器，只是针对具体应用最合适的收集器，合适的分代收集器
 ​    Serial:串行，为单线程环境设计且只使用一个线程进行垃圾回收，会暂停所有的用户线程。
@@ -922,13 +924,13 @@ RADIX-SORT(A)
 
 1、省略findViewById
 Activity:
-@InjectView(R.id.xxx)
+@BindView(R.id.xxx)
 TextView mTextView;     //不能用static，private修饰
 布局设置好之后调用
 ButterKnife.inject(this)
 
 Fragment
-@InjectView(R.id.xxx)
+@BindView(R.id.xxx)
 TextView mTextView;     //不能用static，private修饰
 View view = View.inflate(R.layout.simple,container,false);
 BufferKnife.inject(this,view);
@@ -951,5 +953,386 @@ void xxx(View v){}
 
 4、@OnClick{R.id.xxx、R.id.yyy}
 void xxx(View v){}  //同一个处理函数
+
+
+=================================================屏幕适配方案=============================================
+一个是 代码是否规定了横竖屏
+一个是 我们现在手机是否横竖屏
+
+
+https://blog.csdn.net/u010349644/article/details/83619912
+
+dpi:像素密度，单位尺寸的像素数
+dpi=总px/尺寸
+
+dp:与像素密度无关的尺寸
+px=dp*(dpi/160)=dp*(总px/(尺寸*160))
+
+dp=px*尺寸*160/总px
+
+总dp=总px*160/dpi=尺寸*160
+
+我们设置控件的dp值
+    dpi相同，计算出px越大，屏幕尺寸越大，控件占的位置越大
+    屏幕尺寸相同，dpi越大，计算出的px越大，但是控件占的位置一样，但是
+
+设备 A ， 屏幕宽度为 720px， dpi为160，则屏幕总dp为 720/(160/160) = 720 dp
+设备 B ， 屏幕宽度为 720px， dpi为320，则屏幕总dp为 720/(320/160) = 360 dp
+
+
+============================================  反射&字节码操作  =======================================
+B站
+
+动态语言
+    程序运行时，可以改变程序结构或者变量类型
+    Python、ruby、javascript等
+        function test(){
+            var s = "var a=3;var b=5;alert(a+b);"
+            eval(s);
+        }
+
+    java不是动态语言，但有一定动态型，反射机制、字节码操作获得类似动态语言的特性
+
+反射机制 reflection
+    通过字符串加载一个类，动态获取处理类信息（类名、属性、方法、构造器），构造对象、调用类的任意方法、构造器
+    获取泛型信息、处理注解
+    我们自定义的类，怎么加载到内存？
+    一个类被加载后，JVM通过Class.forName(String)将一个类的类信息封装成一个Class对象，通过这个class对象
+    可以获取类的所有类结构信息
+    一个类只会被加载一个，多次加载的class对象hashcode一样
+
+    Class.forName(String ClassName)
+    object.getClass()
+    Object.class
+
+    class.getName()/class.getSimpleName()
+    class.getField(fieldName)/class.getFields()                   获得public属性
+    class.getDeclaredField(fieldName)/class.getDeclaredFields()   获得所有属性
+    class.getMethod(MethodName,String.class...)/class.getMethods()   实例参数类型String.class
+    class.getDeclaredMethod(MethodName,String.class...)/class.getDeclaredMethods()
+    class.getConstructor(String.class...)/class.getConstructors()   实例参数类型String.class
+    class.getDeclaredConstructor(String.class...)/class.getDeclaredConstructors()
+
+    Class<User> clazz = (Class<User>)Class.forName(String ClassName);
+    User user = clazz.newInstance();    //无参构造方法
+
+    Constructor<Student> constructor = clazz.getDeclaredConstructor(int.class,String.class,int.class);
+    Student student = constructor.newInstance(1,"chenda",26);
+
+    Method method = clazz.getDeclaredMethod("setName",String.class);
+    method.invoke(student,"chendada");
+
+    Field field = clazz.getDeclaredField("age");
+    field.setAccessible(true);
+    field.set(student,18);      //报错，不能这样修改私有属性,加上上面一句才可以
+    Log.d(TAG,"student.getAge()="+field.get(student));
+
+    setAccessible(boolean); //启用/禁用访问安全检查的开关，禁用后效率更高
+
+    //通过反射获得泛型实际类型，获得方法，获得方法的所有参数类型，获得参数化类型中的实际参数类型
+    https://blog.csdn.net/fxl5202301/article/details/85291493
+    泛型
+        ParameterizedType   参数化类型 Collection<String>
+        GenericArrayType    表示一种元素类型的是参数化类型或者类型变量的数组类型
+        TypeVariable        各种类型变量的公共父接口
+        WildcardType        一种通配符类型表达式 ?、? extends Number、? super Integer
+
+
+动态编译
+    1、Runtime启动新的进程操作
+        Runtime run = Runtime.getRuntime();
+        Process p = run.exec("javac -cp d:/myjava/ helloworld.java");
+
+    2、通过JavaCompiler动态编译
+        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        int ret = compiler.run(null,null,null,"d:/myjava/helloworld.java");
+        运行方式一
+        Runtime run = Runtime.getRuntime();
+        Process p = run.exec("java -cp d:/myjava/ helloworld");
+        InputStream in = p.getInputStream();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+        String info = "";
+        while((info=reader.readLine())!=null){
+            log.d();
+        }
+        运行方式二 URLClassLoader
+
+========================================  脚本引擎执行javascri代码  ==================================
+B站 尚学堂 脚本引擎执行javascript脚本
+
+百度
+android Rhino
+android JSBridge
+
+为什么？因为有一些javascri代码效率高很多，比如计算字符串"3+1+4-1-7+1"
+
+//java和android有些不一样
+
+java
+    ScriptEngineMananger
+
+android
+https://www.jianshu.com/p/b649c3c241a6
+
+=============================================  字节码操作  ===========================================
+运行java程序运行时新建java类或者修改java类
+BCEL
+ASM
+CGLIB
+javassist
+
+
+
+
+=================================================  注解  =============================================
+@Override   重写超类的方法
+@Deprecated 过时方法，不建议继续使用
+@SuppressWarnings(value={"deprecated","unchecked"})    压制警告
+    @Target({TYPE, FIELD, METHOD, PARAMETER, CONSTRUCTOR, LOCAL_VARIABLE})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface SuppressWarnings {
+        String[] value() default {""};   //参数名value，类型String[]
+        int id() default -1;             //-1代表不存在的意思
+    }
+
+元注解:给自定义注解使用的注解
+@Target
+    描述注解的使用范围   ElementType.
+    PACKAGE         包
+    TYPE            类、接口、枚举、Annotation类型
+    CONSTRUCTOR     描述构造器
+    FIELD           描述域
+    METHOD          描述方法
+    LOCAL_VARIABLE  描述局部方法
+    PARAMETER       描述参数
+@Retention
+    需要在什么级别保存该注解信息，描述注解的生命周期
+    SOURCE      在源文件中有效
+    CLASS       在class文件中有效
+    RUNTIME     在运行时有效，为Runtime可以被反射机制读取
+@Documented
+@Inherited
+
+反射读取注解
+ORM object relationship mapping 对象关系映射
+
+bean类--加注解--解析类--解析成创建数据表语句
+
+=================================================eventbus=============================================
+
+
+
+==============================================热修复&插件和==========================================
+class文件能够被jvm识别、加载并执行的文件格式，记录一个类文件的所有信息
+    class文件可以由java、python等语言生成
+
+生成：1、IDE帮我们build，2、javac生成
+执行：java命令
+
+class文件结构
+一种8位字节的二进制流文件
+各个数据按顺序紧密的排列，无间隙
+每个类或接口都单独占据一个class文件
+
+类型                                    数量
+u4              magic                     1                         //加密校验数据
+u2              minor_version             1                         //最小支持的jdk版本
+u2              major_version             1                         //主要支持的jdk版本
+u2              constant_pool_conunt      1                         //常量池数量
+cp_info         constant_pool             constant_pool_conunt-1    //常量池
+u2              access_flags              1                         //作用域
+u2              this_class                1                         //当前class
+u2              super_clas                1                         //父class
+u2              interfaces_count          1                         //继承的接口数量
+u2              interfaces                interfaces_count          //继承的接口数量
+u2              fields_count              1                         //成员变量
+field_info      fields                    fields_count
+u2              method_count              1                         //方法
+method_info     method                    method_count
+u2              attributes_count          1                         //类属性，注解
+attributes_info attributes                attributes_count
+
+
+access_flags
+标志名             标志值     标志含义                    针对对象
+ACC_PUBLIC         0x0001   public类型                    所有类型
+ACC_FINAL          0x0010   final类型                     类
+ACC_SUPPER         0x0020   使用心得invokespecial语义     类和接口
+ACC_INTERFACE
+ACC_ABSTRACT
+ACC_SYNTHRTIC               不由用户代码生成
+ACC_ANNOTATION
+ACC_ENUM
+
+constant_pool
+CONSTANT_Integer_info       //常量整型类型
+CONSTANT_Long_info
+CONSTANT_String_info
+CONSTANT_Class_info         //类相关信息，类相关引用的相关信息
+CONSTANT_Fieldref_info      //存储的是索引，指向field_info、method_info、attributes_info
+CONSTANT_Methodredref_info
+
+010 editor 二进制文件查看器
+
+class文件弊端
+内存占用大，不适合移动端
+堆栈的加载模式，加载速度慢
+文件IO操作多，类查找慢
+
+
+dex文件能够被DVM识别，加载并执行的文件格式
+    class文件可以由java、C\C++等语言生成
+
+生成：1、IDE帮我们build，2、dex生成        dex --dex --output Hello.dex Hello.class
+执行：dex命令
+SDK\build-tools\24.0.0\dx.bat
+dalvikvm -cp /sdcard/Hello.dex Hello
+
+dex文件记录整个工程中所有类文件信息，记住的是整个工程，class文件记录的是一个类文件信息
+class文件存在许多冗余信息，dex会取出冗余，并整合
+
+dex文件结构
+一种8位字节的二进制流文件
+各个数据按顺序紧密的排列，无间隙
+整个应用中所有java源文件都放在一个dex文件中
+
+https://blog.csdn.net/tabactivity/article/details/78950379
+
+header                  文件头
+索引区
+string_ids              字符串的索引
+type_ids                类型的索引
+proto_ids               方法原型的索引
+field_ids               域的索引
+methos_ids              方法的索引
+数据区
+class_defs              类的定义区
+data                    数据区
+link_data               链接数据区
+
+
+============================================java虚拟机========================================
+B站 Android学习 热修复与插件化
+
+java虚拟机结构解析
+
+    class文件 --> 类加载器子系统ClassLoader <-->  内存空间(方法区、java堆、java栈、本地方法栈)
+    内存空间(方法区、java堆、java栈、本地方法栈) <--> 垃圾收集器
+    内存空间(方法区、java堆、java栈、本地方法栈) <-- 指令计数器以及其它隐含寄存器 <--> 执行引擎
+    内存空间(方法区、java堆、java栈、本地方法栈) <--> 执行引擎 <--> 本地方法接口
+    内存空间(方法区、java堆、java栈、本地方法栈) <--> 本地方法接口 <-- 本地方法库
+
+javac编译流程
+源代码-词法分析器-Token流-语法分析器-语法树/抽象语法树-语义分析其-注解抽象语法树-字节码生成器-JVM字节码
+
+jvm类加载器结构
+    BootstrapClassLoader    load JRE\lib\rt.jar或者-Xbootclasspath选项指定的jar包           jdk的jar
+    ExtensionClassLoader    load JRE\lib\ext\*.jar或者-Djava.ext.path选项指定目录的jar包    jdk的jar
+    AppClassLoader          load CLASSPATH或者-Djava.class.path选项指定目录的类和jar包      app的jar
+    CustomClassLoader       通过java.lang.lassLoader的子类自定义加载class
+    自底向上检查类是否已经加载
+    自顶向下尝试加载类
+
+android的类加载器
+    BootClassLoader         加载android的framework层的字节码文件
+    PathClassLoader         加载apk中的字节码文件
+    DexClassLoader          加载自定义的字节码文件
+    BaseDexClassLoader      子类
+
+
+双亲代理模型    当要加载一个类时，会判断当前的classloader是否加载过了，加载过了直接返回；没有加载过则寻找其父类是否加载过
+类共享功能
+类加载的隔离功能    不同的classloader加载的类都认为是不同的类
+
+
+类加载流程
+loading -- > linking(Verifying-preparing-Resolving) --> Initializing
+loading：类信息从文件中获取并且载入到jvm的内存中
+Verifying：检查读入的结构是否符合jvm规范的描述
+preparing：分配一个结构用来存储类信息
+Resolving：把这个类的常量池中的所有的符合引用改变成直接引用
+Initializing：执行静态初始化程序，把静态变量初始化成指定的值
+
+jvm内存管理
+内存空间（方法区、堆区、栈区、本地方法区）
+堆区：存放的是java方法执行时的所有数据，堆区描述java方法执行的完整模型
+组成：有栈帧组成，一个栈帧代表一个方法的执行
+栈帧：每个方法从调用到执行完成就对应一个栈帧在虚拟机中从入栈到出栈
+组成：局部变量表、栈操作数、动态链接、方法出口
+本地方法栈：专为native方法服务的
+方法区：存储被虚拟机加载的类信息、常量、静态变量、即时编译器编译后等数据
+堆区：new创建的对象在堆中分配内存
+特点：是虚拟机中最大一块内存，是GC要回收的部分
+
+Dalvik与jvm的不同
+执行文件不同，一个是class，一个是dex
+类加载系统不同
+可以同时存在多个dvm
+dvm基于寄存器的，jvm基于栈的
+
+ART比Dalvik有哪些优势
+程序每次启动，DVM使用JIT来将字节码转换成机器码，再执行，效率低
+程序在安装的时候，art采用AOT预编译技术，将字节码转换成机器码保存，程序启动直接执行机器码
+ART会占用更多的安装时间和存储空间
+
+
+java的classloader
+
+Android的classloader
+
+android的动态加载比一般java程序复杂
+    有许多组件需要注册才能使用，
+    资源的动态加载很复杂
+    android不同版本对类和资源的注册加载也不同
+    原因都是android程序运行需要一个上下文环境
+
+
+热修复详解
+    动态更新apk
+    正式发布和热修复同时使用
+
+流行的热修复技术
+    QQ空间的超级补丁方案
+    微信的Tinker
+    阿里的AndFix，dexposed
+    美团的Robust，ele的migo，百度hotfix
+
+
+                Tinker  QZone   AndFix  Robust
+类替换             y       y       n       n
+So替换             y       n       n       n
+资源替换           y       y       n       n
+全平台支持         y       y       y       y
+即时生效           n       n       y       y
+性能损耗           小      大     小       小
+补丁包大小         小      大     一般     一般
+开发透明           y       y       n       n
+复杂度             低      低      高      高
+gradle支持         y       n       n       n
+Rom体积            大      小      小      小
+成功率             较高    较高    一般    最高
+
+能满足需求的条件下，找学习成本最低的。
+学习成本一样的情况下，优先选择大公司的方案。
+
+
+收集线上应用bug
+分析bug
+创建分支
+Modify code
+Test pass check in code
+Build,diff,make patch,add annotation base on diff
+Release patch, pull or push
+verify, merge code to trunk
+finish
+
+AndFix
+
+
+
+
+
+
+
 
 

@@ -8,6 +8,7 @@ import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
 
 import cd.note.R;
+import cd.note.UiAdapt.UiUtils;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -16,6 +17,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 
     }
     @Override
@@ -48,5 +50,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void oom(View view) {
         startActivity(new Intent(this,OomActivity.class));
+    }
+
+    public void uiTest(View view) {
+        startActivity(new Intent(this,UiAdapterActivity.class));
     }
 }
