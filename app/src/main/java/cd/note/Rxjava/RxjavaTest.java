@@ -112,6 +112,7 @@ public class RxjavaTest {
         String disk = "磁盘中的数据";
         String netWorkData = "网络中的数据";
 
+
         Observable<String> observable1 = Observable.create(new ObservableOnSubscribe<String>() {
             @Override
             public void subscribe(ObservableEmitter<String> emitter) throws Exception {
@@ -542,6 +543,7 @@ public class RxjavaTest {
                 .build();
         RetrofitInterface retrofitInterface = retrofit.create(RetrofitInterface.class);
         Observable<Translation> observable = retrofitInterface.getAjax("fy","auto","auto","hello world");
+
 //        Observable<Translation> observable = retrofitInterface.getAjax();
         Observer observer = new Observer<Translation>() {
             @Override
@@ -657,5 +659,11 @@ public class RxjavaTest {
                 }
             }
         });
+    }
+
+
+    private class MyObservable extends java.util.Observable{
+
+
     }
 }
