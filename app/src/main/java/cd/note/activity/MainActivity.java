@@ -8,7 +8,7 @@ import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
 
 import cd.note.R;
-import cd.note.UiAdapt.UiUtils;
+import cd.note.eventbus.MyEventBus;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -54,5 +54,14 @@ public class MainActivity extends AppCompatActivity {
 
     public void uiTest(View view) {
         startActivity(new Intent(this,UiAdapterActivity.class));
+    }
+
+
+    public void rxjava(View view) {
+        startActivity(new Intent(this,RxjavaActivity.class));
+    }
+
+    public void eventbus(View view) {
+        MyEventBus myEventBus = new MyEventBus();
     }
 }

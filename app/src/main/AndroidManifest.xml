@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="cd.note">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -12,7 +14,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".activity.UiAdapterActivity"/>
+        <activity android:name=".activity.EventBusActivity"></activity>
+        <activity
+            android:name=".activity.RxjavaActivity"
+            android:exported="true" />
+        <activity android:name=".activity.UiAdapterActivity" />
         <activity android:name=".activity.OomActivity" />
         <activity android:name=".activity.JvmActivity" />
         <activity android:name=".activity.ThreadActivity" />
@@ -29,12 +35,10 @@
 
         <meta-data
             android:name="design_width_in_dp"
-            android:value="360"/>
+            android:value="360" />
         <meta-data
             android:name="design_height_in_dp"
-            android:value="640"/>
+            android:value="640" />
     </application>
-
-    <uses-permission android:name="android.permission.INTERNET" />
 
 </manifest>

@@ -1,14 +1,14 @@
 package cd.myapplication;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
 
-import org.greenrobot.eventbus.EventBus;
+import androidx.appcompat.app.AppCompatActivity;
 
 import me.jessyan.autosize.internal.CustomAdapt;
 
 public class MainActivity extends AppCompatActivity implements CustomAdapt {
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

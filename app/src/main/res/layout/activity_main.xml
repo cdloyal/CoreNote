@@ -52,4 +52,16 @@
         android:onClick="oom"
         android:text="oom" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="rxjava"
+        android:text="rxjava" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="eventbus"
+        android:text="eventbus" />
+
 </LinearLayout>
